@@ -38,7 +38,7 @@ class MenuBar(tk.Frame):
         self.menubar.add_cascade(label='File', menu=self.file_menu)
         # Open
         self.file_menu.add_command(label='Open', accelerator='Ctrl + O',
-                compound='left', command=self.open_file)
+                compound='left', command=self.open)
         # Save
         self.file_menu.add_command(label='Save', accelerator='Ctrl + S',
                 compound='left', command=self.save)
@@ -53,7 +53,7 @@ class MenuBar(tk.Frame):
         self.about_menu = tk.Menu(self.menubar, tearoff=0)
         self.menubar.add_cascade(label='About', menu=self.about_menu)
     
-    def open_file(self, event=None):
+    def open(self, event=None):
         input_file_name = filedialog.askopenfilename(defaultextension=".json",
         filetypes=[("Configuration files", "*.json")])
         if input_file_name:
@@ -66,10 +66,10 @@ class MenuBar(tk.Frame):
                 self.json_tree = _file.read()
                 self.parent.editor.entry.insert(1.0, self.json_tree)
 
-    def save(self):
+    def save(self, event=None):
         print('save') 
 
-    def save_as(self):
+    def save_as(self, event=None):
         print('save as') 
         
 
@@ -119,8 +119,14 @@ class MainApplication(tk.Frame):
         #  self.number_block.grid(row = 3, column = 2, rowspan = 2)
 
         # bind open shortcut
-        self.parent.bind('<Control-O>', self.menubar.open_file)
-        self.parent.bind('<Control-o>', self.menubar.open_file)
+        self.parent.bind('<Control-O>', self.menubar.open)
+        self.parent.bind('<Control-o>', self.menubar.open)
+        # bind save shortcut
+        self.parent.bind('<Control-s>', self.menubar.save)
+        self.parent.bind('<Control-S>', self.menubar.save)
+        # bind save as shortcut
+        self.parent.bind('<Control-Shift-s>', self.menubar.save_as)
+        self.parent.bind('<Control-Shift-S>', self.menubar.save_as)
         # bind quit shortcut
         self.parent.bind('<Control-Q>', self.quit_editor)
         self.parent.bind('<Control-q>', self.quit_editor)
