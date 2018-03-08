@@ -1,0 +1,47 @@
+{
+  "convolutional_layer_1": {
+    "filters": 32,
+    "kernel_size": [
+      5,
+      5
+    ]
+  },
+  "convolutional_layer_2": {
+    "filters": 64,
+    "kernel_size": [
+      5,
+      5
+    ]
+  },
+  "pooling_layer_1": {
+    "stride": 2,
+    "pool_size": [
+      2,
+      2
+    ],
+    "kernel_size": [
+      5,
+      5
+    ]
+  },
+  "pooling_layer_2": {
+    "stride": 2,
+    "pool_size": [
+      2,
+      2
+    ],
+    "kernel_size": [
+      5,
+      5
+    ]
+  },
+  "padding": "\"same\"",
+  "dense_layer": {
+    "1": -1,
+    "2": 7,
+    "3": 7,
+    "4": 64,
+    "units": 1024,
+    "dropout_rate": 0.4
+  }
+}
