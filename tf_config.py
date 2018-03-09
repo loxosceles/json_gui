@@ -25,7 +25,7 @@ class FileObj(object):
         self.json_tree_dict = {} 
     
     def json_tree(self):
-        return json.dumps(self.json_tree_dict, indent=4, sort_keys=True)
+        return json.dumps(self.json_tree_dict, indent=4)
 
 class MenuBar(tk.Frame):
     def __init__(self, parent, file_obj=None, *args, **kwargs):
@@ -107,11 +107,11 @@ class KeyValueSection(tk.Frame):
             if isinstance(self.fobj.json_tree_dict[keys[0]][keys[1]], float):
                 value = float(value)
             if isinstance(self.fobj.json_tree_dict[keys[0]][keys[1]], list):
-                value = [ int(x) for x in value.split(' ') ]
+                value = [ int(x) for x in ' '.join(value.split()).split(' ') ]
+                
 
             self.fobj.json_tree_dict[keys[0]][keys[1]] = value
         except TypeError as e:
-            print(e)
             self.fobj.json_tree_dict[keys[0]] = value
 
         #print(self.fobj.json_tree_dict)
@@ -148,13 +148,10 @@ class KeyValueSection(tk.Frame):
                 for kkey, val in obj.items():
                     ttk.Label(frame, text=kkey, justify=tk.LEFT).grid(row=k, column=j, sticky='NW')
 
-                    if isinstance(val, int):
-                        value_field = tk.IntVar(frame, value=val) 
                     if isinstance(val, list):
-                        vv = str(val).strip('[]').replace(',', '')
-                        value_field = tk.StringVar(frame, value=val)
-                    if isinstance(val ,float):
-                        value_field = tk.DoubleVar(frame, value=val)
+                        val = str(val).strip('[]').replace(',', '')
+
+                    value_field = tk.StringVar(frame, value=val)
 
                     tmp = tk.Entry(frame, textvariable=value_field, justify=tk.LEFT)
                     tmp.grid(row=k+1, column=j, sticky='NW')
