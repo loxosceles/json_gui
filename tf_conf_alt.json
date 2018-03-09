@@ -1,0 +1,9 @@
+{
+  "convolutional_layer_1": {
+    "filters": 32,
+    "kernel_size": [
+      5,
+      5
+    ]
+  }
+}

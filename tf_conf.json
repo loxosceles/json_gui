@@ -35,12 +35,12 @@
       5
     ]
   },
-  "padding": "\"same\"",
+  "padding": "same",
   "dense_layer": {
-    "1": -1,
-    "2": 7,
-    "3": 7,
-    "4": 64,
+    "param_1": -1,
+    "param_2": 7,
+    "param_3": 7,
+    "param_4": 64,
     "units": 1024,
     "dropout_rate": 0.4
   }
