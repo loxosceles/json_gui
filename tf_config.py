@@ -187,10 +187,8 @@ class Editor(tk.Frame):
             self.scrollbar.config(command=self.textfield.yview)
 
     def update(self):
-        print("updating the editor")
-        #print(self.fobj.json_tree)
-        #self.entry.set(fobj.json_tree)
-
+        self.textfield.delete(1.0, tk.END)
+        self.textfield.insert(1.0, self.fobj.json_tree())
 
 class MainApplication(tk.Frame):
     def __init__(self, parent, *args, **kwargs):
