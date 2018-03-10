@@ -43,5 +43,50 @@
     "param_4": 64,
     "units": 1024,
     "dropout_rate": 0.4
+  },
+  "convolutional_layer_3": {
+    "filters": 32,
+    "kernel_size": [
+      5,
+      5
+    ]
+  },
+  "convolutional_layer_4": {
+    "filters": 64,
+    "kernel_size": [
+      5,
+      5
+    ]
+  },
+  "pooling_layer_3": {
+    "stride": 2,
+    "pool_size": [
+      2,
+      2
+    ],
+    "kernel_size": [
+      5,
+      5
+    ]
+  },
+  "pooling_layer_4": {
+    "stride": 2,
+    "pool_size": [
+      2,
+      2
+    ],
+    "kernel_size": [
+      5,
+      5
+    ]
+  },
+  "padding_": "same",
+  "dense_layer out": {
+    "param_1": -1,
+    "param_2": 7,
+    "param_3": 7,
+    "param_4": 64,
+    "units": 1024,
+    "dropout_rate": 0.4
   }
 }
