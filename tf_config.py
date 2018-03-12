@@ -28,25 +28,11 @@ class FileObj(object):
         return json.dumps(self.json_tree_dict, indent=4)
 
 class VerticalScrollFrame(ttk.Frame):
-    """A ttk frame allowing vertical scrolling only.
-    Use the '.interior' attribute to place widgets inside the scrollable frame.
-    Adapted from https://gist.github.com/EugeneBakin/76c8f9bcec5b390e45df.
-    Amendments:
-    1. Original logic for configuring the interior frame and canvas
-       scrollregion left canvas regions exposed (not suppose to) and allowed
-       vertical scrolling even when canvas height is greater than the canvas
-       required height, respectively. I have provided a new logic to
-       resolve these issues.
-    2. Provided options to configure the styles of the ttk widgets.
-    3. Tested in Python 3.5.2 (default, Nov 23 2017, 16:37:01),
-                 Python 2.7.12 (default, Dec  4 2017, 14:50:18) and
-                 [GCC 5.4.0 20160609] on linux.
-    Author: Sunbear
-    Website: https://github.com/sunbearc22
-    Created on: 2018-02-26
-    Amended on: 2018-03-01 - corrected __configure_canvas_interiorframe() logic.  
-    """
+    """ 
+    A ttk frame allowing vertical scrolling.
 
+    Use the '.interior' attribute to place widgets inside the scrollable frame.
+    """
     
     def __init__(self, parent, *args, **options):
         """
@@ -54,8 +40,6 @@ class VerticalScrollFrame(ttk.Frame):
            style, pri_background, sec_background, arrowcolor,
            mainborderwidth, interiorborderwidth, mainrelief, interiorrelief 
         """
-        # Extract key and value from **options using Python3 "pop" function:
-        #   pop(key[, default])
         style          = options.pop('style',ttk.Style())
         pri_background = options.pop('pri_background','light grey')
         sec_background = options.pop('sec_background','grey70')
@@ -89,6 +73,10 @@ class VerticalScrollFrame(ttk.Frame):
             arrowcolor=[('active',arrowcolor),('!active',arrowcolor)])
 
 
+    def _on_mousewheel(self, event):
+        self.canvas.yview_scroll(-1*(event.delta/120), "units")
+
+
     def __createWidgets(self, mainborderwidth, interiorborderwidth,
                         mainrelief, interiorrelief, pri_background):
         '''Create widgets of the scroll frame.'''
@@ -103,6 +91,11 @@ class VerticalScrollFrame(ttk.Frame):
                                 )
         self.canvas.pack(side='left', fill='both', expand='true')
         self.vscrollbar.config(command=self.canvas.yview)
+
+        # bind mouse to scrollbar
+        self.canvas.bind_all("<MouseWheel>", self._on_mousewheel)
+        self.bind("<Button-4>", self._on_mousewheel)
+        self.bind("<Button-5>", self._on_mousewheel)
 
         # reset the view
         self.canvas.xview_moveto(0)
@@ -138,12 +131,10 @@ class VerticalScrollFrame(ttk.Frame):
         
         # Set interior frame height and canvas scrollregion
         if canvasHeight > interiorReqHeight:
-            #print('canvasHeight > interiorReqHeight')
             self.canvas.itemconfigure(self.interior_id,  height=canvasHeight)
             self.canvas.config(scrollregion="0 0 {0} {1}".
                                format(canvasWidth, canvasHeight))
         else:
-            #print('canvasHeight <= interiorReqHeight')
             self.canvas.itemconfigure(self.interior_id, height=interiorReqHeight)
             self.canvas.config(scrollregion="0 0 {0} {1}".
                                format(canvasWidth, interiorReqHeight))
@@ -193,7 +184,6 @@ class MenuBar(tk.Frame):
             self.parent.editor.textfield.delete(1.0, tk.END)
 
             with open(self.fobj.name) as _file:
-                #self.fobj.json_tree = _file.read()
                 self.fobj.json_tree_dict = json.loads(_file.read())
                 self.parent.editor.textfield.insert(1.0, self.fobj.json_tree())
                 self.parent.key_value_section.update()
@@ -206,6 +196,10 @@ class MenuBar(tk.Frame):
         
 
 class KeyValueSection(tk.Frame):
+    """
+    Section where configurations can be edited.
+    """
+
     def __init__(self, parent, file_obj=None, *args, **kwargs):
         tk.Frame.__init__(self, parent, *args, **kwargs)
         self.parent = parent
@@ -213,28 +207,12 @@ class KeyValueSection(tk.Frame):
         self.rowconfigure(0, weight=1)
         self.columnconfigure(0, weight=1)
         
-        #  self.frame = VerticalScrollFrame(self)
-        #  self.frame.grid()
-        BG0 = '#aabfe0' #Blue scheme
-        BG1 = '#4e88e5' #Blue scheme
-        self.scroll_frame = VerticalScrollFrame(self,
-                #  pri_background=BG1,
-                #  sec_background=BG0,
-                #  arrowcolor='white',
-                #  mainborderwidth=10,
-                interiorborderwidth=2,
-                #  mainrelief='raised',
-                #  interiorrelief='sunken'
-            )
-        self.scroll_frame.grid(row=0, column=0, sticky='nsew')
-
-        
     def save_field(self, event, keys):
         value = event.widget.get() 
         print(keys[0])
         print(keys[1])
         print(value)
-        # print(self.fobj.json_tree)
+
         try:
             if isinstance(self.fobj.json_tree_dict[keys[0]][keys[1]], int):
                 value = int(value)
@@ -247,14 +225,21 @@ class KeyValueSection(tk.Frame):
             self.fobj.json_tree_dict[keys[0]][keys[1]] = value
         except TypeError as e:
             self.fobj.json_tree_dict[keys[0]] = value
-#print(self.fobj.json_tree_dict)
         self.parent.editor.update()
 
+    def __accomodate_rows(self, j, k):
+        if j < 1:
+            j += 1
+            return j, k
+        else:
+            k +=2
+            return 0, k
 
-    def createWidgets(self, BG0, BG1):
+
+    def update(self):
         self.frame = VerticalScrollFrame(self,
-                                        #  pri_background=BG1,
-                                        #  sec_background=BG0,
+                                        #  pri_background='#aabfe0'
+                                        #  sec_background='#4e88e5'                          
                                         #  arrowcolor='white',
                                         #  mainborderwidth=10,
                                         interiorborderwidth=2,
@@ -263,29 +248,10 @@ class KeyValueSection(tk.Frame):
                                         )
         self.frame.grid(row=0, column=0, sticky='nsew')
 
-        #  text="Shrink the window to activate the scrollbar."
-        #  self.label = tk.Label(background='white', text=text)
-        #  self.label.grid(row=1, column=0, sticky='nsew')
-
-        #  buttons = []
-        #  for i in range(100):
-        #      buttons.append(ttk.Button(self.frame.interior,
-        #                                text="Button " + str(i)))
-        #      buttons[-1].grid(row=i, column=0, sticky='nsew')
-        #
-        def accomodate_rows(j, k):
-            if j < 1:
-                j += 1
-                return j, k
-            else:
-                #  j = 0
-                k +=2
-                return 0, k
         i = 0
         for key, obj in self.fobj.json_tree_dict.items():
             i += 1
             frame = tk.Frame(self.frame.interior)
-            #frame = tk.Frame(self)
             frame.grid(row=i, column=0, padx='20', sticky=tk.NSEW)
 
             ttk.Label(frame,
@@ -310,67 +276,14 @@ class KeyValueSection(tk.Frame):
                     tmp.grid(row=k+1, column=j, sticky='NW')
                     tmp.bind("<FocusOut>", lambda event, keys=(key, kkey): self.save_field(event, keys))
 
-                    j, k = accomodate_rows(j, k)
+                    j, k = self.__accomodate_rows(j, k)
 
             except AttributeError as e:
                 value_field = tk.StringVar(frame, value=obj)
                 tmp = tk.Entry(frame, textvariable=value_field, justify=tk.LEFT)
                 tmp.grid(row=k+1, column=j, sticky='NW')
                 tmp.bind("<FocusOut>", lambda event, keys=(key, None): self.save_field(event, keys))
-                j, k = accomodate_rows(j, k)
-
-        def accomodate_rows(j, k):
-            if j < 2:
-                j += 1
-                return j, k
-            else:
-                #  j = 0
-                k +=2
-                return 0, k
-
-
-    def update(self):
-        BG0 = '#aabfe0' #Blue scheme
-        BG1 = '#4e88e5' #Blue scheme
-        self.createWidgets(BG0, BG1)
-
-        #  i = 0
-        #  for key, obj in self.fobj.json_tree_dict.items():
-        #      i += 1
-        #      frame = tk.Frame(self.scroll_frame.interior)
-        #      #frame = tk.Frame(self)
-        #      frame.grid(row=i, column=0, padx='20', sticky=tk.NSEW)
-        #
-        #      ttk.Label(frame,
-        #                text=string.capwords(key.replace('_', ' ')),
-        #                justify=tk.LEFT,
-        #                padding=[0, 10, 0, 5],
-        #                font=('Arial', 10, 'bold')
-        #            ).grid(row=0, column=0, sticky='NW')
-        #
-        #      try:
-        #          j = 0
-        #          k = i
-        #          for kkey, val in obj.items():
-        #              ttk.Label(frame, text=kkey, justify=tk.LEFT).grid(row=k, column=j, sticky='NW')
-        #
-        #              if isinstance(val, list):
-        #                  val = str(val).strip('[]').replace(',', '')
-        #
-        #              value_field = tk.StringVar(frame, value=val)
-        #
-        #              tmp = tk.Entry(frame, textvariable=value_field, justify=tk.LEFT)
-        #              tmp.grid(row=k+1, column=j, sticky='NW')
-        #              tmp.bind("<FocusOut>", lambda event, keys=(key, kkey): self.save_field(event, keys))
-        #
-        #              j, k = accomodate_rows(j, k)
-        #
-        #      except AttributeError as e:
-        #          value_field = tk.StringVar(frame, value=obj)
-        #          tmp = tk.Entry(frame, textvariable=value_field, justify=tk.LEFT)
-        #          tmp.grid(row=k+1, column=j, sticky='NW')
-        #          tmp.bind("<FocusOut>", lambda event, keys=(key, None): self.save_field(event, keys))
-        #          j, k = accomodate_rows(j, k)
+                j, k = self.__accomodate_rows(j, k)
 
 
 class Editor(tk.Frame):
@@ -432,7 +345,7 @@ if __name__ == "__main__":
     root.title(PROGRAM_NAME)
     screen_width = root.winfo_screenwidth()
     screen_height = root.winfo_screenheight()
-    #root.geometry('{}x{}'.format(int(screen_width // 2.5), int(screen_height)))
     root.configure(padx = 10, pady = 10)
+    root.resizable(False, False)
     MainApplication(root).pack(side="top", fill="both", expand=True)
     root.mainloop()
