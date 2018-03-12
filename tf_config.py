@@ -167,8 +167,8 @@ class MenuBar(tk.Frame):
         self.file_menu.add_command(label='Save as..', accelerator='Shift + Ctrl + S',
                 compound='left', command=self.save_as)
         # Quit
-        self.file_menu.bind('<Control-Q>', self.parent.quit)
-        self.file_menu.bind('<Control-q>', self.parent.quit)
+        self.file_menu.add_command(label='Quit..', accelerator='Ctrl + Q',
+                compound='left', command=self.parent.quit)
 
         # create about menu
         self.about_menu = tk.Menu(self.menubar, tearoff=0)
