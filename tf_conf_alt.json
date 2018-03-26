@@ -1,9 +1,1 @@
-{
-  "convolutional_layer_1": {
-    "filters": 32,
-    "kernel_size": [
-      5,
-      5
-    ]
-  }
-}
+{"input_layer": {"x": [-1, 512, 40, 1]}, "convolutional_layer_1": {"filters": 32, "kernel_size": [5, 5], "padding": "samew"}, "convolutional_layer_2": {"filters": 64, "kernel_size": [3, 3, 3], "padding": "same"}, "pooling_layer_1": {"pool_size": [2, 2], "stride": 2}, "pooling_layer_2": {"pool_size": [2, 2], "stride": 3}, "dense_layer": {"reshape": [-1, 128, 10, 64], "units": 1024, "dropout_rate": 0.4}, "predictions": {"probabilities": "softmax_tensor", "every_n_iter": 50}, "estimator": {"gradient_descent_optimizer": 0.001, "model_dir": "/tmp/birds_audio_convnet_model"}, "input_matrices": {"hop": 202, "window": 40}, "train_input_fn": {"batch_size": 10, "num_epochs": "Non", "shuffle": " True"}, "bird_classifier_train": {"steps": 20000}, "eval_input_fn": {"num_epochs": 1, "shuffle": "False"}}
