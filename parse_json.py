@@ -3,6 +3,7 @@
 
 import json, os, re
 from sortedcontainers import SortedList
+from decimal import *
 
 class Configurations(object):                
     """Object holding configuration variables."""                                         
@@ -15,9 +16,18 @@ class Configurations(object):
         self.json_dict = self.__import_configs(self.config_file)                            
         self.parse_json(self.json_dict, '')                                           
         #  print(self.json_dict)
-        #  print(self.json_dict_flat)
+        print(self.json_dict_flat)
         #  print(self.json_str)
         #self.find_linenumber(self.json_dict, self.json_str)
+        
+        self.test()
+
+    def test(self):
+        for section in self.json_dict_flat.values():
+            for label, val in section.items():   
+                print(val['value'])              
+                print(val['coordinates'])        
+
 
     @property
     def json_str(self):
@@ -38,7 +48,7 @@ class Configurations(object):
     def parse_json(self, jobj, key_path):  
         """Parses json object recursively and returns path and value."""                  
         if not isinstance(jobj, dict):       
-            print(key_path)
+            #print(key_path)
             path_tuple = tuple(key_path.strip().split(' '))
 
             label = key_path.split(' ')[-1]
@@ -47,12 +57,12 @@ class Configurations(object):
             #print("Path: ", path)
             if not self.json_dict_flat.get(path):
                 self.json_dict_flat[path] = {} 
-            self.json_dict_flat[path][label] = jobj
+            self.json_dict_flat[path][label] = {}
+            self.json_dict_flat[path][label]['value'] = jobj
 
-            self.find_linenumber(self.json_str, path_tuple)
-            #print(self.json_dict)
+            start, end = self.find_linenumber(self.json_str, path_tuple)
+            self.json_dict_flat[path][label]['coordinates'] = (start, end) 
 
-            #return key_path, jobj            
         else:                                
             for key, value in jobj.items():  
                 self.parse_json(value, key_path + ' ' + key)                            
@@ -65,7 +75,7 @@ class Configurations(object):
             se += '"' + path[i] + '"' + match_all
 
         se += '"' + path[-1] + '"' + ':\s*(\[[^}]*?\]|".*?"|\d+\.*\d*)' 
-        print(se)
+        #print(se)
 
         s = re.compile(se, re.DOTALL)
         #print(s)
@@ -73,7 +83,8 @@ class Configurations(object):
 
         start = self.calc_match_position(self.json_str, match.start(2))
         end = self.calc_match_position(self.json_str, match.end(2))
-        print("Start: {}, End: {}".format(start, end))
+        #print("Start: {}, End: {}".format(start, end))
+        return start, end
 
     def calc_match_position(self, string, match_index):
         """Calculates the positions of the matched value in the editor window
@@ -88,7 +99,8 @@ class Configurations(object):
 
         column = match_index - ln.start() - 1
 
-        return line + float('0.' + str(column))
+        pos = line + float('0.' + str(column))
+        return 
 
 
     def print_configs(self):                 
