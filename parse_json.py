@@ -99,8 +99,7 @@ class Configurations(object):
 
         column = match_index - ln.start() - 1
 
-        pos = line + float('0.' + str(column))
-        return 
+        return line + float('0.' + str(column))
 
 
     def print_configs(self):                 
