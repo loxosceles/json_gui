@@ -61,7 +61,7 @@ class Configurations(object):
             self.json_dict_flat[path][label]['value'] = jobj
 
             start, end = self.find_linenumber(self.json_str, path_tuple)
-            self.json_dict_flat[path][label]['coordinates'] = (start, end) 
+            self.json_dict_flat[path][label]['coordinates'] = [start, end]
 
         else:                                
             for key, value in jobj.items():  

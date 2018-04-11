@@ -35,51 +35,105 @@ INTERIORBORDERWIDTH = 2
 #PRI_BACKGROUND = '#4e88e5'
 PRI_BACKGROUND = "white" 
 
-class TagList(SortedList):           
-    """Docstring for TagList. """    
-                                     
-    def __init__(self):              
-        """TODO: to be defined1. """ 
-        SortedList.__init__(self)    
+class Configurations(object):                
+    """Object holding configuration variables."""                                         
+    config_file = 'tf_conf.json'                                 
+    json_validated = bool()                  
 
-    def add(self, start, end, diff):
-        SortedList.add(self, start)
-        index = SortedList.index(self, start)
-        self.shift_values(index, diff)
-        SortedList.insert(self, index + 1, end)
-
-    def discard(self, start):
-        try:
-            index = SortedList.index(self, start)
-            SortedList.pop(self, index + 1) # end
-            SortedList.discard(self, start)
-        except ValueError:
-            pass
-
-    def get_pair(self, index):
-        return SortedList.__getitem__(self, index),\
-               SortedList.__getitem__(self, index + 1)
-
-    def shift_values(self, index, change):
-        print("change: ", change)
-        if change >= 0:
-            for i in reversed(range(index + 1, SortedList.__len__(self))):
-                updated_value = SortedList.__getitem__(self, i)
-                updated_value += change
-                SortedList.__setitem__(self, i, updated_value)
-        else:
-            for i in range(index + 1, SortedList.__len__(self)):
-                updated_value = SortedList.__getitem__(self, i)
-                updated_value += change
-                SortedList.__setitem__(self, i, updated_value)
-
-
-class FileObj(object):
-
-    def __init__(self):
-        """TODO: Docstring for function."""
-        self.dirty_tags = TagList()
+    def __init__(self):                      
+        self.regex_nl = re.compile('\n')
+        self.json_dict_flat = {}
+        self.json_dict = self.__import_configs(self.config_file)                            
+        self.json_dict_cmp = self.json_dict
+        self.parse_json(self.json_dict, '')                                           
+        self.dirty_tags = set() 
+        
         self.textfield_length = 0
+        #  print(self.json_dict)
+        #  print(self.json_dict_flat)
+        #  print(self.json_str)
+
+    @property
+    def json_str(self):
+        return json.dumps(self.json_dict, indent=4)
+    
+    def __import_configs(self, conf_file):   
+        """Import configurations from tf_conf.json."""                                    
+        try:                                 
+            with open(str(conf_file), 'r') as infile:                                     
+                conf = json.load(infile)     
+                self.json_validated = True   
+                return conf                  
+        except ValueError as e:              
+            print("Decoding the JSON config file has failed. Please make sure the format is correct.")
+            return None                      
+
+
+    def parse_json(self, jobj, key_path):  
+        """Parses json object recursively and returns path and value."""                  
+        if not isinstance(jobj, dict):       
+            #print(key_path)
+            path_tuple = tuple(key_path.strip().split(' '))
+
+            label = key_path.split(' ')[-1]
+            #print("Label: ", label)
+            path = key_path.split(label)[0].strip(' ')
+            #print("Path: ", path)
+            if not self.json_dict_flat.get(path):
+                self.json_dict_flat[path] = {} 
+            self.json_dict_flat[path][label] = {}
+            self.json_dict_flat[path][label]['value'] = jobj
+
+            start, end = self.find_linenumber(self.json_str, path_tuple)
+            self.json_dict_flat[path][label]['coordinates'] = [start, end]
+
+        else:                                
+            for key, value in jobj.items():  
+                self.parse_json(value, key_path + ' ' + key)                            
+
+    def find_linenumber(self, json_str, path):
+        #print("Path: ", path)
+        match_all = '([^}])*'              
+        se = ''
+        for i in range(len(path) - 1):
+            se += '"' + path[i] + '"' + match_all
+
+        se += '"' + path[-1] + '"' + ':\s*(\[[^}]*?\]|".*?"|\d+\.*\d*)' 
+        #print(se)
+
+        s = re.compile(se, re.DOTALL)
+        #print(s)
+        match = s.search(self.json_str)
+
+        start = self.calc_match_position(self.json_str, match.start(2))
+        end = self.calc_match_position(self.json_str, match.end(2))
+        #print("Start: {}, End: {}".format(start, end))
+        return start, end
+
+    def calc_match_position(self, string, match_index):
+        """Calculates the positions of the matched value in the editor window
+
+        :match:   matched string
+        :returns: position in the form of line.column 
+        """
+        line = 1
+        for ln in self.regex_nl.finditer(string, 0, match_index):
+            line += 1
+            #  print(ln)
+
+        column = match_index - ln.start() - 1
+
+        return line + float('0.' + str(column))
+
+
+    def print_configs(self):                 
+        """Print out variables parsed from json file."""                                  
+        attrs = dict((key, getattr(self, key)) for key in dir(self) if key.startswith('self'))        
+        for key, value in attrs.items():     
+            print("{}: {}".format(key, value))                                            
+
+    def validated(self):                     
+        return self.json_validated           
 
     @property
     def name(self):
@@ -89,23 +143,38 @@ class FileObj(object):
     def name(self, name):
         self._name = name
 
-    @property
-    def json_str(self):
-        return json.dumps(self._json_dict, indent=4)
-    
-    @property
-    def json_dict(self):
-        return self._json_dict
-
-    @json_dict.setter
-    def json_dict(self, d):
-        self._json_dict = d
-
     def is_field_dirty(self, keys, value):
-        if self.json_dict[keys[0]][keys[1]] != value:
-            return True 
+        if self.json_dict_cmp[keys[0]][keys[1]] != value:
+            print("Dirty")
+            return True
         else:
+            print("Clean")
             return False
+
+#  class TagList(SortedList):
+#      """Docstring for TagList. """
+#
+#      def __init__(self):
+#          """TODO: to be defined1. """
+#          SortedList.__init__(self)
+#
+#      def add(self, start, end):
+#          SortedList.add(self, start)
+#          index = SortedList.index(self, start)
+#          # self.shift_values(index, diff)
+#          SortedList.insert(self, index + 1, end)
+#
+#      def discard(self, start):
+#          try:
+#              index = SortedList.index(self, start)
+#              SortedList.pop(self, index + 1) # end
+#              SortedList.discard(self, start)
+#          except ValueError:
+#              pass
+#
+#      def get_pair(self, index):
+#          return SortedList.__getitem__(self, index),\
+#                 SortedList.__getitem__(self, index + 1)
 
 
 class VerticalScrollFrame(ttk.Frame):
@@ -290,72 +359,59 @@ class KeyValueSection(tk.Frame):
 
         self.parent.editor.splash.destroy()
 
-        self.frame = VerticalScrollFrame(self,
-                    INTERIORBORDERWIDTH=2,
-                )
+        self.frame = VerticalScrollFrame(self, INTERIORBORDERWIDTH=2,)
 
         self.frame.grid(row=0, column=0, sticky=tk.NSEW)
-
-        for i, (key, obj) in enumerate(self.fobj.json_dict.items(), 1):
+        
+        for i, (section, obj) in enumerate(self.fobj.json_dict_flat.items(), 1):
             frame = tk.Frame(self.frame.interior)
             frame.grid(row=i, column=0, padx='20', sticky=tk.NSEW)
-
             ttk.Label(frame,
-                      text=string.capwords(key.replace('_', ' ')),
+                      text=string.capwords(section.replace('_', ' ')),
                       justify=tk.LEFT,
                       padding=[0, 10, 0, 5],
                       font=('Arial', 10, 'bold')
                   ).grid(row=0, column=0, sticky=tk.NW)
 
-            try:
-                j = 0
-                k = i
-                for kkey, val in obj.items():
-                    ttk.Label(frame, text=kkey, justify=tk.LEFT).grid(row=k,
-                            column=j, sticky=tk.NW)
+            j = 0
+            k = i
+            for key, val in obj.items():
+                ttk.Label(frame, text=key, justify=tk.LEFT).grid(row=k,
+                        column=j, sticky=tk.NW)
 
-                    if isinstance(val, list):
-                        val = str(val).strip('[]').replace(',', '')
+                if isinstance(val['value'], list):
+                    val = str(val['value']).strip('[]').replace(',', '')
+                else:
+                    val = val['value']
 
-                    value_field = tk.StringVar(frame, value=val)
+                value_field = tk.StringVar(frame, value=val)
 
-                    entry = tk.Entry(frame, textvariable=value_field, justify=tk.LEFT)
-                    entry.grid(row=k+1, column=j, sticky=tk.NW)
-                    entry.bind("<FocusOut>", lambda event, keys=(key, kkey):
-                            self.save_field(event, keys))
-
-                    j, k = _accomodate_rows(j, k)
-
-            except AttributeError as e:
-                value_field = tk.StringVar(frame, value=obj)
                 entry = tk.Entry(frame, textvariable=value_field, justify=tk.LEFT)
                 entry.grid(row=k+1, column=j, sticky=tk.NW)
-                entry.bind("<FocusOut>", lambda event, keys=(key, None):
+                entry.bind("<FocusOut>", lambda event, keys=(section, key):
                         self.save_field(event, keys))
+
                 j, k = _accomodate_rows(j, k)
+
 
     def save_field(self, event, keys):
         value = event.widget.get() 
-        print("value: ", value)
         print("keys: ", keys)
+        #print("value: ", value)
 
         self.fobj.textfield_length = len(self.regex_nl.findall(self.fobj.json_str,
             re.DOTALL)) + 1 
-        print("UPDATING LINES: ", self.fobj.textfield_length) 
+        #print("UPDATING LINES: ", self.fobj.textfield_length) 
 
-        try:
-            if isinstance(self.fobj.json_dict[keys[0]][keys[1]], int):
-                value = int(value)
-            if isinstance(self.fobj.json_dict[keys[0]][keys[1]], float):
-                value = float(value)
-            if isinstance(self.fobj.json_dict[keys[0]][keys[1]], list):
-                value = [ int(x) for x in ' '.join(value.split()).split(' ') ]
-                
-            if self.fobj.is_field_dirty(keys, value):
-                self.fobj.json_dict[keys[0]][keys[1]] = value
-        except TypeError as e:
-            if self.fobj.is_field_dirty(keys, value):
-                self.fobj.json_dict[keys[0]] = value
+        #  try:
+        if isinstance(self.fobj.json_dict[keys[0]][keys[1]], int):
+            value = int(value)
+        if isinstance(self.fobj.json_dict[keys[0]][keys[1]], float):
+            value = float(value)
+        if isinstance(self.fobj.json_dict[keys[0]][keys[1]], list):
+            value = [ int(x) for x in ' '.join(value.split()).split(' ') ]
+            
+        self.fobj.json_dict[keys[0]][keys[1]] = value
 
         self.parent.editor.update(keys, value)
 
@@ -384,28 +440,34 @@ class Editor(tk.Frame):
                                      )
             self.splash.place(x=100, y=100)
 
+    def vh_update(self, value, v_shift, h_shift):
+        l = value.split('.')            
+        l[0] = str(int(l[0]) + v_shift) 
+        l[1] = str(int(l[1]) + h_shift) 
+        return '.'.join(l)              
+
+    def shift_positions(self, d, start_idx, h_shift, v_shift):           
+        for obj in d.values():                           
+            for label in obj.values():                   
+                if label['coordinates'][0] == start_idx:
+                    vh_update(label['coordinates'][0], h_shift, v_shift)
+                elif label['coordinates'][0] > start_idx:
+                    vh_update(label['coordinates'][0], h_shift, v_shift)
+                    vh_update(label['coordinates'][1], h_shift, v_shift)
+
     def update(self, keys, value):
-
-
-        #FIXME: Build this dynamically denpending on depth
-        match_all = '([^}])*'              
-        search_expression = re.compile('"{}"{}"{}":\s*(\[.*?\]|".*?"|\d+\.*\d*)'.format(keys[0], match_all,
-            keys[1]), re.DOTALL)
-
-        match = search_expression.search(self.fobj.json_str)
-
-        start = self.calc_match_position(self.fobj.json_str, match.start(2))
-        end = self.calc_match_position(self.fobj.json_str, match.end(2))
-
         textfield_length = len(self.regex_nl.findall(self.fobj.json_str, re.DOTALL)) + 1
-        diff = textfield_length - self.fobj.textfield_length
-        
-        self.fobj.dirty_tags.discard(start)
+        line_diff = textfield_length - self.fobj.textfield_length
 
-        print("Before TagList: " , self.fobj.dirty_tags)
-        if self.fobj.is_field_dirty:
-            self.fobj.dirty_tags.add(start, end, diff)
-            print(" Before TagList: " , self.fobj.dirty_tags)
+        start = self.fobj.json_dict_flat[keys[0]][keys[1]]['coordinates'][0]
+        end = self.fobj.json_dict_flat[keys[0]][keys[1]]['coordinates'][1]
+        
+        self.shift_positions(self.fobj.json_dict_flat, end, line_diff, row_diff )
+        self.fobj.dirty_tags.discard(keys)
+
+        #if self.fobj.is_field_dirty:
+        if self.fobj.json_dict_flat[keys[0]][keys[1]]['value'] != value:
+            self.fobj.dirty_tags.add(keys)
 
         self.refresh()
 
@@ -414,12 +476,9 @@ class Editor(tk.Frame):
     def refresh(self):
         self.textfield.delete(1.0, tk.END)
         self.textfield.insert(1.0, self.fobj.json_str)
-        #  for position in self.fobj.dirty_tags:
-        #      self.textfield.tag_add('match', position[0], position[1])
-        #FIXME: This is ugly
-        for i in range(0, len(self.fobj.dirty_tags), 2):       
-            pair = self.fobj.dirty_tags.get_pair(i)
-            self.textfield.tag_add('match', pair[0], pair[1])
+        for el in self.fobj.dirty_tags:
+            self.textfield.tag_add('match', self.fobj.json_dict_flat[el[0]][el[1]]['coordinates'][0], 
+                                            self.fobj.json_dict_flat[el[0]][el[1]]['coordinates'][1])
 
 
     def calc_match_position(self, string, match_index):
@@ -441,7 +500,8 @@ class MainApplication(tk.Frame):
     def __init__(self, parent, *args, **kwargs):
         tk.Frame.__init__(self, parent, *args, **kwargs)
         self.parent = parent
-        self.file_obj = FileObj()
+        # self.file_obj = FileObj()
+        self.file_obj = Configurations()
 
         # Add menu bar
         self.menubar = MenuBar(self, self.file_obj)
