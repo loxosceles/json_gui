@@ -8,6 +8,7 @@ from tkinter import ttk
 import os, re, json, string, pprint
 from functools import partial as fp
 from sortedcontainers import SortedList
+from decimal import * 
 
 SPLASHSCREEN_TEXT = \
 """
@@ -92,22 +93,19 @@ class Configurations(object):
                 self.parse_json(value, key_path + ' ' + key)                            
 
     def find_linenumber(self, json_str, path):
-        #print("Path: ", path)
         match_all = '([^}])*'              
         se = ''
         for i in range(len(path) - 1):
             se += '"' + path[i] + '"' + match_all
 
         se += '"' + path[-1] + '"' + ':\s*(\[[^}]*?\]|".*?"|\d+\.*\d*)' 
-        #print(se)
 
         s = re.compile(se, re.DOTALL)
-        #print(s)
         match = s.search(self.json_str)
 
         start = self.calc_match_position(self.json_str, match.start(2))
         end = self.calc_match_position(self.json_str, match.end(2))
-        #print("Start: {}, End: {}".format(start, end))
+        #  print("Start: {}, End: {}".format(start), end))
         return start, end
 
     def calc_match_position(self, string, match_index):
@@ -123,8 +121,25 @@ class Configurations(object):
 
         column = match_index - ln.start() - 1
 
-        return line + float('0.' + str(column))
+        return Decimal(line) + Decimal('0.' + str(column))
 
+    def dyn_dict_get(self, keys):          
+        s = 'self.json_dict'  
+        for i, el in enumerate(keys):   
+            s += "[keys[" + str(i) + "]]"
+        return eval(s)
+
+    def dyn_dict_set(self, keys, val):     
+        s = 'self.json_dict'  
+        for i in range(len(keys)):   
+            s += "[keys[" + str(i) + "]]" 
+        if isinstance(val, str):
+            s += " = " + str('"' + val + '"')
+        else:
+            s += " = " + str(val)
+
+        print("Exec string: ", s)
+        exec(s)  
 
     def print_configs(self):                 
         """Print out variables parsed from json file."""                                  
@@ -150,31 +165,6 @@ class Configurations(object):
         else:
             print("Clean")
             return False
-
-#  class TagList(SortedList):
-#      """Docstring for TagList. """
-#
-#      def __init__(self):
-#          """TODO: to be defined1. """
-#          SortedList.__init__(self)
-#
-#      def add(self, start, end):
-#          SortedList.add(self, start)
-#          index = SortedList.index(self, start)
-#          # self.shift_values(index, diff)
-#          SortedList.insert(self, index + 1, end)
-#
-#      def discard(self, start):
-#          try:
-#              index = SortedList.index(self, start)
-#              SortedList.pop(self, index + 1) # end
-#              SortedList.discard(self, start)
-#          except ValueError:
-#              pass
-#
-#      def get_pair(self, index):
-#          return SortedList.__getitem__(self, index),\
-#                 SortedList.__getitem__(self, index + 1)
 
 
 class VerticalScrollFrame(ttk.Frame):
@@ -388,15 +378,16 @@ class KeyValueSection(tk.Frame):
 
                 entry = tk.Entry(frame, textvariable=value_field, justify=tk.LEFT)
                 entry.grid(row=k+1, column=j, sticky=tk.NW)
-                entry.bind("<FocusOut>", lambda event, keys=(section, key):
-                        self.save_field(event, keys))
+                entry.bind("<FocusOut>", lambda event, keys=tuple((section + " " +
+                    key).split(' ')), flat_keys=(section, key): self.save_field(event, keys, flat_keys))
 
                 j, k = _accomodate_rows(j, k)
 
 
-    def save_field(self, event, keys):
+    def save_field(self, event, keys, flat_keys):
         value = event.widget.get() 
         print("keys: ", keys)
+        print("flat_keys: ", flat_keys)
         #print("value: ", value)
 
         self.fobj.textfield_length = len(self.regex_nl.findall(self.fobj.json_str,
@@ -404,16 +395,18 @@ class KeyValueSection(tk.Frame):
         #print("UPDATING LINES: ", self.fobj.textfield_length) 
 
         #  try:
-        if isinstance(self.fobj.json_dict[keys[0]][keys[1]], int):
+        if isinstance(self.fobj.json_dict_flat[flat_keys[0]][flat_keys[1]]['value'], int):
             value = int(value)
-        if isinstance(self.fobj.json_dict[keys[0]][keys[1]], float):
+        if isinstance(self.fobj.json_dict_flat[flat_keys[0]][flat_keys[1]]['value'], float):
             value = float(value)
-        if isinstance(self.fobj.json_dict[keys[0]][keys[1]], list):
+        if isinstance(self.fobj.json_dict_flat[flat_keys[0]][flat_keys[1]]['value'], list):
+            print("its a list")
             value = [ int(x) for x in ' '.join(value.split()).split(' ') ]
             
-        self.fobj.json_dict[keys[0]][keys[1]] = value
+        #self.fobj.json_dict[keys[0]][keys[1]] = value
+        self.fobj.dyn_dict_set(keys, value)
 
-        self.parent.editor.update(keys, value)
+        self.parent.editor.update(keys, flat_keys, value)
 
 class Editor(tk.Frame):
     def __init__(self, parent, file_obj=None, *args, **kwargs):
@@ -440,34 +433,47 @@ class Editor(tk.Frame):
                                      )
             self.splash.place(x=100, y=100)
 
-    def vh_update(self, value, v_shift, h_shift):
-        l = value.split('.')            
-        l[0] = str(int(l[0]) + v_shift) 
-        l[1] = str(int(l[1]) + h_shift) 
-        return '.'.join(l)              
+    def vh_update(self, value, v_shift, h_shift=0):
+        if h_shift != 0:
+            aux = list(map(lambda x: int(x), str(value).split('.'))) 
+            aux[0] = str(aux[0] + v_shift)                               
+            aux[1] = str(aux[1] + h_shift)                               
+            value = Decimal('.'.join(aux))                           
+        else:
+            value += v_shift
+        #  print(value)
+        return value
 
-    def shift_positions(self, d, start_idx, h_shift, v_shift):           
+    def shift_positions(self, d, start_idx, v_shift, h_shift):           
+        #  print("start_idx:", start_idx)
         for obj in d.values():                           
             for label in obj.values():                   
-                if label['coordinates'][0] == start_idx:
-                    vh_update(label['coordinates'][0], h_shift, v_shift)
+                #  print("label: ", label['coordinates'])
+                if label['coordinates'][1] == start_idx:
+                    label['coordinates'][1] = self.vh_update(label['coordinates'][1], v_shift, h_shift)
+                    #  print("label after: ", label['coordinates'])
                 elif label['coordinates'][0] > start_idx:
-                    vh_update(label['coordinates'][0], h_shift, v_shift)
-                    vh_update(label['coordinates'][1], h_shift, v_shift)
+                    #  print("label 2: ", label['coordinates'])
+                    label['coordinates'][0] = self.vh_update(label['coordinates'][0], v_shift)
+                    label['coordinates'][1] = self.vh_update(label['coordinates'][1], v_shift)
+                    #  print("label 2 after: ", label['coordinates'])
 
-    def update(self, keys, value):
+    def update(self, keys, flat_keys, value):
+        print(keys)
         textfield_length = len(self.regex_nl.findall(self.fobj.json_str, re.DOTALL)) + 1
         line_diff = textfield_length - self.fobj.textfield_length
+        #FIXME
+        row_diff = 3 
 
-        start = self.fobj.json_dict_flat[keys[0]][keys[1]]['coordinates'][0]
-        end = self.fobj.json_dict_flat[keys[0]][keys[1]]['coordinates'][1]
+        start = self.fobj.json_dict_flat[flat_keys[0]][flat_keys[1]]['coordinates'][0]
+        end = self.fobj.json_dict_flat[flat_keys[0]][flat_keys[1]]['coordinates'][1]
         
         self.shift_positions(self.fobj.json_dict_flat, end, line_diff, row_diff )
         self.fobj.dirty_tags.discard(keys)
 
         #if self.fobj.is_field_dirty:
-        if self.fobj.json_dict_flat[keys[0]][keys[1]]['value'] != value:
-            self.fobj.dirty_tags.add(keys)
+        if self.fobj.json_dict_flat[flat_keys[0]][flat_keys[1]]['value'] != value:
+            self.fobj.dirty_tags.add(flat_keys)
 
         self.refresh()
 
