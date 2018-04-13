@@ -436,15 +436,6 @@ class Editor(tk.Frame):
             value += v_shift
         return value
 
-    #  def shift_positions(self, d, start_idx, v_shift, h_shift):
-    #      for obj in d.values():
-    #          for label in obj.values():
-    #              if label['coordinates'][1] == start_idx:
-    #                  label['coordinates'][1] = self.vh_update(label['coordinates'][1], v_shift, h_shift)
-    #              elif label['coordinates'][0] > start_idx:
-    #                  label['coordinates'][0] = self.vh_update(label['coordinates'][0], v_shift)
-    #                  label['coordinates'][1] = self.vh_update(label['coordinates'][1], v_shift)
-
     def shift_positions(self, d, start_idx, v_shift, h_shift):
         for obj in d.values():
             for label in obj.values():
