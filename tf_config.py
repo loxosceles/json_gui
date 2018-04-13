@@ -434,19 +434,27 @@ class Editor(tk.Frame):
             value = Decimal('.'.join(aux))                           
         else:
             value += v_shift
-
         return value
 
-    def shift_positions(self, d, start_idx, v_shift, h_shift):           
-        for obj in d.values():                           
-            for label in obj.values():                   
+    #  def shift_positions(self, d, start_idx, v_shift, h_shift):
+    #      for obj in d.values():
+    #          for label in obj.values():
+    #              if label['coordinates'][1] == start_idx:
+    #                  label['coordinates'][1] = self.vh_update(label['coordinates'][1], v_shift, h_shift)
+    #              elif label['coordinates'][0] > start_idx:
+    #                  label['coordinates'][0] = self.vh_update(label['coordinates'][0], v_shift)
+    #                  label['coordinates'][1] = self.vh_update(label['coordinates'][1], v_shift)
+
+    def shift_positions(self, d, start_idx, v_shift, h_shift):
+        for obj in d.values():
+            for label in obj.values():
                 start_cds = label['coordinates'][0]
                 end_cds = label['coordinates'][1]
                 if end_cds == start_idx:
-                    end_cds = self.vh_update(end_cds, v_shift, h_shift)
+                    label['coordinates'][1] = self.vh_update(end_cds, v_shift, h_shift)
                 elif start_cds > start_idx:
-                    start_cds = self.vh_update(start_cds, v_shift)
-                    end_cds = self.vh_update(end_cds, v_shift)
+                    label['coordinates'][0] = self.vh_update(start_cds, v_shift)
+                    label['coordinates'][1] = self.vh_update(end_cds, v_shift)
 
     def update(self, flat_keys, value):
         textfield_length = len(self.regex_nl.findall(self.fobj.json_str, re.DOTALL)) + 1
