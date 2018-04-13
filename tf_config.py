@@ -330,16 +330,16 @@ class KeyValueSection(tk.Frame):
         self.columnconfigure(0, weight=1)
         self.regex_nl = re.compile('\n')
 
+    def _accomodate_rows(self, j, k):
+        if j < 1:
+            j += 1
+            return j, k
+        else:
+            k +=2
+            return 0, k
+
     def update(self):
         """Update the key-value section with entry fields."""
-
-        def _accomodate_rows(j, k):
-            if j < 1:
-                j += 1
-                return j, k
-            else:
-                k +=2
-                return 0, k
 
         self.parent.editor.splash.destroy()
 
@@ -375,7 +375,7 @@ class KeyValueSection(tk.Frame):
                 entry.bind("<FocusOut>", lambda event, flat_keys=(section, key):
                     self.save_field(event, flat_keys))
 
-                j, k = _accomodate_rows(j, k)
+                j, k = self._accomodate_rows(j, k)
 
 
     def save_field(self, event, flat_keys):
