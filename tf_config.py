@@ -45,14 +45,11 @@ class Configurations(object):
         self.regex_nl = re.compile('\n')
         self.json_dict_flat = {}
         self.json_dict = self.__import_configs(self.config_file)                            
-        self.json_dict_cmp = self.json_dict
         self.parse_json(self.json_dict, '')                                           
         self.dirty_tags = set() 
         
         self.textfield_length = 0
-        #  print(self.json_dict)
-        #  print(self.json_dict_flat)
-        #  print(self.json_str)
+        self.previous_value = "" 
 
     @property
     def json_str(self):
@@ -73,15 +70,14 @@ class Configurations(object):
     def parse_json(self, jobj, key_path):  
         """Parses json object recursively and returns path and value."""                  
         if not isinstance(jobj, dict):       
-            #print(key_path)
             path_tuple = tuple(key_path.strip().split(' '))
 
             label = key_path.split(' ')[-1]
-            #print("Label: ", label)
             path = key_path.split(label)[0].strip(' ')
-            #print("Path: ", path)
+
             if not self.json_dict_flat.get(path):
                 self.json_dict_flat[path] = {} 
+
             self.json_dict_flat[path][label] = {}
             self.json_dict_flat[path][label]['value'] = jobj
 
@@ -103,9 +99,8 @@ class Configurations(object):
         s = re.compile(se, re.DOTALL)
         match = s.search(self.json_str)
 
-        start = self.calc_match_position(self.json_str, match.start(2))
-        end = self.calc_match_position(self.json_str, match.end(2))
-        #  print("Start: {}, End: {}".format(start), end))
+        start = self.calc_match_position(self.json_str, match.start(len(path)))
+        end = self.calc_match_position(self.json_str, match.end(len(path)))
         return start, end
 
     def calc_match_position(self, string, match_index):
@@ -117,7 +112,6 @@ class Configurations(object):
         line = 1
         for ln in self.regex_nl.finditer(string, 0, match_index):
             line += 1
-            #  print(ln)
 
         column = match_index - ln.start() - 1
 
@@ -125,30 +119,30 @@ class Configurations(object):
 
     def dyn_dict_get(self, keys):          
         s = 'self.json_dict'  
+
         for i, el in enumerate(keys):   
             s += "[keys[" + str(i) + "]]"
+
         return eval(s)
 
     def dyn_dict_set(self, keys, val):     
         s = 'self.json_dict'  
+
         for i in range(len(keys)):   
             s += "[keys[" + str(i) + "]]" 
+
         if isinstance(val, str):
             s += " = " + str('"' + val + '"')
         else:
             s += " = " + str(val)
 
-        print("Exec string: ", s)
         exec(s)  
 
-    def print_configs(self):                 
-        """Print out variables parsed from json file."""                                  
-        attrs = dict((key, getattr(self, key)) for key in dir(self) if key.startswith('self'))        
-        for key, value in attrs.items():     
-            print("{}: {}".format(key, value))                                            
+    def get_coords(self, keys, position):
+        return self.json_dict_flat[keys[0]][keys[1]]['coordinates'][position]
 
-    def validated(self):                     
-        return self.json_validated           
+    def get_init_value(self, keys):
+        return self.json_dict_flat[keys[0]][keys[1]]['value']
 
     @property
     def name(self):
@@ -159,11 +153,9 @@ class Configurations(object):
         self._name = name
 
     def is_field_dirty(self, keys, value):
-        if self.json_dict_cmp[keys[0]][keys[1]] != value:
-            print("Dirty")
+        if self.json_dict_flat[keys[0]][keys[1]]['value'] != value:
             return True
         else:
-            print("Clean")
             return False
 
 
@@ -295,6 +287,9 @@ class MenuBar(tk.Frame):
                 self.parent.editor.textfield.insert(1.0, self.fobj.json_str)
                 self.parent.key_value_section.update()
 
+        # reset previos value 
+        self.fobj.previous_value = "" 
+
     def save(self, event=None):
         if not self.fobj.name:
             save_as()
@@ -333,7 +328,6 @@ class KeyValueSection(tk.Frame):
         self.fobj = file_obj
         self.rowconfigure(0, weight=1)
         self.columnconfigure(0, weight=1)
-        #FIXME
         self.regex_nl = re.compile('\n')
 
     def update(self):
@@ -378,35 +372,34 @@ class KeyValueSection(tk.Frame):
 
                 entry = tk.Entry(frame, textvariable=value_field, justify=tk.LEFT)
                 entry.grid(row=k+1, column=j, sticky=tk.NW)
-                entry.bind("<FocusOut>", lambda event, keys=tuple((section + " " +
-                    key).split(' ')), flat_keys=(section, key): self.save_field(event, keys, flat_keys))
+                entry.bind("<FocusOut>", lambda event, flat_keys=(section, key):
+                    self.save_field(event, flat_keys))
 
                 j, k = _accomodate_rows(j, k)
 
 
-    def save_field(self, event, keys, flat_keys):
+    def save_field(self, event, flat_keys):
         value = event.widget.get() 
-        print("keys: ", keys)
-        print("flat_keys: ", flat_keys)
-        #print("value: ", value)
 
+        # set editor field length before changing it
         self.fobj.textfield_length = len(self.regex_nl.findall(self.fobj.json_str,
             re.DOTALL)) + 1 
-        #print("UPDATING LINES: ", self.fobj.textfield_length) 
 
-        #  try:
-        if isinstance(self.fobj.json_dict_flat[flat_keys[0]][flat_keys[1]]['value'], int):
+        if isinstance(self.fobj.get_init_value(flat_keys), int):
             value = int(value)
-        if isinstance(self.fobj.json_dict_flat[flat_keys[0]][flat_keys[1]]['value'], float):
+        if isinstance(self.fobj.get_init_value(flat_keys), float):
             value = float(value)
-        if isinstance(self.fobj.json_dict_flat[flat_keys[0]][flat_keys[1]]['value'], list):
-            print("its a list")
+        if isinstance(self.fobj.get_init_value(flat_keys), list):
             value = [ int(x) for x in ' '.join(value.split()).split(' ') ]
             
-        #self.fobj.json_dict[keys[0]][keys[1]] = value
+        keys = tuple((flat_keys[0] + " " + flat_keys[1]).split(' '))
+        # save previous value for column comparison
+        self.fobj.previous_value = self.fobj.dyn_dict_get(keys)
+        # save value to master dict
         self.fobj.dyn_dict_set(keys, value)
+        # call the update method of the editor
+        self.parent.editor.update(flat_keys, value)
 
-        self.parent.editor.update(keys, flat_keys, value)
 
 class Editor(tk.Frame):
     def __init__(self, parent, file_obj=None, *args, **kwargs):
@@ -441,38 +434,32 @@ class Editor(tk.Frame):
             value = Decimal('.'.join(aux))                           
         else:
             value += v_shift
-        #  print(value)
+
         return value
 
     def shift_positions(self, d, start_idx, v_shift, h_shift):           
-        #  print("start_idx:", start_idx)
         for obj in d.values():                           
             for label in obj.values():                   
-                #  print("label: ", label['coordinates'])
-                if label['coordinates'][1] == start_idx:
-                    label['coordinates'][1] = self.vh_update(label['coordinates'][1], v_shift, h_shift)
-                    #  print("label after: ", label['coordinates'])
-                elif label['coordinates'][0] > start_idx:
-                    #  print("label 2: ", label['coordinates'])
-                    label['coordinates'][0] = self.vh_update(label['coordinates'][0], v_shift)
-                    label['coordinates'][1] = self.vh_update(label['coordinates'][1], v_shift)
-                    #  print("label 2 after: ", label['coordinates'])
+                start_cds = label['coordinates'][0]
+                end_cds = label['coordinates'][1]
+                if end_cds == start_idx:
+                    end_cds = self.vh_update(end_cds, v_shift, h_shift)
+                elif start_cds > start_idx:
+                    start_cds = self.vh_update(start_cds, v_shift)
+                    end_cds = self.vh_update(end_cds, v_shift)
 
-    def update(self, keys, flat_keys, value):
-        print(keys)
+    def update(self, flat_keys, value):
         textfield_length = len(self.regex_nl.findall(self.fobj.json_str, re.DOTALL)) + 1
         line_diff = textfield_length - self.fobj.textfield_length
-        #FIXME
-        row_diff = 3 
+        row_diff = len(str(value)) - len(str(self.fobj.previous_value)) + 10 
 
-        start = self.fobj.json_dict_flat[flat_keys[0]][flat_keys[1]]['coordinates'][0]
-        end = self.fobj.json_dict_flat[flat_keys[0]][flat_keys[1]]['coordinates'][1]
+        start = self.fobj.get_coords(flat_keys, 0)
+        end = self.fobj.get_coords(flat_keys, 1)
         
         self.shift_positions(self.fobj.json_dict_flat, end, line_diff, row_diff )
-        self.fobj.dirty_tags.discard(keys)
+        self.fobj.dirty_tags.discard(flat_keys)
 
-        #if self.fobj.is_field_dirty:
-        if self.fobj.json_dict_flat[flat_keys[0]][flat_keys[1]]['value'] != value:
+        if self.fobj.is_field_dirty(flat_keys, value):
             self.fobj.dirty_tags.add(flat_keys)
 
         self.refresh()
@@ -483,8 +470,8 @@ class Editor(tk.Frame):
         self.textfield.delete(1.0, tk.END)
         self.textfield.insert(1.0, self.fobj.json_str)
         for el in self.fobj.dirty_tags:
-            self.textfield.tag_add('match', self.fobj.json_dict_flat[el[0]][el[1]]['coordinates'][0], 
-                                            self.fobj.json_dict_flat[el[0]][el[1]]['coordinates'][1])
+            self.textfield.tag_add('match', self.fobj.get_coords(el, 0),
+                                            self.fobj.get_coords(el, 1))
 
 
     def calc_match_position(self, string, match_index):
