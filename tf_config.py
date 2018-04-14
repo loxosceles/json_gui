@@ -37,15 +37,16 @@ PRI_BACKGROUND = "white"
 
 class DataObject(object):                
     """Object holding configuration variables."""                                         
-    config_file = 'tf_conf.json'                                 
-    json_validated = bool()                  
+    #config_file = 'tf_conf.json'                                 
+    #json_validated = bool()                  
 
     def __init__(self):                      
         self.regex_nl = re.compile('\n')
         self.json_dict_flat = {}
-        self.json_dict = self.__import_configs(self.config_file)                            
-        self.parse_json(self.json_dict, '')                                           
+        #  self.json_dict = self.import_file(json_file)
+        #  self.gen_flat_key_dict(self.json_dict, '')
         self.dirty_tags = set() 
+        self._name = ""
         
         self.textfield_length = 0
         self.previous_value = "" 
@@ -54,19 +55,19 @@ class DataObject(object):
     def json_str(self):
         return json.dumps(self.json_dict, indent=4)
     
-    def __import_configs(self, conf_file):   
+    def import_file(self, conf_file):   
         """Import configurations from tf_conf.json."""                                    
         try:                                 
             with open(str(conf_file), 'r') as infile:                                     
                 conf = json.load(infile)     
-                self.json_validated = True   
+                #self.json_validated = True   
                 return conf                  
         except ValueError as e:              
             print("Decoding the JSON config file has failed. Please make sure the format is correct.")
             return None                      
 
 
-    def parse_json(self, jobj, key_path):  
+    def gen_flat_key_dict(self, jobj, key_path):  
         """Parses json object recursively and returns path and value."""                  
         if not isinstance(jobj, dict):       
             path_tuple = tuple(key_path.strip().split(' '))
@@ -85,7 +86,7 @@ class DataObject(object):
 
         else:                                
             for key, value in jobj.items():  
-                self.parse_json(value, key_path + ' ' + key)                            
+                self.gen_flat_key_dict(value, key_path + ' ' + key)                            
 
     def find_linenumber(self, json_str, path):
         match_all = '([^}])*'              
@@ -246,7 +247,7 @@ class MenuBar(tk.Frame):
     def __init__(self, parent, data_object=None, *args, **kwargs):
         tk.Frame.__init__(self, parent, *args, **kwargs)
         self.parent = parent
-        self.fobj = data_object 
+        self.d_obj = data_object 
 
         # Create menu bar
         self.menubar = tk.Menu(self)
@@ -276,25 +277,29 @@ class MenuBar(tk.Frame):
         input_file_name = filedialog.askopenfilename(defaultextension=".json",
         filetypes=[("Configuration files", "*.json")])
         if input_file_name:
-            self.fobj.name = input_file_name
-            self.parent.parent.title('{} - {}'.format(os.path.basename(self.fobj.name),
+            self.d_obj.name = input_file_name
+            self.parent.parent.title('{} - {}'.format(os.path.basename(self.d_obj.name),
             PROGRAM_NAME))
             self.parent.editor.textfield.delete(1.0, tk.END)
 
-            with open(self.fobj.name) as _file:
-                self.fobj.json_dict = json.loads(_file.read())
-                self.parent.editor.textfield.insert(1.0, self.fobj.json_str)
+            with open(self.d_obj.name) as _file:
+                self.d_obj.json_dict = json.loads(_file.read())
+                self.parent.editor.textfield.insert(1.0, self.d_obj.json_str)
                 self.parent.key_value_section.update()
 
         # reset previos value 
-        self.fobj.previous_value = "" 
+        self.d_obj.previous_value = "" 
 
     def save(self, event=None):
-        if not self.fobj.name:
-            save_as()
+        print(self.d_obj.json_dict)
+        print(self.d_obj.json_dict_flat)
+        if len(self.d_obj.json_dict) == 0:
+            return
+        if not self.d_obj.name:
+            self.save_as()
         else:
-            self.write_to_file(self.fobj.name)
-            self.fobj.dirty_tags.clear()
+            self.write_to_file(self.d_obj.name)
+            self.d_obj.dirty_tags.clear()
             self.parent.editor.refresh()
         return "break"
 
@@ -302,16 +307,16 @@ class MenuBar(tk.Frame):
         input_file_name = filedialog.asksaveasfilename(defaultextension=".json",
                 filetypes=[("Configuration Files", "*.json")]) 
         if input_file_name:
-            self.fobj.name = input_file_name
-            self.write_to_file(self.fobj.name)
+            self.d_obj.name = input_file_name
+            self.write_to_file(self.d_obj.name)
             self.parent.parent.title('{} - {}'
-                    .format(os.path.basename(self.fobj.name), PROGRAM_NAME)) 
+                    .format(os.path.basename(self.d_obj.name), PROGRAM_NAME)) 
 
             return "break"
 
     def write_to_file(self, file_name):
         try:
-            content = self.fobj.json_dict
+            content = self.d_obj.json_dict
             with open(file_name, 'w') as outfile: 
                 json.dump(content, outfile)
         except IOError:
@@ -391,7 +396,7 @@ class KeyValueSection(tk.Frame):
     def __init__(self, parent, data_object=None, *args, **kwargs):
         tk.Frame.__init__(self, parent, *args, **kwargs)
         self.parent = parent
-        self.fobj = data_object
+        self.d_obj = data_object
         self.rowconfigure(0, weight=1)
         self.columnconfigure(0, weight=1)
         self.regex_nl = re.compile('\n')
@@ -413,7 +418,7 @@ class KeyValueSection(tk.Frame):
 
         self.frame.grid(row=0, column=0, sticky=tk.NSEW)
         
-        for i, (section, obj) in enumerate(self.fobj.json_dict_flat.items(), 1):
+        for i, (section, obj) in enumerate(self.d_obj.json_dict_flat.items(), 1):
             frame = tk.Frame(self.frame.interior)
             frame.grid(row=i, column=0, padx='20', sticky=tk.NSEW)
             ttk.Label(frame,
@@ -453,20 +458,20 @@ class KeyValueSection(tk.Frame):
         value = event.widget.get() 
 
         # set editor field length before changing it
-        self.fobj.textfield_length = len(self.regex_nl.findall(self.fobj.json_str,
+        self.d_obj.textfield_length = len(self.regex_nl.findall(self.d_obj.json_str,
             re.DOTALL)) + 1 
 
-        if isinstance(self.fobj.get_init_value(flat_keys), int):
+        if isinstance(self.d_obj.get_init_value(flat_keys), int):
             try:
                 value = int(value)
             except ValueError:
                 value = ""
-        if isinstance(self.fobj.get_init_value(flat_keys), float):
+        if isinstance(self.d_obj.get_init_value(flat_keys), float):
             try:
                 value = float(value)
             except ValueError:
                 value = ""
-        if isinstance(self.fobj.get_init_value(flat_keys), list):
+        if isinstance(self.d_obj.get_init_value(flat_keys), list):
             try:
                 value = [ int(x) for x in ' '.join(value.split()).split(' ') ]
             except ValueError:
@@ -474,9 +479,9 @@ class KeyValueSection(tk.Frame):
 
         keys = tuple((flat_keys[0] + " " + flat_keys[1]).split(' '))
         # save previous value for column comparison
-        self.fobj.previous_value = self.fobj.dyn_dict_get(keys)
+        self.d_obj.previous_value = self.d_obj.dyn_dict_get(keys)
         # save value to master dict
-        self.fobj.dyn_dict_set(keys, value)
+        self.d_obj.dyn_dict_set(keys, value)
         # call the update method of the editor
         self.parent.editor.update(flat_keys, value)
 
@@ -485,7 +490,7 @@ class Editor(tk.Frame):
     def __init__(self, parent, data_object=None, *args, **kwargs):
         tk.Frame.__init__(self, parent, *args, **kwargs)
         self.parent = parent
-        self.fobj = data_object
+        self.d_obj = data_object
         self.startup_screen = tk.StringVar()
         self.config(pady = 20)
         self.regex_nl = re.compile('\n')
@@ -528,18 +533,18 @@ class Editor(tk.Frame):
                     label['coordinates'][1] = self.vh_update(end_cds, v_shift)
 
     def update(self, flat_keys, value):
-        textfield_length = len(self.regex_nl.findall(self.fobj.json_str, re.DOTALL)) + 1
-        line_diff = textfield_length - self.fobj.textfield_length
-        row_diff = len(str(value)) - len(str(self.fobj.previous_value)) + 10 
+        textfield_length = len(self.regex_nl.findall(self.d_obj.json_str, re.DOTALL)) + 1
+        line_diff = textfield_length - self.d_obj.textfield_length
+        row_diff = len(str(value)) - len(str(self.d_obj.previous_value)) + 10 
 
-        start = self.fobj.get_coords(flat_keys, 0)
-        end = self.fobj.get_coords(flat_keys, 1)
+        start = self.d_obj.get_coords(flat_keys, 0)
+        end = self.d_obj.get_coords(flat_keys, 1)
         
-        self.shift_positions(self.fobj.json_dict_flat, end, line_diff, row_diff )
-        self.fobj.dirty_tags.discard(flat_keys)
+        self.shift_positions(self.d_obj.json_dict_flat, end, line_diff, row_diff )
+        self.d_obj.dirty_tags.discard(flat_keys)
 
-        if self.fobj.is_field_dirty(flat_keys, value):
-            self.fobj.dirty_tags.add(flat_keys)
+        if self.d_obj.is_field_dirty(flat_keys, value):
+            self.d_obj.dirty_tags.add(flat_keys)
 
         self.refresh()
 
@@ -547,10 +552,10 @@ class Editor(tk.Frame):
 
     def refresh(self):
         self.textfield.delete(1.0, tk.END)
-        self.textfield.insert(1.0, self.fobj.json_str)
-        for el in self.fobj.dirty_tags:
-            self.textfield.tag_add('match', self.fobj.get_coords(el, 0),
-                                            self.fobj.get_coords(el, 1))
+        self.textfield.insert(1.0, self.d_obj.json_str)
+        for el in self.d_obj.dirty_tags:
+            self.textfield.tag_add('match', self.d_obj.get_coords(el, 0),
+                                            self.d_obj.get_coords(el, 1))
 
 
     def calc_match_position(self, string, match_index):
