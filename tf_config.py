@@ -3,12 +3,15 @@
 
 import tkinter as tk
 from tkinter import ttk
+
 from tkinter import filedialog
 from tkinter import font
 import os, re, json, string
 from functools import partial as fp
 from decimal import * 
 
+
+#  Global constants
 SPLASHSCREEN_TEXT = \
 """
  _______                                     ___  __                  
@@ -25,15 +28,7 @@ SPLASHSCREEN_TEXT = \
         === Configuration Editor for Neuronal Networks ===            
 """
 PROGRAM_NAME = 'Tensorflow Configuration Tool'
-TEXTFIELD_WIDTH = 60
-#TEXTFIELD_PARAMS = ('arial', 10)
-TEXTFIELD_PARAMS = ('Consolas', 10)
-TEXTFIELD_HEIGHT = 10
 
-MAINBORDERWIDTH = 2
-INTERIORBORDERWIDTH = 2 
-#PRI_BACKGROUND = '#4e88e5'
-PRI_BACKGROUND = "white" 
 
 class DataObject(object):                
     """Object holding configuration variables."""                                         
@@ -157,9 +152,11 @@ class VerticalScrollFrame(ttk.Frame):
 
     Use the '.interior' attribute to place widgets inside the scrollable frame.
     """
-    
     def __init__(self, parent, *args, **options):
-        ttk.Frame.__init__(self, parent, borderwidth=MAINBORDERWIDTH )
+        # style variables
+        self.canvas_bg = "white" 
+
+        ttk.Frame.__init__(self, parent)
         self.__createWidgets()
         self.__setBindings()
 
@@ -179,17 +176,14 @@ class VerticalScrollFrame(ttk.Frame):
 
     def __createWidgets(self):
         '''Create widgets of the scroll frame.'''
-        self.vscrollbar = ttk.Scrollbar(self, orient='vertical',
-                                        style='canvas.Vertical.TScrollbar')
-        self.vscrollbar.pack(side='right', fill='y', expand='false')
+        self.vscrollbar = ttk.Scrollbar(self, orient=tk.VERTICAL)
+        self.vscrollbar.pack(side=tk.RIGHT, fill=tk.Y, expand=tk.FALSE)
         self.canvas = tk.Canvas(self,
-                                bd=0,
-                                highlightthickness=0,
                                 yscrollcommand=self.vscrollbar.set,
-                                background=PRI_BACKGROUND 
-                                )
+                                background=self.canvas_bg)
+
         self.canvas.configure(height=screen_height - (screen_height * 0.3))
-        self.canvas.pack(side='left', fill='both', expand='true')
+        self.canvas.pack(side=tk.LEFT, fill=tk.BOTH, expand=tk.TRUE)
         self.vscrollbar.config(command=self.canvas.yview)
 
         self.canvas.bind('<Enter>', self._bind_to_mousewheel)
@@ -200,11 +194,12 @@ class VerticalScrollFrame(ttk.Frame):
         #  self.canvas.yview_moveto(0)
 
         # create a frame inside the canvas which will be scrolled with it
-        self.interior = ttk.Frame(self.canvas, borderwidth=INTERIORBORDERWIDTH)
+        self.interior = ttk.Frame(self.canvas)
                                   
         self.interior_id = self.canvas.create_window(0, 0,
                                                      window=self.interior,
-                                                     anchor='nw')
+                                                     anchor=tk.NW,
+                                                     tags="self.interior")
 
     def __setBindings(self):
         '''Activate binding to configure scroll frame widgets.'''
@@ -235,9 +230,9 @@ class VerticalScrollFrame(ttk.Frame):
                                format(canvasWidth, interiorReqHeight))
 
 
-class MenuBar(tk.Frame):
+class MenuBar(ttk.Frame):
     def __init__(self, parent, data_object=None, *args, **kwargs):
-        tk.Frame.__init__(self, parent, *args, **kwargs)
+        ttk.Frame.__init__(self, parent, *args, **kwargs)
         self.parent = parent
         self.d_obj = data_object 
 
@@ -250,16 +245,16 @@ class MenuBar(tk.Frame):
         self.menubar.add_cascade(label='File', menu=self.file_menu)
         # Open
         self.file_menu.add_command(label='Open', accelerator='Ctrl + O',
-                compound='left', command=self.open)
+                compound=tk.LEFT, command=self.open)
         # Save
         self.file_menu.add_command(label='Save', accelerator='Ctrl + S',
-                compound='left', command=self.save)
+                compound=tk.LEFT, command=self.save)
         # Save as
         self.file_menu.add_command(label='Save as..', accelerator='Shift + Ctrl + S',
-                compound='left', command=self.save_as)
+                compound=tk.LEFT, command=self.save_as)
         # Quit
         self.file_menu.add_command(label='Quit', accelerator='Ctrl + Q',
-                compound='left', command=self.parent.quit)
+                compound=tk.LEFT, command=self.parent.quit)
 
         # Create about menu
         self.about_menu = tk.Menu(self.menubar, tearoff=0)
@@ -276,7 +271,7 @@ class MenuBar(tk.Frame):
 
             self.d_obj.import_file(input_file_name)
             self.parent.editor.textfield.insert(1.0, self.d_obj.json_str)
-            self.parent.key_value_section.update()
+            self.parent.key_value_section.create_entry_boxes()
 
         # reset previos value 
         self.d_obj.previous_value = "" 
@@ -303,8 +298,7 @@ class MenuBar(tk.Frame):
             self.d_obj.name = input_file_name
             self.write_to_file(self.d_obj.name)
             self.parent.parent.title('{} - {}'
-                    .format(os.path.basename(self.d_obj.name), PROGRAM_NAME)) 
-
+                    .format(os.path.basename(self.d_obj.name), PROGRAM_NAME))
             return "break"
 
     def write_to_file(self, file_name):
@@ -316,10 +310,10 @@ class MenuBar(tk.Frame):
             pass
                 
 
-class KeyValueSection(tk.Frame):
+class KeyValueSection(ttk.Frame):
     """ Section where configurations can be edited."""
 
-    class ValidatingEntry(tk.Entry):
+    class ValidatingEntry(ttk.Entry):
     # base class for validating entry widgets
 
         def __init__(self, parent, value="", **kwargs):
@@ -387,9 +381,11 @@ class KeyValueSection(tk.Frame):
                 return None
 
     def __init__(self, parent, data_object=None, *args, **kwargs):
-        tk.Frame.__init__(self, parent, *args, **kwargs)
+        ttk.Frame.__init__(self, parent, *args, **kwargs)
         self.parent = parent
         self.d_obj = data_object
+
+        # style variables
         self.rowconfigure(0, weight=1)
         self.columnconfigure(0, weight=1)
         self.regex_nl = re.compile('\n')
@@ -402,23 +398,28 @@ class KeyValueSection(tk.Frame):
             k +=2
             return 0, k
 
-    def update(self):
+    def create_entry_boxes(self):
         """Update the key-value section with entry fields."""
 
-        self.parent.editor.splash.destroy()
+        self.label_style = ttk.Style()
+        self.label_style.configure("label_style.TLabel", 
+                          justify=tk.LEFT,
+                          padding=[0, 10, 0, 5],
+                          font=('Arial', 10, 'bold')
+                          )
 
-        self.frame = VerticalScrollFrame(self, INTERIORBORDERWIDTH=2,)
+        self.parent.editor.splash.destroy()
+        self.parent.editor.textfield.configure(width=self.parent.editor.textfield_width)
+
+        self.frame = VerticalScrollFrame(self)
 
         self.frame.grid(row=0, column=0, sticky=tk.NSEW)
         
         for i, (section, obj) in enumerate(self.d_obj.json_dict_flat.items(), 1):
-            frame = tk.Frame(self.frame.interior)
+            frame = ttk.Frame(self.frame.interior)
             frame.grid(row=i, column=0, padx='20', sticky=tk.NSEW)
-            ttk.Label(frame,
-                      text=string.capwords(section.replace('_', ' ')),
-                      justify=tk.LEFT,
-                      padding=[0, 10, 0, 5],
-                      font=('Arial', 10, 'bold')
+            ttk.Label(frame, style="label_style.TLabel",
+                      text=string.capwords(section.replace('_', ' '))
                   ).grid(row=0, column=0, sticky=tk.NW)
 
             j = 0
@@ -479,30 +480,44 @@ class KeyValueSection(tk.Frame):
         self.parent.editor.update(flat_keys, value)
 
 
-class Editor(tk.Frame):
+class Editor(ttk.Frame):
     def __init__(self, parent, data_object=None, *args, **kwargs):
-        tk.Frame.__init__(self, parent, *args, **kwargs)
+        ttk.Frame.__init__(self, parent, *args, **kwargs)
         self.parent = parent
         self.d_obj = data_object
+
+        # style variables
+        self.splashscreen_width = 80 
+        self.textfield_width = 50
+        self.textfield_font = ('Consolas', 10)
+
         self.startup_screen = tk.StringVar()
-        self.config(pady = 20)
+
+        self.frame_style = ttk.Style()
+        self.frame_style.configure("TFrame", pady = 20)
+        self.configure(style="TFrame")
+
         self.regex_nl = re.compile('\n')
         self.startup_screen.set(SPLASHSCREEN_TEXT)
         self.create_textfield()
-        self.textfield.tag_config('match', foreground='red')#, background='yellow')
+        self.textfield.tag_config('match', foreground='red')
+
 
     def create_textfield(self):
             self.scrollbar = ttk.Scrollbar(self)
-            self.scrollbar.pack(side='right', fill='y')
-            self.textfield = tk.Text(self, font=TEXTFIELD_PARAMS, yscrollcommand=self.scrollbar.set)
-            self.textfield.pack(fill='both', expand=1)
+            self.scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
+            self.textfield = tk.Text(self, font=self.textfield_font, 
+                    yscrollcommand=self.scrollbar.set,
+                    width=self.splashscreen_width)
+            self.textfield.pack(fill=tk.BOTH, expand=1)
             self.scrollbar.config(command=self.textfield.yview)
-            self.splash = tk.Label(self.textfield, 
-                                     textvariable=self.startup_screen,
-                                     font=('Courier', 8, 'bold'),
-                                     bg="white",
-                                     )
-            self.splash.place(x=100, y=100)
+
+            self.splash_style = ttk.Style()                                                           
+            self.splash = ttk.Label(self.textfield, textvariable=self.startup_screen, 
+                    style="SPLASH.TLabel")
+            self.splash_style.configure("SPLASH.TLabel", font=('Courier', 8, 'bold'), 
+                    background="white", anchor=tk.CENTER, padding=50)
+            self.splash.pack()
 
     def vh_update(self, value, v_shift, h_shift=0):
         if h_shift != 0:
@@ -566,9 +581,9 @@ class Editor(tk.Frame):
         return line + float('0.' + str(column))
         
 
-class MainApplication(tk.Frame):
+class MainApplication(ttk.Frame):
     def __init__(self, parent, *args, **kwargs):
-        tk.Frame.__init__(self, parent, *args, **kwargs)
+        ttk.Frame.__init__(self, parent, *args, **kwargs)
         self.parent = parent
         # self.data_object = FileObj()
         self.data_object = DataObject()
