@@ -28,6 +28,7 @@ SPLASHSCREEN_TEXT = \
         === Configuration Editor for Neuronal Networks ===            
 """
 PROGRAM_NAME = 'Tensorflow Configuration Tool'
+REGEX_NL = re.compile('\n')
 
 
 class DataObject(object):                
@@ -40,7 +41,6 @@ class DataObject(object):
         
         self.textfield_length = 0
         self.previous_value = "" 
-        self.regex_nl = re.compile('\n')
 
     @property
     def json_str(self):
@@ -69,13 +69,13 @@ class DataObject(object):
             self.json_dict_flat[path][label] = {}
             self.json_dict_flat[path][label]['value'] = jobj
 
-            start, end = self.find_linenumber(self.json_str, path_tuple)
-            self.json_dict_flat[path][label]['coordinates'] = [start, end]
+            start, end = self.gen_value_coords(self.json_str, path_tuple)
+            self.json_dict_flat[path][label]['coords'] = [start, end]
         else:                                
             for key, value in jobj.items():  
                 self.gen_flat_key_dict(value, key_path + ' ' + key)
 
-    def find_linenumber(self, json_str, path):
+    def gen_value_coords(self, json_str, path):
         match_all = '([^}])*'              
         se = ''
         for i in range(len(path) - 1):
@@ -97,7 +97,7 @@ class DataObject(object):
         :returns: position in the form of line.column 
         """
         line = 1
-        for ln in self.regex_nl.finditer(string, 0, match_index):
+        for ln in REGEX_NL.finditer(string, 0, match_index):
             line += 1
 
         column = match_index - ln.start() - 1
@@ -126,7 +126,7 @@ class DataObject(object):
         exec(s)  
 
     def get_coords(self, keys, position):
-        return self.json_dict_flat[keys[0]][keys[1]]['coordinates'][position]
+        return self.json_dict_flat[keys[0]][keys[1]]['coords'][position]
 
     def get_init_value(self, keys):
         return self.json_dict_flat[keys[0]][keys[1]]['value']
@@ -315,7 +315,6 @@ class KeyValueSection(ttk.Frame):
 
     class ValidatingEntry(ttk.Entry):
     # base class for validating entry widgets
-
         def __init__(self, parent, value="", **kwargs):
             tk.Entry.__init__(self, parent, **kwargs)
             self.__value = value
@@ -340,7 +339,6 @@ class KeyValueSection(ttk.Frame):
             return value
 
     class IntegerEntry(ValidatingEntry):
-
         def validate(self, value):
             try:
                 if value:
@@ -350,7 +348,6 @@ class KeyValueSection(ttk.Frame):
                 return None
 
     class FloatEntry(ValidatingEntry):
-
         def validate(self, value):
             try:
                 if value:
@@ -360,7 +357,6 @@ class KeyValueSection(ttk.Frame):
                 return None
 
     class ArrayEntry(ValidatingEntry):
-
         def validate(self, value):
             try:
                 if value:
@@ -370,7 +366,6 @@ class KeyValueSection(ttk.Frame):
                 return None
 
     class StringEntry(ValidatingEntry):
-
         def validate(self, value):
             try:
                 if value:
@@ -388,7 +383,6 @@ class KeyValueSection(ttk.Frame):
         # style variables
         self.rowconfigure(0, weight=1)
         self.columnconfigure(0, weight=1)
-        self.regex_nl = re.compile('\n')
 
     def _accomodate_rows(self, j, k):
         if j < 1:
@@ -452,7 +446,7 @@ class KeyValueSection(ttk.Frame):
         value = event.widget.get() 
 
         # set editor field length before changing it
-        self.d_obj.textfield_length = len(self.regex_nl.findall(self.d_obj.json_str,
+        self.d_obj.textfield_length = len(REGEX_NL.findall(self.d_obj.json_str,
             re.DOTALL)) + 1 
 
         if isinstance(self.d_obj.get_init_value(flat_keys), int):
@@ -477,7 +471,7 @@ class KeyValueSection(ttk.Frame):
         # save value to master dict
         self.d_obj.dyn_dict_set(keys, value)
         # call the update method of the editor
-        self.parent.editor.update(flat_keys, value)
+        self.parent.editor.update_tags(flat_keys, value)
 
 
 class Editor(ttk.Frame):
@@ -497,7 +491,6 @@ class Editor(ttk.Frame):
         self.frame_style.configure("TFrame", pady = 20)
         self.configure(style="TFrame")
 
-        self.regex_nl = re.compile('\n')
         self.startup_screen.set(SPLASHSCREEN_TEXT)
         self.create_textfield()
         self.textfield.tag_config('match', foreground='red')
@@ -532,16 +525,16 @@ class Editor(ttk.Frame):
     def shift_positions(self, d, start_idx, v_shift, h_shift):
         for obj in d.values():
             for label in obj.values():
-                start_cds = label['coordinates'][0]
-                end_cds = label['coordinates'][1]
+                start_cds = label['coords'][0]
+                end_cds = label['coords'][1]
                 if end_cds == start_idx:
-                    label['coordinates'][1] = self.vh_update(end_cds, v_shift, h_shift)
+                    label['coords'][1] = self.vh_update(end_cds, v_shift, h_shift)
                 elif start_cds > start_idx:
-                    label['coordinates'][0] = self.vh_update(start_cds, v_shift)
-                    label['coordinates'][1] = self.vh_update(end_cds, v_shift)
+                    label['coords'][0] = self.vh_update(start_cds, v_shift)
+                    label['coords'][1] = self.vh_update(end_cds, v_shift)
 
-    def update(self, flat_keys, value):
-        textfield_length = len(self.regex_nl.findall(self.d_obj.json_str, re.DOTALL)) + 1
+    def update_tags(self, flat_keys, value):
+        textfield_length = len(REGEX_NL.findall(self.d_obj.json_str, re.DOTALL)) + 1
         line_diff = textfield_length - self.d_obj.textfield_length
         row_diff = len(str(value)) - len(str(self.d_obj.previous_value)) + 10 
 
@@ -556,30 +549,14 @@ class Editor(ttk.Frame):
 
         self.refresh()
 
-        self.textfield.see(end)
-
     def refresh(self):
         self.textfield.delete(1.0, tk.END)
         self.textfield.insert(1.0, self.d_obj.json_str)
         for el in self.d_obj.dirty_tags:
             self.textfield.tag_add('match', self.d_obj.get_coords(el, 0),
                                             self.d_obj.get_coords(el, 1))
+        self.textfield.see(end)
 
-
-    def calc_match_position(self, string, match_index):
-        """Calculates the positions of the matched value in the editor window
-
-        :match:   matched string
-        :returns: position in the form of line.column 
-        """
-        line = 1
-        for ln in self.regex_nl.finditer(string, 0, match_index):
-            line += 1
-
-        column = match_index - ln.start() - 1
-
-        return line + float('0.' + str(column))
-        
 
 class MainApplication(ttk.Frame):
     def __init__(self, parent, *args, **kwargs):
