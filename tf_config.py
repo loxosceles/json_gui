@@ -37,35 +37,28 @@ PRI_BACKGROUND = "white"
 
 class DataObject(object):                
     """Object holding configuration variables."""                                         
-    #config_file = 'tf_conf.json'                                 
-    #json_validated = bool()                  
-
     def __init__(self):                      
-        self.regex_nl = re.compile('\n')
         self.json_dict_flat = {}
-        #  self.json_dict = self.import_file(json_file)
-        #  self.gen_flat_key_dict(self.json_dict, '')
+        self.json_dict = {}
         self.dirty_tags = set() 
         self._name = ""
         
         self.textfield_length = 0
         self.previous_value = "" 
+        self.regex_nl = re.compile('\n')
 
     @property
     def json_str(self):
         return json.dumps(self.json_dict, indent=4)
     
-    def import_file(self, conf_file):   
+    def import_file(self, json_file):   
         """Import configurations from tf_conf.json."""                                    
         try:                                 
-            with open(str(conf_file), 'r') as infile:                                     
-                conf = json.load(infile)     
-                #self.json_validated = True   
-                return conf                  
-        except ValueError as e:              
+            with open(json_file, 'r') as infile:
+                self.json_dict = json.load(infile)
+                self.gen_flat_key_dict(self.json_dict, '')
+        except ValueError as e:
             print("Decoding the JSON config file has failed. Please make sure the format is correct.")
-            return None                      
-
 
     def gen_flat_key_dict(self, jobj, key_path):  
         """Parses json object recursively and returns path and value."""                  
@@ -83,10 +76,9 @@ class DataObject(object):
 
             start, end = self.find_linenumber(self.json_str, path_tuple)
             self.json_dict_flat[path][label]['coordinates'] = [start, end]
-
         else:                                
             for key, value in jobj.items():  
-                self.gen_flat_key_dict(value, key_path + ' ' + key)                            
+                self.gen_flat_key_dict(value, key_path + ' ' + key)
 
     def find_linenumber(self, json_str, path):
         match_all = '([^}])*'              
@@ -282,19 +274,17 @@ class MenuBar(tk.Frame):
             PROGRAM_NAME))
             self.parent.editor.textfield.delete(1.0, tk.END)
 
-            with open(self.d_obj.name) as _file:
-                self.d_obj.json_dict = json.loads(_file.read())
-                self.parent.editor.textfield.insert(1.0, self.d_obj.json_str)
-                self.parent.key_value_section.update()
+            self.d_obj.import_file(input_file_name)
+            self.parent.editor.textfield.insert(1.0, self.d_obj.json_str)
+            self.parent.key_value_section.update()
 
         # reset previos value 
         self.d_obj.previous_value = "" 
 
     def save(self, event=None):
-        print(self.d_obj.json_dict)
-        print(self.d_obj.json_dict_flat)
         if len(self.d_obj.json_dict) == 0:
             return
+
         if not self.d_obj.name:
             self.save_as()
         else:
@@ -304,6 +294,9 @@ class MenuBar(tk.Frame):
         return "break"
 
     def save_as(self, event=None):
+        if len(self.d_obj.json_dict) == 0:
+            return
+
         input_file_name = filedialog.asksaveasfilename(defaultextension=".json",
                 filetypes=[("Configuration Files", "*.json")]) 
         if input_file_name:
