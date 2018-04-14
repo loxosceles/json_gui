@@ -1,13 +1,12 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from tkinter import filedialog
 import tkinter as tk
-from tkinter import font
 from tkinter import ttk
-import os, re, json, string, pprint
+from tkinter import filedialog
+from tkinter import font
+import os, re, json, string
 from functools import partial as fp
-from sortedcontainers import SortedList
 from decimal import * 
 
 SPLASHSCREEN_TEXT = \
@@ -36,7 +35,7 @@ INTERIORBORDERWIDTH = 2
 #PRI_BACKGROUND = '#4e88e5'
 PRI_BACKGROUND = "white" 
 
-class Configurations(object):                
+class DataObject(object):                
     """Object holding configuration variables."""                                         
     config_file = 'tf_conf.json'                                 
     json_validated = bool()                  
@@ -244,10 +243,10 @@ class VerticalScrollFrame(ttk.Frame):
 
 
 class MenuBar(tk.Frame):
-    def __init__(self, parent, file_obj=None, *args, **kwargs):
+    def __init__(self, parent, data_object=None, *args, **kwargs):
         tk.Frame.__init__(self, parent, *args, **kwargs)
         self.parent = parent
-        self.fobj = file_obj 
+        self.fobj = data_object 
 
         # Create menu bar
         self.menubar = tk.Menu(self)
@@ -322,10 +321,77 @@ class MenuBar(tk.Frame):
 class KeyValueSection(tk.Frame):
     """ Section where configurations can be edited."""
 
-    def __init__(self, parent, file_obj=None, *args, **kwargs):
+    class ValidatingEntry(tk.Entry):
+    # base class for validating entry widgets
+
+        def __init__(self, parent, value="", **kwargs):
+            tk.Entry.__init__(self, parent, **kwargs)
+            self.__value = value
+            self.__variable = tk.StringVar()
+            self.__variable.set(value)
+            self.__variable.trace("w", self.__callback)
+            self.config(textvariable=self.__variable)
+
+        def __callback(self, *dummy):
+            value = self.__variable.get()
+            newvalue = self.validate(value)
+            if newvalue is None:
+                self.__variable.set(self.__value)
+            elif newvalue != value:
+                self.__value = newvalue
+                self.__variable.set(self.newvalue)
+            else:
+                self.__value = value
+
+        def validate(self, value):
+            # override: return value, new value, or None if invalid
+            return value
+
+    class IntegerEntry(ValidatingEntry):
+
+        def validate(self, value):
+            try:
+                if value:
+                    v = int(value)
+                return value
+            except ValueError:
+                return None
+
+    class FloatEntry(ValidatingEntry):
+
+        def validate(self, value):
+            try:
+                if value:
+                    v = float(value)
+                return value
+            except ValueError:
+                return None
+
+    class ArrayEntry(ValidatingEntry):
+
+        def validate(self, value):
+            try:
+                if value:
+                    v = list(map(lambda x: int(x), value.split()))
+                return value
+            except ValueError:
+                return None
+
+    class StringEntry(ValidatingEntry):
+
+        def validate(self, value):
+            try:
+                if value:
+                    if '"' in value:
+                        raise ValueError
+                return value
+            except ValueError:
+                return None
+
+    def __init__(self, parent, data_object=None, *args, **kwargs):
         tk.Frame.__init__(self, parent, *args, **kwargs)
         self.parent = parent
-        self.fobj = file_obj
+        self.fobj = data_object
         self.rowconfigure(0, weight=1)
         self.columnconfigure(0, weight=1)
         self.regex_nl = re.compile('\n')
@@ -359,24 +425,29 @@ class KeyValueSection(tk.Frame):
 
             j = 0
             k = i
+
             for key, val in obj.items():
                 ttk.Label(frame, text=key, justify=tk.LEFT).grid(row=k,
                         column=j, sticky=tk.NW)
 
-                if isinstance(val['value'], list):
+                if isinstance(val['value'], int):
+                    entry = self.IntegerEntry(frame, value=val['value'])
+                elif isinstance(val['value'], float):
+                    entry = self.FloatEntry(frame, value=val['value'])
+                elif isinstance(val['value'], list):
                     val = str(val['value']).strip('[]').replace(',', '')
+                    entry = self.ArrayEntry(frame, val)
                 else:
-                    val = val['value']
+                    entry = self.StringEntry(frame, value=val['value'])
 
-                value_field = tk.StringVar(frame, value=val)
 
-                entry = tk.Entry(frame, textvariable=value_field, justify=tk.LEFT)
+                entry.config(justify=tk.LEFT)
+
                 entry.grid(row=k+1, column=j, sticky=tk.NW)
                 entry.bind("<FocusOut>", lambda event, flat_keys=(section, key):
                     self.save_field(event, flat_keys))
 
                 j, k = self._accomodate_rows(j, k)
-
 
     def save_field(self, event, flat_keys):
         value = event.widget.get() 
@@ -386,12 +457,21 @@ class KeyValueSection(tk.Frame):
             re.DOTALL)) + 1 
 
         if isinstance(self.fobj.get_init_value(flat_keys), int):
-            value = int(value)
+            try:
+                value = int(value)
+            except ValueError:
+                value = ""
         if isinstance(self.fobj.get_init_value(flat_keys), float):
-            value = float(value)
+            try:
+                value = float(value)
+            except ValueError:
+                value = ""
         if isinstance(self.fobj.get_init_value(flat_keys), list):
-            value = [ int(x) for x in ' '.join(value.split()).split(' ') ]
-            
+            try:
+                value = [ int(x) for x in ' '.join(value.split()).split(' ') ]
+            except ValueError:
+                value = []
+
         keys = tuple((flat_keys[0] + " " + flat_keys[1]).split(' '))
         # save previous value for column comparison
         self.fobj.previous_value = self.fobj.dyn_dict_get(keys)
@@ -402,10 +482,10 @@ class KeyValueSection(tk.Frame):
 
 
 class Editor(tk.Frame):
-    def __init__(self, parent, file_obj=None, *args, **kwargs):
+    def __init__(self, parent, data_object=None, *args, **kwargs):
         tk.Frame.__init__(self, parent, *args, **kwargs)
         self.parent = parent
-        self.fobj = file_obj
+        self.fobj = data_object
         self.startup_screen = tk.StringVar()
         self.config(pady = 20)
         self.regex_nl = re.compile('\n')
@@ -492,15 +572,15 @@ class MainApplication(tk.Frame):
     def __init__(self, parent, *args, **kwargs):
         tk.Frame.__init__(self, parent, *args, **kwargs)
         self.parent = parent
-        # self.file_obj = FileObj()
-        self.file_obj = Configurations()
+        # self.data_object = FileObj()
+        self.data_object = DataObject()
 
         # Add menu bar
-        self.menubar = MenuBar(self, self.file_obj)
+        self.menubar = MenuBar(self, self.data_object)
 
         # Create GUI elements
-        self.key_value_section = KeyValueSection(self, self.file_obj)
-        self.editor = Editor(self, self.file_obj)
+        self.key_value_section = KeyValueSection(self, self.data_object)
+        self.editor = Editor(self, self.data_object)
 
         # Place GUI elements
         self.editor.grid(row=0, column=0, sticky=tk.NS)
