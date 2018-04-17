@@ -506,6 +506,7 @@ class Editor(ttk.Frame):
             self.textfield = tk.Text(self, font=self.textfield_font, 
                     yscrollcommand=self.scrollbar.set,
                     width=self.splashscreen_width)
+            # make textfield copy-pastable
             self.textfield.bind("<1>", lambda event: self.textfield.focus_set())
             self.textfield.pack(fill=tk.BOTH, expand=1)
             self.scrollbar.config(command=self.textfield.yview)
