@@ -189,10 +189,6 @@ class VerticalScrollFrame(ttk.Frame):
         self.canvas.bind('<Enter>', self._bind_to_mousewheel)
         self.canvas.bind('<Leave>', self._unbind_from_mousewheel)
 
-        #  # reset the view
-        #  self.canvas.xview_moveto(0)
-        #  self.canvas.yview_moveto(0)
-
         # create a frame inside the canvas which will be scrolled with it
         self.interior = ttk.Frame(self.canvas)
                                   
@@ -204,7 +200,6 @@ class VerticalScrollFrame(ttk.Frame):
     def __setBindings(self):
         '''Activate binding to configure scroll frame widgets.'''
         self.canvas.bind('<Configure>',self.__configure_canvas_interiorframe)
-        
 
     def __configure_canvas_interiorframe(self, event):
         '''Configure the interior frame size and the canvas scrollregion'''
@@ -228,6 +223,10 @@ class VerticalScrollFrame(ttk.Frame):
             self.canvas.itemconfigure(self.interior_id, height=interiorReqHeight)
             self.canvas.config(scrollregion="0 0 {0} {1}".
                                format(canvasWidth, interiorReqHeight))
+
+    def move_to_focus(line_number):
+        self.canvas.xview_moveto(line_number)
+        self.canvas.yview_moveto(line_number)
 
 
 class MenuBar(ttk.Frame):
@@ -271,6 +270,7 @@ class MenuBar(ttk.Frame):
 
             self.d_obj.import_file(input_file_name)
             self.parent.editor.textfield.insert(1.0, self.d_obj.json_str)
+            self.parent.editor.textfield.configure(state="disabled")
             self.parent.key_value_section.create_entry_boxes()
 
         # reset previos value 
@@ -443,6 +443,10 @@ class KeyValueSection(ttk.Frame):
                 j, k = self._accomodate_rows(j, k)
 
     def save_field(self, event, flat_keys):
+        # FIXME: get position of event inside canvas
+        #  print(event.widget.winfo_y())
+        #  print(self.frame.canvas.coords(entry))
+        
         value = event.widget.get() 
 
         # set editor field length before changing it
@@ -502,6 +506,7 @@ class Editor(ttk.Frame):
             self.textfield = tk.Text(self, font=self.textfield_font, 
                     yscrollcommand=self.scrollbar.set,
                     width=self.splashscreen_width)
+            self.textfield.bind("<1>", lambda event: self.textfield.focus_set())
             self.textfield.pack(fill=tk.BOTH, expand=1)
             self.scrollbar.config(command=self.textfield.yview)
 
@@ -548,15 +553,16 @@ class Editor(ttk.Frame):
             self.d_obj.dirty_tags.add(flat_keys)
 
         self.refresh()
+        self.textfield.see(end)
 
     def refresh(self):
+        self.textfield.configure(state='normal')
         self.textfield.delete(1.0, tk.END)
         self.textfield.insert(1.0, self.d_obj.json_str)
         for el in self.d_obj.dirty_tags:
             self.textfield.tag_add('match', self.d_obj.get_coords(el, 0),
                                             self.d_obj.get_coords(el, 1))
-        self.textfield.see(end)
-
+        self.textfield.configure(state='disabled')
 
 class MainApplication(ttk.Frame):
     def __init__(self, parent, *args, **kwargs):
