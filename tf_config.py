@@ -9,6 +9,7 @@ from tkinter import font
 import os, re, json, string
 from functools import partial as fp
 from decimal import * 
+from collections import OrderedDict
 
 
 #  Global constants
@@ -34,8 +35,8 @@ REGEX_NL = re.compile('\n')
 class DataObject(object):                
     """Object holding configuration variables."""                                         
     def __init__(self):                      
-        self.json_dict_flat = {}
-        self.json_dict = {}
+        self.json_dict_flat = {} 
+        self.json_dict = OrderedDict()
         self.dirty_tags = set() 
         self._name = ""
         
@@ -255,10 +256,18 @@ class MenuBar(ttk.Frame):
         self.file_menu.add_command(label='Quit', accelerator='Ctrl + Q',
                 compound=tk.LEFT, command=self.parent.quit)
 
+        # Create edit menu
+        self.edit_menu = tk.Menu(self.menubar, tearoff=0)
+        self.menubar.add_cascade(label='Edit', menu=self.edit_menu)
+        # Add object
+        self.edit_menu.add_command(label='Add Object', accelerator='Shift + Ctrl + O',
+                compound=tk.LEFT, command=self.add_object)
+
         # Create about menu
         self.about_menu = tk.Menu(self.menubar, tearoff=0)
         self.menubar.add_cascade(label='About', menu=self.about_menu)
     
+    # File menu methods
     def open(self, event=None):
         input_file_name = filedialog.askopenfilename(defaultextension=".json",
         filetypes=[("Configuration files", "*.json")])
@@ -308,6 +317,15 @@ class MenuBar(ttk.Frame):
                 json.dump(content, outfile)
         except IOError:
             pass
+
+    # Edit menu methods
+    def add_object(self, event=None, object_key="Default"):
+        print("Adding object")
+        self.d_obj.json_dict[object_key] = {}
+        self.d_obj.json_dict['pooling_layer_2']['dummy_label'] = 'dummy_value'
+        self.d_obj.gen_flat_key_dict(self.d_obj.json_dict, "")
+        self.parent.key_value_section.create_entry_boxes()
+        self.parent.editor.refresh()
                 
 
 class KeyValueSection(ttk.Frame):
@@ -595,6 +613,9 @@ class MainApplication(ttk.Frame):
         # bind quit shortcut
         self.parent.bind('<Control-Q>', self.quit_editor)
         self.parent.bind('<Control-q>', self.quit_editor)
+        # bind add object
+        self.parent.bind('<Control-Shift-O>', self.menubar.add_object)
+        self.parent.bind('<Control-Shift-o>', self.menubar.add_object)
 
     def quit_editor(self, event=None):
         self.parent.destroy()
