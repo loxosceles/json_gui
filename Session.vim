@@ -1,6 +1,6 @@
 " /mnt/DATA/__programming/PROJECTS/config_tool/Session.vim:
 " Vim session script.
-" Created by session.vim 2.13.1 on 01 Mai 2018 at 12:33:59.
+" Created by session.vim 2.13.1 on 01 Mai 2018 at 17:19:20.
 " Open this file in Vim and run :source % to restore your session.
 
 set guioptions=aegimrLtT
@@ -155,7 +155,7 @@ if expand('%') == '' && !&modified && line('$') <= 1 && getline(1) == ''
   let s:wipebuf = bufnr('%')
 endif
 set shortmess=aoO
-badd +508 tf_config.py
+badd +596 tf_config.py
 argglobal
 silent! argdel *
 edit tf_config.py
@@ -183,7 +183,7 @@ setlocal fdn=20
 setlocal nofen
 wincmd w
 argglobal
-setlocal fdm=manual
+setlocal fdm=indent
 setlocal fde=0
 setlocal fmr={{{,}}}
 setlocal fdi=#
@@ -191,19 +191,130 @@ setlocal fdl=0
 setlocal fml=1
 setlocal fdn=20
 setlocal fen
-silent! normal! zE
-270,288fold
-269,288fold
-269
+235
 silent! normal! zo
-270
+236
 silent! normal! zo
-let s:l = 508 - ((28 * winheight(0) + 30) / 61)
+273
+silent! normal! zo
+276
+silent! normal! zo
+302
+silent! normal! zo
+308
+silent! normal! zo
+324
+silent! normal! zo
+326
+silent! normal! zo
+326
+silent! normal! zo
+335
+silent! normal! zo
+339
+silent! normal! zo
+340
+silent! normal! zo
+348
+silent! normal! zo
+353
+silent! normal! zo
+363
+silent! normal! zo
+364
+silent! normal! zo
+365
+silent! normal! zo
+369
+silent! normal! zo
+372
+silent! normal! zo
+381
+silent! normal! zo
+382
+silent! normal! zo
+383
+silent! normal! zo
+417
+silent! normal! zo
+421
+silent! normal! zo
+421
+silent! normal! zo
+421
+silent! normal! zo
+421
+silent! normal! zo
+434
+silent! normal! zo
+437
+silent! normal! zo
+444
+silent! normal! zo
+452
+silent! normal! zo
+471
+silent! normal! zo
+503
+silent! normal! zo
+504
+silent! normal! zo
+581
+silent! normal! zo
+591
+silent! normal! zo
+592
+silent! normal! zo
+594
+silent! normal! zo
+597
+silent! normal! zo
+603
+silent! normal! zo
+603
+silent! normal! zo
+603
+silent! normal! zo
+603
+silent! normal! zo
+603
+silent! normal! zo
+603
+silent! normal! zo
+603
+silent! normal! zo
+620
+silent! normal! zo
+620
+silent! normal! zo
+627
+silent! normal! zo
+627
+silent! normal! zo
+631
+silent! normal! zo
+631
+silent! normal! zo
+644
+silent! normal! zo
+648
+silent! normal! zo
+652
+silent! normal! zo
+653
+silent! normal! zo
+686
+silent! normal! zo
+689
+silent! normal! zo
+693
+silent! normal! zo
+let s:l = 631 - ((30 * winheight(0) + 30) / 61)
 if s:l < 1 | let s:l = 1 | endif
 exe s:l
 normal! zt
-508
-normal! 0
+631
+normal! 026|
 wincmd w
 2wincmd w
 exe 'vert 1resize ' . ((&columns * 25 + 57) / 115)

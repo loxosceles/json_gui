@@ -10,6 +10,7 @@ import os, re, json, string
 from functools import partial as fp
 from decimal import * 
 from collections import OrderedDict
+import insert_dialog
 
 
 #  Global constants
@@ -320,12 +321,14 @@ class MenuBar(ttk.Frame):
 
     # Edit menu methods
     def add_object(self, event=None, object_key="Default"):
+        self.parent.create_dialog()
+        
         print("Adding object")
-        self.d_obj.json_dict[object_key] = {}
-        self.d_obj.json_dict['pooling_layer_2']['dummy_label'] = 'dummy_value'
-        self.d_obj.gen_flat_key_dict(self.d_obj.json_dict, "")
-        self.parent.key_value_section.create_entry_boxes()
-        self.parent.editor.refresh()
+        #  self.d_obj.json_dict[object_key] = {}
+        #  self.d_obj.json_dict['pooling_layer_2']['dummy_label'] = 'dummy_value'
+        #  self.d_obj.gen_flat_key_dict(self.d_obj.json_dict, "")
+        #  self.parent.key_value_section.create_entry_boxes()
+        #  self.parent.editor.refresh()
                 
 
 class KeyValueSection(ttk.Frame):
@@ -583,6 +586,68 @@ class Editor(ttk.Frame):
                                             self.d_obj.get_coords(el, 1))
         self.textfield.configure(state='disabled')
 
+
+class CreateDialog(insert_dialog.Dialog):
+    def __init__(self, parent, data_object):
+        insert_dialog.Dialog.__init__(self, parent)
+        #  self.parent = parent
+        self.d_obj = data_object
+
+    def body(self, root):
+        options_frame = ttk.Frame(root)
+        #  options_frame.grid(row=0, column=0, padx='20', pady='20', sticky=tk.NSEW)
+        options_frame.pack()
+        self.checked = tk.IntVar()
+        self.checked.set(0)
+        self.obj_cb = ttk.Checkbutton(options_frame,
+                                      variable=self.checked,
+                                      text="Inside new object", 
+                                      onvalue=1,
+                                      offvalue=0,
+                                      command=self.toggle_checkbox)
+        self.obj_cb.grid(row=0, column=0)
+
+        n = ttk.Notebook(root)
+        # create tabs
+        t_array = ttk.Frame(n)
+        t_float = ttk.Frame(n)
+        t_integer = ttk.Frame(n)
+        t_string = ttk.Frame(n)
+        
+        # create tab content
+
+        ttk.Label(t_array, style="id_label_style.TLabel", text="Key"
+                 ).grid(row=0, column=0, sticky=tk.NW)
+
+        self.key = tk.StringVar()
+        self.key_entry = tk.Entry(t_array, textvariable=self.key) 
+        self.key_entry.grid(row=1, column=0, sticky=tk.NW)
+
+        ttk.Label(t_array, style="id_label_style.TLabel", text="Value"
+                 ).grid(row=2, column=0, sticky=tk.NW)
+
+        self.value = tk.StringVar()
+        self.value_entry = self.parent.key_value_section.ArrayEntry(
+                t_array, self.value)
+        self.value_entry.grid(row=3, column=0, sticky=tk.NW)
+
+
+        n.add(t_array, text='Array')
+        n.add(t_float, text='Float')
+        n.add(t_integer, text='Integer')
+        n.add(t_string, text='String')
+        n.pack()
+
+        return t_array # initial focus
+
+    def apply(self):
+        print("Key: ", self.key.get())
+        print("Value: ", self.value.get())
+
+    def toggle_checkbox(self):
+        pass
+
+
 class MainApplication(ttk.Frame):
     def __init__(self, parent, *args, **kwargs):
         ttk.Frame.__init__(self, parent, *args, **kwargs)
@@ -620,6 +685,9 @@ class MainApplication(ttk.Frame):
     def quit_editor(self, event=None):
         self.parent.destroy()
 
+    def create_dialog(self):
+        self.obj_dialog = CreateDialog(self, self.data_object)
+        self.parent.wait_window(self.obj_dialog.parent.parent)
 
 if __name__ == "__main__":
     root = tk.Tk()
