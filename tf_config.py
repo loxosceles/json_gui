@@ -125,6 +125,10 @@ class DataObject(object):
 
         for i in range(len(keys)):   
             s += "[keys[" + str(i) + "]]" 
+            try:
+                eval(s)
+            except KeyError:
+                exec(s + " = {}")
 
         if isinstance(val, str):
             s += " = " + str('"' + val + '"')
@@ -138,6 +142,9 @@ class DataObject(object):
 
     def get_init_value(self, keys):
         return self.json_dict_flat[keys[0]][keys[1]]['value']
+
+    def flat_keys_list(self):
+        return list(self.json_dict_flat)
 
     @property
     def name(self):
@@ -600,43 +607,58 @@ class Editor(ttk.Frame):
 class CreateDialog(insert_dialog.Dialog):
     def __init__(self, parent, data_object):
         insert_dialog.Dialog.__init__(self, parent)
-        #  self.parent = parent
         self.d_obj = data_object
 
     def body(self, root):
+
         options_frame = ttk.Frame(root)
-        #  options_frame.grid(row=0, column=0, padx='20', pady='20', sticky=tk.NSEW)
+
+        n = ttk.Notebook(root)
+        # create tabs
+        t_array = ttk.Frame(n, padding=20)
+        t_float = ttk.Frame(n, padding=20)
+        t_integer = ttk.Frame(n, padding=20)
+        t_string = ttk.Frame(n, padding=20)
+
+        self.flat_keys = tk.StringVar()
+
+        self.key_list = ttk.Combobox(t_array, textvariable=self.flat_keys)
+        self.key_list['values'] = (self.parent.data_object.flat_keys_list()) 
+        self.key_list.grid(row=0, column=0, sticky=tk.NW)
+
+        self.obj_key_entry = StringEntry(t_array, state=tk.DISABLED)
+
         options_frame.pack()
         self.checked = tk.IntVar()
-        self.checked.set(1)
+        self.checked.set(0)
         self.obj_cb = ttk.Checkbutton(options_frame,
                                       variable=self.checked,
                                       text="Inside new object", 
                                       onvalue=1,
                                       offvalue=0,
-                                      command=self.toggle_checkbox)
+                                      command=lambda e=self.obj_key_entry, v=self.checked:
+                                        self.toggle_objectname_field(e,v))
+
         self.obj_cb.grid(row=0, column=0)
 
-        n = ttk.Notebook(root)
-        # create tabs
-        t_array = ttk.Frame(n)
-        t_float = ttk.Frame(n)
-        t_integer = ttk.Frame(n)
-        t_string = ttk.Frame(n)
         
         # create tab content
+        ttk.Label(t_array, style="id_label_style.TLabel", text="Object Key"
+                 ).grid(row=1, column=0, sticky=tk.NW)
 
-        ttk.Label(t_array, style="id_label_style.TLabel", text="Key"
-                 ).grid(row=0, column=0, sticky=tk.NW)
+        self.obj_key_entry.grid(row=2, column=0, sticky=tk.NW)
+
+        obj_key_label = ttk.Label(t_array, style="id_label_style.TLabel", text="Key"
+                 ).grid(row=3, column=0, sticky=tk.NW)
 
         self.key_entry = StringEntry(t_array)
-        self.key_entry.grid(row=1, column=0, sticky=tk.NW)
+        self.key_entry.grid(row=4, column=0, sticky=tk.NW)
 
         ttk.Label(t_array, style="id_label_style.TLabel", text="Value"
-                 ).grid(row=2, column=0, sticky=tk.NW)
+                 ).grid(row=5, column=0, sticky=tk.NW)
 
         self.value_entry = ArrayEntry(t_array)
-        self.value_entry.grid(row=3, column=0, sticky=tk.NW)
+        self.value_entry.grid(row=6, column=0, sticky=tk.NW)
 
         n.add(t_array, text='Array')
         n.add(t_float, text='Float')
@@ -647,33 +669,36 @@ class CreateDialog(insert_dialog.Dialog):
         return t_array # initial focus
 
     def apply(self):
-        print("Key get: ", self.key_entry.get())
-        print("Value get: ", self.value_entry.get())
-        object_key = "new_object_ba"
+        #  print("Key get: ", self.key_entry.get())
+        #  print("Value get: ", self.value_entry.get())
+        #  print("Key List: ", self.key_list.get())
+        #  print("Node: ", self.key_list.get())
 
-        key = self.key_entry.get().strip().replace(' ', '_')
-        print("KEY: ", key) 
+        node = self.key_list.get()
+        key = self.key_entry.get().strip().replace(' ', '_').lower()
 
         value = self.value_entry.get()
         value = [ int(x) for x in ' '.join(value.split()).split(' ') ]
 
         if self.checked.get() == 1:
-            print("Adding object")
-            if not self.parent.data_object.json_dict.get(object_key):
-                self.parent.data_object.json_dict[object_key] = {}
-            self.parent.data_object.json_dict[object_key][key] = value
-        #  elif self.checked.get() == 0:
-        #      self.parent.data_object.json_dict[][key] = value
-        #      #  print(self.parent.data_object.json_dict)
+            object_key = self.obj_key_entry.get().strip().replace(' ', '_').lower()
+            aux = (node + " " + object_key + " " + key).strip()
+        else:
+            aux = (node + " " + key).strip()
 
-        print("Dict string: ", self.parent.data_object.json_str)
+        xkeys = tuple(aux.split(' '))
+
+        self.parent.data_object.dyn_dict_set(xkeys, value)
+
         self.parent.data_object.gen_flat_key_dict(self.parent.data_object.json_dict, "")
         self.parent.key_value_section.create_entry_boxes()
         self.parent.editor.refresh()
 
-    def toggle_checkbox(self):
-        # Useful for a preview
-        pass
+    def toggle_objectname_field(self, entry, var):
+        if var.get() == 0:
+            entry.configure(state=tk.DISABLED)
+        else:
+            entry.configure(state=tk.NORMAL)
 
 
 class MainApplication(ttk.Frame):

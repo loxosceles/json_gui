@@ -1,6 +1,6 @@
 " /mnt/DATA/__programming/PROJECTS/config_tool/Session.vim:
 " Vim session script.
-" Created by session.vim 2.13.1 on 01 Mai 2018 at 21:38:26.
+" Created by session.vim 2.13.1 on 02 Mai 2018 at 01:07:21.
 " Open this file in Vim and run :source % to restore your session.
 
 set guioptions=aegimrLtT
@@ -207,6 +207,8 @@ silent! normal! zo
 silent! normal! zo
 66
 silent! normal! zo
+73
+silent! normal! zo
 81
 silent! normal! zo
 82
@@ -217,160 +219,190 @@ silent! normal! zo
 silent! normal! zo
 116
 silent! normal! zo
-242
+124
 silent! normal! zo
-243
+127
 silent! normal! zo
-251
+129
 silent! normal! zo
-256
+131
 silent! normal! zo
-277
+141
 silent! normal! zo
-290
+147
 silent! normal! zo
-292
+158
 silent! normal! zo
-293
+249
 silent! normal! zo
-312
+250
 silent! normal! zo
-313
+258
 silent! normal! zo
-350
+263
 silent! normal! zo
-353
+284
 silent! normal! zo
-379
+297
 silent! normal! zo
-385
+299
 silent! normal! zo
-401
+300
 silent! normal! zo
-405
+319
+silent! normal! zo
+320
+silent! normal! zo
+357
+silent! normal! zo
+360
+silent! normal! zo
+386
+silent! normal! zo
+392
 silent! normal! zo
 408
 silent! normal! zo
-417
+412
 silent! normal! zo
-418
+415
 silent! normal! zo
-421
+424
 silent! normal! zo
 425
 silent! normal! zo
-429
+428
 silent! normal! zo
-429
+432
 silent! normal! zo
-429
+436
 silent! normal! zo
-429
+436
 silent! normal! zo
-442
+436
 silent! normal! zo
-447
+436
+silent! normal! zo
+449
 silent! normal! zo
 454
 silent! normal! zo
-458
-silent! normal! zo
-460
-silent! normal! zo
-462
+461
 silent! normal! zo
 465
 silent! normal! zo
-481
+467
 silent! normal! zo
-498
+469
 silent! normal! zo
-513
+472
 silent! normal! zo
-514
+488
 silent! normal! zo
-535
+495
 silent! normal! zo
-535
+500
 silent! normal! zo
-538
+505
 silent! normal! zo
-538
+520
 silent! normal! zo
-591
+521
 silent! normal! zo
-595
+542
 silent! normal! zo
-596
+542
 silent! normal! zo
-596
+545
 silent! normal! zo
-596
+545
 silent! normal! zo
-596
+581
 silent! normal! zo
-596
-silent! normal! zo
-596
-silent! normal! zo
-596
-silent! normal! zo
-596
-silent! normal! zo
-601
+598
 silent! normal! zo
 602
 silent! normal! zo
-604
+603
 silent! normal! zo
-607
+603
 silent! normal! zo
-613
+603
 silent! normal! zo
-613
+603
 silent! normal! zo
-613
+603
 silent! normal! zo
-613
+603
 silent! normal! zo
-613
+603
 silent! normal! zo
-613
+603
 silent! normal! zo
-613
+608
 silent! normal! zo
-630
+609
 silent! normal! zo
-630
+614
 silent! normal! zo
-636
+635
 silent! normal! zo
-636
+635
 silent! normal! zo
-650
+635
 silent! normal! zo
-661
+635
 silent! normal! zo
-663
+635
 silent! normal! zo
-676
+635
 silent! normal! zo
-680
+635
 silent! normal! zo
-681
+640
 silent! normal! zo
-714
+647
 silent! normal! zo
-717
+647
 silent! normal! zo
-721
+652
 silent! normal! zo
-let s:l = 664 - ((30 * winheight(0) + 30) / 61)
+652
+silent! normal! zo
+658
+silent! normal! zo
+658
+silent! normal! zo
+677
+silent! normal! zo
+684
+silent! normal! zo
+687
+silent! normal! zo
+698
+silent! normal! zo
+699
+silent! normal! zo
+701
+silent! normal! zo
+701
+silent! normal! zo
+705
+silent! normal! zo
+706
+silent! normal! zo
+739
+silent! normal! zo
+742
+silent! normal! zo
+746
+silent! normal! zo
+let s:l = 649 - ((44 * winheight(0) + 30) / 61)
 if s:l < 1 | let s:l = 1 | endif
 exe s:l
 normal! zt
-664
-normal! 0
+649
+normal! 062|
 wincmd w
 2wincmd w
 exe 'vert 1resize ' . ((&columns * 25 + 60) / 121)
