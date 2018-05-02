@@ -677,7 +677,7 @@ class CreateDialog(insert_dialog.Dialog):
         return t_array # initial focus
 
     def apply(self):
-        node = self.key_list.get()
+        node = self.key_list.get().strip().replace(' ', '_').lower()
         key = self.key_entry.get().strip().replace(' ', '_').lower()
 
         value = self.value_entry.get()

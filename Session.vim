@@ -1,6 +1,6 @@
 " /mnt/DATA/__programming/PROJECTS/config_tool/Session.vim:
 " Vim session script.
-" Created by session.vim 2.13.1 on 02 Mai 2018 at 11:38:56.
+" Created by session.vim 2.13.1 on 02 Mai 2018 at 12:57:01.
 " Open this file in Vim and run :source % to restore your session.
 
 set guioptions=aegimrLtT
@@ -155,7 +155,7 @@ if expand('%') == '' && !&modified && line('$') <= 1 && getline(1) == ''
   let s:wipebuf = bufnr('%')
 endif
 set shortmess=aoO
-badd +508 tf_config.py
+badd +680 tf_config.py
 argglobal
 silent! argdel *
 edit tf_config.py
@@ -168,8 +168,8 @@ set nosplitbelow
 set nosplitright
 wincmd t
 set winminheight=1 winheight=1 winminwidth=1 winwidth=1
-exe 'vert 1resize ' . ((&columns * 25 + 60) / 121)
-exe 'vert 2resize ' . ((&columns * 95 + 60) / 121)
+exe 'vert 1resize ' . ((&columns * 25 + 72) / 144)
+exe 'vert 2resize ' . ((&columns * 118 + 72) / 144)
 argglobal
 enew
 " file NERD_tree_2
@@ -343,34 +343,6 @@ silent! normal! zo
 silent! normal! zo
 614
 silent! normal! zo
-638
-silent! normal! zo
-638
-silent! normal! zo
-638
-silent! normal! zo
-638
-silent! normal! zo
-638
-silent! normal! zo
-638
-silent! normal! zo
-638
-silent! normal! zo
-643
-silent! normal! zo
-652
-silent! normal! zo
-652
-silent! normal! zo
-659
-silent! normal! zo
-659
-silent! normal! zo
-666
-silent! normal! zo
-666
-silent! normal! zo
 680
 silent! normal! zo
 686
@@ -379,30 +351,24 @@ silent! normal! zo
 silent! normal! zo
 700
 silent! normal! zo
-701
-silent! normal! zo
-703
-silent! normal! zo
 707
 silent! normal! zo
 708
-silent! normal! zo
-741
 silent! normal! zo
 744
 silent! normal! zo
 748
 silent! normal! zo
-let s:l = 616 - ((0 * winheight(0) + 30) / 61)
+let s:l = 675 - ((30 * winheight(0) + 25) / 51)
 if s:l < 1 | let s:l = 1 | endif
 exe s:l
 normal! zt
-616
-normal! 0
+675
+normal! 016|
 wincmd w
 2wincmd w
-exe 'vert 1resize ' . ((&columns * 25 + 60) / 121)
-exe 'vert 2resize ' . ((&columns * 95 + 60) / 121)
+exe 'vert 1resize ' . ((&columns * 25 + 72) / 144)
+exe 'vert 2resize ' . ((&columns * 118 + 72) / 144)
 tabnext 1
 if exists('s:wipebuf')
 "   silent exe 'bwipe ' . s:wipebuf
@@ -432,7 +398,7 @@ if !getbufvar(s:bufnr_save, '&modified')
   endif
 endif
 execute "cd" fnameescape(s:cwd_save)
-1resize 61|vert 1resize 25|2resize 61|vert 2resize 95|
+1resize 51|vert 1resize 25|2resize 51|vert 2resize 118|
 2wincmd w
 tabnext 1
 if exists('s:wipebuf')
