@@ -610,10 +610,9 @@ class CreateDialog(insert_dialog.Dialog):
         self.d_obj = data_object
 
     def body(self, root):
-
         options_frame = ttk.Frame(root)
-
         n = ttk.Notebook(root)
+
         # create tabs
         t_array = ttk.Frame(n, padding=20)
         t_float = ttk.Frame(n, padding=20)

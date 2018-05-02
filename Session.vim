@@ -1,6 +1,6 @@
 " /mnt/DATA/__programming/PROJECTS/config_tool/Session.vim:
 " Vim session script.
-" Created by session.vim 2.13.1 on 02 Mai 2018 at 01:07:21.
+" Created by session.vim 2.13.1 on 02 Mai 2018 at 11:00:27.
 " Open this file in Vim and run :source % to restore your session.
 
 set guioptions=aegimrLtT
@@ -155,7 +155,7 @@ if expand('%') == '' && !&modified && line('$') <= 1 && getline(1) == ''
   let s:wipebuf = bufnr('%')
 endif
 set shortmess=aoO
-badd +71 tf_config.py
+badd +508 tf_config.py
 argglobal
 silent! argdel *
 edit tf_config.py
@@ -172,7 +172,7 @@ exe 'vert 1resize ' . ((&columns * 25 + 60) / 121)
 exe 'vert 2resize ' . ((&columns * 95 + 60) / 121)
 argglobal
 enew
-" file NERD_tree_1
+" file NERD_tree_2
 setlocal fdm=manual
 setlocal fde=0
 setlocal fmr={{{,}}}
@@ -243,11 +243,9 @@ silent! normal! zo
 silent! normal! zo
 284
 silent! normal! zo
-297
+298
 silent! normal! zo
 299
-silent! normal! zo
-300
 silent! normal! zo
 319
 silent! normal! zo
@@ -343,66 +341,64 @@ silent! normal! zo
 silent! normal! zo
 609
 silent! normal! zo
-614
+613
 silent! normal! zo
-635
+634
 silent! normal! zo
-635
+634
 silent! normal! zo
-635
+634
 silent! normal! zo
-635
+634
 silent! normal! zo
-635
+634
 silent! normal! zo
-635
+634
 silent! normal! zo
-635
+634
 silent! normal! zo
-640
+639
 silent! normal! zo
-647
+646
 silent! normal! zo
-647
+646
 silent! normal! zo
-652
+651
 silent! normal! zo
-652
+651
 silent! normal! zo
-658
+657
 silent! normal! zo
-658
+657
 silent! normal! zo
-677
+676
 silent! normal! zo
-684
+683
 silent! normal! zo
-687
+686
+silent! normal! zo
+697
 silent! normal! zo
 698
 silent! normal! zo
-699
+700
 silent! normal! zo
-701
-silent! normal! zo
-701
+704
 silent! normal! zo
 705
 silent! normal! zo
-706
+738
 silent! normal! zo
-739
+741
 silent! normal! zo
-742
+745
 silent! normal! zo
-746
-silent! normal! zo
-let s:l = 649 - ((44 * winheight(0) + 30) / 61)
+let s:l = 619 - ((28 * winheight(0) + 30) / 61)
 if s:l < 1 | let s:l = 1 | endif
 exe s:l
 normal! zt
-649
-normal! 062|
+619
+normal! 09|
 wincmd w
 2wincmd w
 exe 'vert 1resize ' . ((&columns * 25 + 60) / 121)
