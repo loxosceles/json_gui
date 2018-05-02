@@ -1,6 +1,6 @@
 " /mnt/DATA/__programming/PROJECTS/config_tool/Session.vim:
 " Vim session script.
-" Created by session.vim 2.13.1 on 02 Mai 2018 at 11:38:56.
+" Created by session.vim 2.13.1 on 02 Mai 2018 at 12:20:56.
 " Open this file in Vim and run :source % to restore your session.
 
 set guioptions=aegimrLtT
@@ -155,7 +155,7 @@ if expand('%') == '' && !&modified && line('$') <= 1 && getline(1) == ''
   let s:wipebuf = bufnr('%')
 endif
 set shortmess=aoO
-badd +508 tf_config.py
+badd +618 tf_config.py
 argglobal
 silent! argdel *
 edit tf_config.py
@@ -341,64 +341,66 @@ silent! normal! zo
 silent! normal! zo
 608
 silent! normal! zo
-614
+613
 silent! normal! zo
-638
+634
 silent! normal! zo
-638
+649
 silent! normal! zo
-638
+649
 silent! normal! zo
-638
+649
 silent! normal! zo
-638
+649
 silent! normal! zo
-638
+649
 silent! normal! zo
-638
+649
 silent! normal! zo
-643
+649
 silent! normal! zo
-652
+654
 silent! normal! zo
-652
+663
 silent! normal! zo
-659
+663
 silent! normal! zo
-659
+670
 silent! normal! zo
-666
+670
 silent! normal! zo
-666
+677
 silent! normal! zo
-680
+677
 silent! normal! zo
-686
+683
 silent! normal! zo
 689
 silent! normal! zo
-700
-silent! normal! zo
-701
+692
 silent! normal! zo
 703
 silent! normal! zo
-707
+704
 silent! normal! zo
-708
+706
 silent! normal! zo
-741
+710
+silent! normal! zo
+711
 silent! normal! zo
 744
 silent! normal! zo
-748
+747
 silent! normal! zo
-let s:l = 616 - ((0 * winheight(0) + 30) / 61)
+751
+silent! normal! zo
+let s:l = 624 - ((6 * winheight(0) + 30) / 61)
 if s:l < 1 | let s:l = 1 | endif
 exe s:l
 normal! zt
-616
-normal! 0
+624
+normal! 016|
 wincmd w
 2wincmd w
 exe 'vert 1resize ' . ((&columns * 25 + 60) / 121)

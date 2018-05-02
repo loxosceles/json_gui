@@ -610,74 +610,77 @@ class CreateDialog(insert_dialog.Dialog):
 
     def body(self, root):
         
-        # vars
-        self.flat_keys = tk.StringVar()
-        self.checked = tk.IntVar()
-
-        options_frame = ttk.Frame(root)
         n = ttk.Notebook(root)
+        self.options_frame = ttk.Frame(root)
 
         # create tabs
-        t_array = ttk.Frame(n, padding=20)
-        t_float = ttk.Frame(n, padding=20)
-        t_integer = ttk.Frame(n, padding=20)
-        t_string = ttk.Frame(n, padding=20)
+        self.t_array = ttk.Frame(n, padding=20)
+        self.t_float = ttk.Frame(n, padding=20)
+        self.t_integer = ttk.Frame(n, padding=20)
+        self.t_string = ttk.Frame(n, padding=20)
+
+        self.create_tab_content(self.t_array)
+
+        n.add(self.t_array, text='Array')
+        n.add(self.t_float, text='Float')
+        n.add(self.t_integer, text='Integer')
+        n.add(self.t_string, text='String')
+        n.pack()
+
+        return self.t_array # initial focus
+
+    def create_tab_content(self, tab_type):
+        # vars
+        flat_keys = tk.StringVar()
+        checked = tk.IntVar()
 
         # create elements
-        self.key_list = ttk.Combobox(t_array, textvariable=self.flat_keys)
-        self.obj_key_entry = StringEntry(t_array, state=tk.DISABLED)
-        self.key_entry = StringEntry(t_array)
-        self.value_entry = ArrayEntry(t_array)
+        key_list = ttk.Combobox(tab_type, textvariable=flat_keys)
+        obj_key_entry = StringEntry(tab_type, state=tk.DISABLED)
+        key_entry = StringEntry(tab_type)
+        value_entry = ArrayEntry(tab_type)
 
         # options frame config and placement
-        options_frame.pack()
+        self.options_frame.pack()
 
         # checkbutton 
-        self.checked.set(0)
-        self.obj_cb = ttk.Checkbutton(options_frame,
-                                      variable=self.checked,
+        checked.set(0)
+        obj_cb = ttk.Checkbutton(self.options_frame,
+                                      variable=checked,
                                       text="Inside new object", 
                                       onvalue=1,
                                       offvalue=0,
-                                      command=lambda e=self.obj_key_entry, v=self.checked:
+                                      command=lambda e=obj_key_entry, v=checked:
                                         self.toggle_objectname_field(e,v))
-        self.obj_cb.grid(row=0, column=0)
+        obj_cb.grid(row=0, column=0)
 
         # key list config and placement
-        self.key_list['values'] = (self.parent.data_object.flat_keys_list()) 
-        self.key_list.grid(row=0, column=0, sticky=tk.NW)
+        key_list['values'] = (self.parent.data_object.flat_keys_list()) 
+        key_list.grid(row=0, column=0, sticky=tk.NW)
 
         # Object key label
-        ttk.Label(t_array, style="id_label_style.TLabel", text="Object Key"
+        ttk.Label(tab_type, style="id_label_style.TLabel", text="Object Key"
                  ).grid(row=1, column=0, sticky=tk.NW)
 
         # Object key entry
-        self.obj_key_entry.grid(row=2, column=0, sticky=tk.NW)
+        obj_key_entry.grid(row=2, column=0, sticky=tk.NW)
 
         # Key label
-        key_label = ttk.Label(t_array, style="id_label_style.TLabel", text="Key"
+        key_label = ttk.Label(tab_type, style="id_label_style.TLabel", text="Key"
                  ).grid(row=3, column=0, sticky=tk.NW)
 
         # Key entry
-        self.key_entry.grid(row=4, column=0, sticky=tk.NW)
+        key_entry.grid(row=4, column=0, sticky=tk.NW)
         
         # Value label
-        ttk.Label(t_array, style="id_label_style.TLabel", text="Value"
+        ttk.Label(tab_type, style="id_label_style.TLabel", text="Value"
                  ).grid(row=5, column=0, sticky=tk.NW)
 
         # Value entry
-        self.value_entry.grid(row=6, column=0, sticky=tk.NW)
-
-        n.add(t_array, text='Array')
-        n.add(t_float, text='Float')
-        n.add(t_integer, text='Integer')
-        n.add(t_string, text='String')
-        n.pack()
-
-        return t_array # initial focus
+        value_entry.grid(row=6, column=0, sticky=tk.NW)
 
     def apply(self):
-        node = self.key_list.get()
+        node = self.t_array.key_list.get()
         key = self.key_entry.get().strip().replace(' ', '_').lower()
 
         value = self.value_entry.get()
