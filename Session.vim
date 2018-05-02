@@ -1,6 +1,6 @@
 " /mnt/DATA/__programming/PROJECTS/config_tool/Session.vim:
 " Vim session script.
-" Created by session.vim 2.13.1 on 02 Mai 2018 at 11:00:27.
+" Created by session.vim 2.13.1 on 02 Mai 2018 at 11:38:56.
 " Open this file in Vim and run :source % to restore your session.
 
 set guioptions=aegimrLtT
@@ -295,110 +295,110 @@ silent! normal! zo
 silent! normal! zo
 472
 silent! normal! zo
-488
+487
 silent! normal! zo
-495
+494
 silent! normal! zo
-500
+499
 silent! normal! zo
-505
+504
+silent! normal! zo
+519
 silent! normal! zo
 520
 silent! normal! zo
-521
+541
 silent! normal! zo
-542
+541
 silent! normal! zo
-542
+544
 silent! normal! zo
-545
+544
 silent! normal! zo
-545
+580
 silent! normal! zo
-581
+597
 silent! normal! zo
-598
+601
 silent! normal! zo
 602
 silent! normal! zo
-603
+602
 silent! normal! zo
-603
+602
 silent! normal! zo
-603
+602
 silent! normal! zo
-603
+602
 silent! normal! zo
-603
+602
 silent! normal! zo
-603
+602
 silent! normal! zo
-603
+602
 silent! normal! zo
-603
+607
 silent! normal! zo
 608
 silent! normal! zo
-609
+614
 silent! normal! zo
-613
+638
 silent! normal! zo
-634
+638
 silent! normal! zo
-634
+638
 silent! normal! zo
-634
+638
 silent! normal! zo
-634
+638
 silent! normal! zo
-634
+638
 silent! normal! zo
-634
+638
 silent! normal! zo
-634
+643
 silent! normal! zo
-639
+652
 silent! normal! zo
-646
+652
 silent! normal! zo
-646
+659
 silent! normal! zo
-651
+659
 silent! normal! zo
-651
+666
 silent! normal! zo
-657
+666
 silent! normal! zo
-657
-silent! normal! zo
-676
-silent! normal! zo
-683
+680
 silent! normal! zo
 686
 silent! normal! zo
-697
-silent! normal! zo
-698
+689
 silent! normal! zo
 700
 silent! normal! zo
-704
+701
 silent! normal! zo
-705
+703
 silent! normal! zo
-738
+707
+silent! normal! zo
+708
 silent! normal! zo
 741
 silent! normal! zo
-745
+744
 silent! normal! zo
-let s:l = 619 - ((28 * winheight(0) + 30) / 61)
+748
+silent! normal! zo
+let s:l = 616 - ((0 * winheight(0) + 30) / 61)
 if s:l < 1 | let s:l = 1 | endif
 exe s:l
 normal! zt
-619
-normal! 09|
+616
+normal! 0
 wincmd w
 2wincmd w
 exe 'vert 1resize ' . ((&columns * 25 + 60) / 121)

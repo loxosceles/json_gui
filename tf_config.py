@@ -471,7 +471,6 @@ class KeyValueSection(ttk.Frame):
                 else:
                     entry = StringEntry(frame, value=val['value'])
 
-
                 entry.config(justify=tk.LEFT)
 
                 entry.grid(row=k+1, column=j, sticky=tk.NW)
@@ -610,6 +609,11 @@ class CreateDialog(insert_dialog.Dialog):
         self.d_obj = data_object
 
     def body(self, root):
+        
+        # vars
+        self.flat_keys = tk.StringVar()
+        self.checked = tk.IntVar()
+
         options_frame = ttk.Frame(root)
         n = ttk.Notebook(root)
 
@@ -619,16 +623,16 @@ class CreateDialog(insert_dialog.Dialog):
         t_integer = ttk.Frame(n, padding=20)
         t_string = ttk.Frame(n, padding=20)
 
-        self.flat_keys = tk.StringVar()
-
+        # create elements
         self.key_list = ttk.Combobox(t_array, textvariable=self.flat_keys)
-        self.key_list['values'] = (self.parent.data_object.flat_keys_list()) 
-        self.key_list.grid(row=0, column=0, sticky=tk.NW)
-
         self.obj_key_entry = StringEntry(t_array, state=tk.DISABLED)
+        self.key_entry = StringEntry(t_array)
+        self.value_entry = ArrayEntry(t_array)
 
+        # options frame config and placement
         options_frame.pack()
-        self.checked = tk.IntVar()
+
+        # checkbutton 
         self.checked.set(0)
         self.obj_cb = ttk.Checkbutton(options_frame,
                                       variable=self.checked,
@@ -637,26 +641,31 @@ class CreateDialog(insert_dialog.Dialog):
                                       offvalue=0,
                                       command=lambda e=self.obj_key_entry, v=self.checked:
                                         self.toggle_objectname_field(e,v))
-
         self.obj_cb.grid(row=0, column=0)
 
-        
-        # create tab content
+        # key list config and placement
+        self.key_list['values'] = (self.parent.data_object.flat_keys_list()) 
+        self.key_list.grid(row=0, column=0, sticky=tk.NW)
+
+        # Object key label
         ttk.Label(t_array, style="id_label_style.TLabel", text="Object Key"
                  ).grid(row=1, column=0, sticky=tk.NW)
 
+        # Object key entry
         self.obj_key_entry.grid(row=2, column=0, sticky=tk.NW)
 
-        obj_key_label = ttk.Label(t_array, style="id_label_style.TLabel", text="Key"
+        # Key label
+        key_label = ttk.Label(t_array, style="id_label_style.TLabel", text="Key"
                  ).grid(row=3, column=0, sticky=tk.NW)
 
-        self.key_entry = StringEntry(t_array)
+        # Key entry
         self.key_entry.grid(row=4, column=0, sticky=tk.NW)
-
+        
+        # Value label
         ttk.Label(t_array, style="id_label_style.TLabel", text="Value"
                  ).grid(row=5, column=0, sticky=tk.NW)
 
-        self.value_entry = ArrayEntry(t_array)
+        # Value entry
         self.value_entry.grid(row=6, column=0, sticky=tk.NW)
 
         n.add(t_array, text='Array')
@@ -668,16 +677,10 @@ class CreateDialog(insert_dialog.Dialog):
         return t_array # initial focus
 
     def apply(self):
-        #  print("Key get: ", self.key_entry.get())
-        #  print("Value get: ", self.value_entry.get())
-        #  print("Key List: ", self.key_list.get())
-        #  print("Node: ", self.key_list.get())
-
         node = self.key_list.get()
         key = self.key_entry.get().strip().replace(' ', '_').lower()
 
         value = self.value_entry.get()
-        value = [ int(x) for x in ' '.join(value.split()).split(' ') ]
 
         if self.checked.get() == 1:
             object_key = self.obj_key_entry.get().strip().replace(' ', '_').lower()
@@ -685,9 +688,9 @@ class CreateDialog(insert_dialog.Dialog):
         else:
             aux = (node + " " + key).strip()
 
-        xkeys = tuple(aux.split(' '))
+        keys = tuple(aux.split(' '))
 
-        self.parent.data_object.dyn_dict_set(xkeys, value)
+        self.parent.data_object.dyn_dict_set(keys, value)
 
         self.parent.data_object.gen_flat_key_dict(self.parent.data_object.json_dict, "")
         self.parent.key_value_section.create_entry_boxes()
