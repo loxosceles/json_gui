@@ -1,6 +1,6 @@
 " /mnt/DATA/__programming/PROJECTS/config_tool/Session.vim:
 " Vim session script.
-" Created by session.vim 2.13.1 on 01 Mai 2018 at 17:19:20.
+" Created by session.vim 2.13.1 on 01 Mai 2018 at 21:38:26.
 " Open this file in Vim and run :source % to restore your session.
 
 set guioptions=aegimrLtT
@@ -155,7 +155,7 @@ if expand('%') == '' && !&modified && line('$') <= 1 && getline(1) == ''
   let s:wipebuf = bufnr('%')
 endif
 set shortmess=aoO
-badd +596 tf_config.py
+badd +71 tf_config.py
 argglobal
 silent! argdel *
 edit tf_config.py
@@ -168,8 +168,8 @@ set nosplitbelow
 set nosplitright
 wincmd t
 set winminheight=1 winheight=1 winminwidth=1 winwidth=1
-exe 'vert 1resize ' . ((&columns * 25 + 57) / 115)
-exe 'vert 2resize ' . ((&columns * 89 + 57) / 115)
+exe 'vert 1resize ' . ((&columns * 25 + 60) / 121)
+exe 'vert 2resize ' . ((&columns * 95 + 60) / 121)
 argglobal
 enew
 " file NERD_tree_1
@@ -191,134 +191,190 @@ setlocal fdl=0
 setlocal fml=1
 setlocal fdn=20
 setlocal fen
-235
+38
 silent! normal! zo
-236
+40
 silent! normal! zo
-273
+53
 silent! normal! zo
-276
+55
 silent! normal! zo
-302
+56
 silent! normal! zo
-308
+59
 silent! normal! zo
-324
+62
 silent! normal! zo
-326
+66
 silent! normal! zo
-326
+81
 silent! normal! zo
-335
+82
 silent! normal! zo
-339
+86
 silent! normal! zo
-340
+102
 silent! normal! zo
-348
+116
+silent! normal! zo
+242
+silent! normal! zo
+243
+silent! normal! zo
+251
+silent! normal! zo
+256
+silent! normal! zo
+277
+silent! normal! zo
+290
+silent! normal! zo
+292
+silent! normal! zo
+293
+silent! normal! zo
+312
+silent! normal! zo
+313
+silent! normal! zo
+350
 silent! normal! zo
 353
 silent! normal! zo
-363
+379
 silent! normal! zo
-364
+385
 silent! normal! zo
-365
+401
 silent! normal! zo
-369
+405
 silent! normal! zo
-372
-silent! normal! zo
-381
-silent! normal! zo
-382
-silent! normal! zo
-383
+408
 silent! normal! zo
 417
 silent! normal! zo
-421
+418
 silent! normal! zo
 421
 silent! normal! zo
-421
+425
 silent! normal! zo
-421
+429
 silent! normal! zo
-434
+429
 silent! normal! zo
-437
+429
 silent! normal! zo
-444
+429
 silent! normal! zo
-452
+442
 silent! normal! zo
-471
+447
 silent! normal! zo
-503
+454
 silent! normal! zo
-504
+458
 silent! normal! zo
-581
+460
+silent! normal! zo
+462
+silent! normal! zo
+465
+silent! normal! zo
+481
+silent! normal! zo
+498
+silent! normal! zo
+513
+silent! normal! zo
+514
+silent! normal! zo
+535
+silent! normal! zo
+535
+silent! normal! zo
+538
+silent! normal! zo
+538
 silent! normal! zo
 591
 silent! normal! zo
-592
+595
 silent! normal! zo
-594
+596
 silent! normal! zo
-597
+596
 silent! normal! zo
-603
+596
 silent! normal! zo
-603
+596
 silent! normal! zo
-603
+596
 silent! normal! zo
-603
+596
 silent! normal! zo
-603
+596
 silent! normal! zo
-603
+596
 silent! normal! zo
-603
+601
 silent! normal! zo
-620
+602
 silent! normal! zo
-620
+604
 silent! normal! zo
-627
+607
 silent! normal! zo
-627
+613
 silent! normal! zo
-631
+613
 silent! normal! zo
-631
+613
 silent! normal! zo
-644
+613
 silent! normal! zo
-648
+613
 silent! normal! zo
-652
+613
 silent! normal! zo
-653
+613
 silent! normal! zo
-686
+630
 silent! normal! zo
-689
+630
 silent! normal! zo
-693
+636
 silent! normal! zo
-let s:l = 631 - ((30 * winheight(0) + 30) / 61)
+636
+silent! normal! zo
+650
+silent! normal! zo
+661
+silent! normal! zo
+663
+silent! normal! zo
+676
+silent! normal! zo
+680
+silent! normal! zo
+681
+silent! normal! zo
+714
+silent! normal! zo
+717
+silent! normal! zo
+721
+silent! normal! zo
+let s:l = 664 - ((30 * winheight(0) + 30) / 61)
 if s:l < 1 | let s:l = 1 | endif
 exe s:l
 normal! zt
-631
-normal! 026|
+664
+normal! 0
 wincmd w
 2wincmd w
-exe 'vert 1resize ' . ((&columns * 25 + 57) / 115)
-exe 'vert 2resize ' . ((&columns * 89 + 57) / 115)
+exe 'vert 1resize ' . ((&columns * 25 + 60) / 121)
+exe 'vert 2resize ' . ((&columns * 95 + 60) / 121)
 tabnext 1
 if exists('s:wipebuf')
 "   silent exe 'bwipe ' . s:wipebuf
@@ -348,7 +404,7 @@ if !getbufvar(s:bufnr_save, '&modified')
   endif
 endif
 execute "cd" fnameescape(s:cwd_save)
-1resize 61|vert 1resize 25|2resize 61|vert 2resize 89|
+1resize 61|vert 1resize 25|2resize 61|vert 2resize 95|
 2wincmd w
 tabnext 1
 if exists('s:wipebuf')

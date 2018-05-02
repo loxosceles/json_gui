@@ -12,7 +12,6 @@ from decimal import *
 from collections import OrderedDict
 import insert_dialog
 
-import pprint
 
 #  Global constants
 SPLASHSCREEN_TEXT = \
@@ -60,14 +59,12 @@ class DataObject(object):
 
     def gen_flat_key_dict(self, jobj, key_path):  
         """Parses json object recursively and returns path and value."""                  
-        pprint.pprint(jobj)
-        print("Key path: ", key_path)
+        print(pprint.pprin(jobj))
         if not isinstance(jobj, dict):       
             path_tuple = tuple(key_path.strip().split(' '))
 
             label = key_path.split(' ')[-1]
-            print("Label: ", label)
-            path = key_path[:-(len(label))].strip(' ')
+            path = key_path.split(label)[0].strip(' ')
 
             if not self.json_dict_flat.get(path):
                 self.json_dict_flat[path] = {} 
@@ -82,14 +79,12 @@ class DataObject(object):
                 self.gen_flat_key_dict(value, key_path + ' ' + key)
 
     def gen_value_coords(self, json_str, path):
-        #  print("JSON String: ", json_str)
         match_all = '([^}])*'              
         se = ''
         for i in range(len(path) - 1):
             se += '"' + path[i] + '"' + match_all
 
         se += '"' + path[-1] + '"' + ':\s*(\[[^}]*?\]|".*?"|\d+\.*\d*)' 
-        print("Search expression: ", se)
 
         s = re.compile(se, re.DOTALL)
         match = s.search(self.json_str)
@@ -439,8 +434,6 @@ class KeyValueSection(ttk.Frame):
         self.frame.grid(row=0, column=0, sticky=tk.NSEW)
         
         for i, (section, obj) in enumerate(self.d_obj.json_dict_flat.items(), 1):
-            print("Section: ", section)
-            print("Obj: ", obj)
             frame = ttk.Frame(self.frame.interior)
             frame.grid(row=i, column=0, padx='20', sticky=tk.NSEW)
             ttk.Label(frame, style="label_style.TLabel",
@@ -608,7 +601,7 @@ class CreateDialog(insert_dialog.Dialog):
         #  options_frame.grid(row=0, column=0, padx='20', pady='20', sticky=tk.NSEW)
         options_frame.pack()
         self.checked = tk.IntVar()
-        self.checked.set(1)
+        self.checked.set(0)
         self.obj_cb = ttk.Checkbutton(options_frame,
                                       variable=self.checked,
                                       text="Inside new object", 
@@ -649,27 +642,16 @@ class CreateDialog(insert_dialog.Dialog):
     def apply(self):
         print("Key get: ", self.key_entry.get())
         print("Value get: ", self.value_entry.get())
-        object_key = "new_object_ba"
-
-        key = self.key_entry.get().strip().replace(' ', '_')
-        print("KEY: ", key) 
-
-        value = self.value_entry.get()
-        value = [ int(x) for x in ' '.join(value.split()).split(' ') ]
+        object_key = "new_object_key"
 
         if self.checked.get() == 1:
             print("Adding object")
-            if not self.parent.data_object.json_dict.get(object_key):
-                self.parent.data_object.json_dict[object_key] = {}
-            self.parent.data_object.json_dict[object_key][key] = value
-        #  elif self.checked.get() == 0:
-        #      self.parent.data_object.json_dict[][key] = value
-        #      #  print(self.parent.data_object.json_dict)
-
-        print("Dict string: ", self.parent.data_object.json_str)
-        self.parent.data_object.gen_flat_key_dict(self.parent.data_object.json_dict, "")
-        self.parent.key_value_section.create_entry_boxes()
-        self.parent.editor.refresh()
+            self.parent.data_object.json_dict[object_key] = {}
+            self.parent.data_object.json_dict[object_key][self.key_entry.get()] = self.value_entry.get() 
+            #  print(self.parent.data_object.json_dict)
+            self.parent.data_object.gen_flat_key_dict(self.parent.data_object.json_dict, "")
+            self.parent.key_value_section.create_entry_boxes()
+            self.parent.editor.refresh()
 
     def toggle_checkbox(self):
         # Useful for a preview
