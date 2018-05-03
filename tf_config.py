@@ -88,6 +88,7 @@ class DataObject(object):
             se += '"' + path[i] + '"' + match_all
 
         se += '"' + path[-1] + '"' + ':\s*(\[[^}]*?\]|".*?"|\d+\.*\d*)' 
+        #  print("Search expression: ", se)
 
         s = re.compile(se, re.DOTALL)
         match = s.search(self.json_str)
@@ -204,11 +205,19 @@ class MenuBar(ttk.Frame):
             self.d_obj.name = input_file_name
             self.parent.parent.title('{} - {}'.format(os.path.basename(self.d_obj.name),
             PROGRAM_NAME))
+            self.parent.editor.textfield.configure(state=tk.NORMAL)
             self.parent.editor.textfield.delete(1.0, tk.END)
+
+            ##FIXME: Need to instantiate a new data object
+            ##FIXME
+            self.d_obj.json_dict_flat.clear()
+            self.d_obj.dirty_tags.clear()
+            self.d_obj.textfield_length = 0
+            self.d_obj.previous_value = ""
 
             self.d_obj.import_file(input_file_name)
             self.parent.editor.textfield.insert(1.0, self.d_obj.json_str)
-            self.parent.editor.textfield.configure(state="disabled")
+            self.parent.editor.textfield.configure(state=tk.DISABLED)
             self.parent.key_value_section.create_entry_boxes()
 
         # reset previos value 
@@ -418,6 +427,7 @@ class Editor(ttk.Frame):
                     label['coords'][1] = self.vh_update(end_cds, v_shift)
 
     def update_tags(self, flat_keys, value):
+        print("Flat keys inside update_tags (Editor): ", flat_keys)
         textfield_length = len(REGEX_NL.findall(self.d_obj.json_str, re.DOTALL)) + 1
         line_diff = textfield_length - self.d_obj.textfield_length
         row_diff = len(str(value)) - len(str(self.d_obj.previous_value)) + 10 
@@ -428,48 +438,48 @@ class Editor(ttk.Frame):
         self.shift_positions(self.d_obj.json_dict_flat, end, line_diff, row_diff )
         self.d_obj.dirty_tags.discard(flat_keys)
 
-        if self.d_obj.is_field_dirty(flat_keys, value):
-            self.d_obj.dirty_tags.add(flat_keys)
+        #  if self.d_obj.is_field_dirty(flat_keys, value):
+        self.d_obj.dirty_tags.add(flat_keys)
+
+        start = self.d_obj.get_coords(flat_keys, 0)
+        end = self.d_obj.get_coords(flat_keys, 1)
+        print("start inside update_tags: ", start)
+        print("end same same: ", end)
 
         self.refresh()
         self.textfield.see(end)
 
     def refresh(self):
-        self.textfield.configure(state='normal')
+        self.textfield.configure(state=tk.NORMAL)
         self.textfield.delete(1.0, tk.END)
         self.textfield.insert(1.0, self.d_obj.json_str)
         for el in self.d_obj.dirty_tags:
             self.textfield.tag_add('match', self.d_obj.get_coords(el, 0),
                                             self.d_obj.get_coords(el, 1))
-        self.textfield.configure(state='disabled')
+        self.textfield.configure(state=tk.DISABLED)
 
 
 class CreateDialog(insert_dialog.Dialog):
     def __init__(self, parent, data_object, title):
+        print("CREATED NEW DIALOG")
         self.tab_widgets = []
-        self.tabs = []
+        self.tab_ids = ["Array", "Float", "Integer", "String"]
         self.checked = tk.IntVar()
         self.flat_keys = tk.StringVar()
+        self.data_object = data_object
         insert_dialog.Dialog.__init__(self, parent, title)
-        self.d_obj = data_object
 
     def body(self, root):
-        
         self.options_frame = ttk.Frame(root)
         self.options_frame.pack()
 
         self.n = ttk.Notebook(root)
 
         # create tabs
-        t_array = ttk.Frame(self.n, padding=20)
-        t_float = ttk.Frame(self.n, padding=20)
-        t_integer = ttk.Frame(self.n, padding=20)
-        t_string = ttk.Frame(self.n, padding=20)
-
-        self.tab_widgets.append(self.create_tabs(t_array, "array"))
-        self.tab_widgets.append(self.create_tabs(t_float, "float"))
-        self.tab_widgets.append(self.create_tabs(t_integer, "int"))
-        self.tab_widgets.append(self.create_tabs(t_string, "string"))
+        for element in self.tab_ids:
+            tf = ttk.Frame(self.n, padding=20)
+            self.tab_widgets.append(self.create_tabs(tf, element))
+            self.n.add(tf, text=element)
 
         # checkbutton 
         self.checked.set(0)
@@ -482,13 +492,8 @@ class CreateDialog(insert_dialog.Dialog):
         self.obj_cb.configure(command=lambda e=[ x[1] for x in self.tab_widgets ],
                 v=self.checked: self.toggle_objectname_field(e,v))
 
-        self.n.add(t_array, text='Array')
-        self.n.add(t_float, text='Float')
-        self.n.add(t_integer, text='Integer')
-        self.n.add(t_string, text='String')
         self.n.pack()
 
-        return t_array # initial focus
 
     def create_tabs(self, tab, value_type):
 
@@ -497,13 +502,13 @@ class CreateDialog(insert_dialog.Dialog):
         obj_key_entry = StringEntry(tab, state=tk.DISABLED)
         key_entry = StringEntry(tab)
 
-        if value_type == "array":
+        if value_type == "Array":
             value_entry = ArrayEntry(tab)
-        elif value_type == "float":
+        elif value_type == "Float":
             value_entry = FloatEntry(tab)
-        elif value_type == "int":
+        elif value_type == "Integer":
             value_entry = IntegerEntry(tab)
-        elif value_type == "string":
+        elif value_type == "String":
             value_entry = StringEntry(tab)
 
         # key list config and placement
@@ -535,9 +540,7 @@ class CreateDialog(insert_dialog.Dialog):
 
 
     def apply(self):
-
         active_tab = self.n.index(self.n.select())       
-        print('Apply: active tab:', active_tab)        
 
         node = self.tab_widgets[active_tab][0].get().strip().replace(' ', '_').lower()
         key = self.tab_widgets[active_tab][2].get().strip().replace(' ', '_').lower()
@@ -552,17 +555,14 @@ class CreateDialog(insert_dialog.Dialog):
             value = float(value)
         elif active_tab == 2:
             value = int(value)
+        elif active_tab == 3:
+            value = value.strip() # strip spaces from string, left and right
 
         if self.checked.get() == 1:
             object_key = self.tab_widgets[active_tab][1].get().strip().replace(' ', '_').lower()
-            print("Object Key yes: ", object_key)
             aux = (node + " " + object_key + " " + key).strip()
         else:
             aux = (node + " " + key).strip()
-
-        print("Node: ", node)
-        print("Key: ", key)
-        print("Value: ", value)
 
         keys = tuple(aux.split(' '))
 
@@ -570,7 +570,9 @@ class CreateDialog(insert_dialog.Dialog):
 
         self.parent.data_object.gen_flat_key_dict(self.parent.data_object.json_dict, "")
         self.parent.key_value_section.create_entry_boxes()
-        self.parent.editor.refresh()
+        print("Keys: ", keys)
+        self.parent.editor.update_tags(keys, value)
+        #  self.parent.editor.refresh()
 
     def toggle_objectname_field(self, entry_widgets, var):
         for ew in entry_widgets:

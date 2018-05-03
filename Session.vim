@@ -1,6 +1,6 @@
 " /mnt/DATA/__programming/PROJECTS/config_tool/Session.vim:
 " Vim session script.
-" Created by session.vim 2.13.1 on 02 Mai 2018 at 23:45:15.
+" Created by session.vim 2.13.1 on 03 Mai 2018 at 02:01:46.
 " Open this file in Vim and run :source % to restore your session.
 
 set guioptions=aegimrLtT
@@ -346,161 +346,191 @@ silent! normal! zo
 silent! normal! zo
 88
 silent! normal! zo
-100
+101
 silent! normal! zo
-107
+108
 silent! normal! zo
-114
+115
 silent! normal! zo
-117
+118
 silent! normal! zo
-122
+123
 silent! normal! zo
-125
+126
 silent! normal! zo
-127
+128
 silent! normal! zo
-129
+130
 silent! normal! zo
-132
+133
 silent! normal! zo
-134
+135
 silent! normal! zo
-139
+140
 silent! normal! zo
-142
+143
 silent! normal! zo
-145
+146
 silent! normal! zo
-149
+150
 silent! normal! zo
-153
-silent! normal! zo
-156
+154
 silent! normal! zo
 157
 silent! normal! zo
-159
+158
 silent! normal! zo
-163
+160
 silent! normal! zo
 164
 silent! normal! zo
-177
+165
 silent! normal! zo
-177
+178
 silent! normal! zo
-180
+178
 silent! normal! zo
-180
+181
 silent! normal! zo
-180
+181
 silent! normal! zo
-180
+181
 silent! normal! zo
-183
+181
 silent! normal! zo
-183
+184
 silent! normal! zo
-183
+184
 silent! normal! zo
-183
+184
 silent! normal! zo
-186
+184
 silent! normal! zo
-186
+187
 silent! normal! zo
-186
+187
 silent! normal! zo
-186
+187
 silent! normal! zo
-193
+187
 silent! normal! zo
-193
+194
 silent! normal! zo
-193
+194
 silent! normal! zo
-193
+194
 silent! normal! zo
-180
+194
 silent! normal! zo
-180
+181
 silent! normal! zo
-183
+181
 silent! normal! zo
-183
+184
 silent! normal! zo
-186
+184
 silent! normal! zo
-186
+187
 silent! normal! zo
-193
+187
 silent! normal! zo
-193
+194
 silent! normal! zo
-201
+194
 silent! normal! zo
-201
+202
 silent! normal! zo
-204
+202
 silent! normal! zo
-204
+205
 silent! normal! zo
-218
-silent! normal! zo
-218
+205
 silent! normal! zo
 219
 silent! normal! zo
 219
 silent! normal! zo
-222
+220
 silent! normal! zo
-222
+220
 silent! normal! zo
-224
+223
 silent! normal! zo
-224
+223
 silent! normal! zo
-230
+225
 silent! normal! zo
-230
-silent! normal! zo
-231
+225
 silent! normal! zo
 231
 silent! normal! zo
-234
+231
 silent! normal! zo
-234
+232
 silent! normal! zo
-234
+232
 silent! normal! zo
-234
+235
 silent! normal! zo
-236
+235
 silent! normal! zo
-236
+235
 silent! normal! zo
-239
+235
 silent! normal! zo
-239
+237
 silent! normal! zo
-239
+237
 silent! normal! zo
-239
+240
 silent! normal! zo
-243
+240
 silent! normal! zo
-243
+240
+silent! normal! zo
+240
 silent! normal! zo
 244
 silent! normal! zo
 244
 silent! normal! zo
-246
+245
 silent! normal! zo
-246
+245
+silent! normal! zo
+247
+silent! normal! zo
+247
+silent! normal! zo
+249
+silent! normal! zo
+249
+silent! normal! zo
+253
+silent! normal! zo
+253
+silent! normal! zo
+202
+silent! normal! zo
+205
+silent! normal! zo
+227
+silent! normal! zo
+228
+silent! normal! zo
+231
+silent! normal! zo
+233
+silent! normal! zo
+239
+silent! normal! zo
+240
+silent! normal! zo
+243
+silent! normal! zo
+243
+silent! normal! zo
+245
 silent! normal! zo
 248
 silent! normal! zo
@@ -508,522 +538,494 @@ silent! normal! zo
 silent! normal! zo
 252
 silent! normal! zo
-252
+253
 silent! normal! zo
-201
+255
 silent! normal! zo
-204
+257
 silent! normal! zo
-218
+261
 silent! normal! zo
-219
-silent! normal! zo
-222
-silent! normal! zo
-224
-silent! normal! zo
-230
-silent! normal! zo
-231
-silent! normal! zo
-234
-silent! normal! zo
-234
-silent! normal! zo
-236
-silent! normal! zo
-239
-silent! normal! zo
-239
-silent! normal! zo
-243
-silent! normal! zo
-244
-silent! normal! zo
-246
-silent! normal! zo
-248
-silent! normal! zo
-252
-silent! normal! zo
-256
-silent! normal! zo
-259
+265
 silent! normal! zo
 268
 silent! normal! zo
-268
+277
 silent! normal! zo
-269
+277
 silent! normal! zo
-269
+278
 silent! normal! zo
-272
+278
 silent! normal! zo
-272
+281
 silent! normal! zo
-276
+281
 silent! normal! zo
-276
+285
 silent! normal! zo
-280
+285
 silent! normal! zo
-280
+289
 silent! normal! zo
-280
+289
 silent! normal! zo
-280
+289
 silent! normal! zo
-280
+289
 silent! normal! zo
-280
+289
 silent! normal! zo
-280
+289
 silent! normal! zo
-280
+289
 silent! normal! zo
-280
+289
 silent! normal! zo
-292
+289
 silent! normal! zo
-292
+301
 silent! normal! zo
-295
+301
 silent! normal! zo
-295
+304
 silent! normal! zo
-295
+304
 silent! normal! zo
-295
+304
 silent! normal! zo
-295
+304
 silent! normal! zo
-302
+304
 silent! normal! zo
-302
+311
 silent! normal! zo
-303
+311
 silent! normal! zo
-303
+312
 silent! normal! zo
-303
+312
 silent! normal! zo
-303
+312
 silent! normal! zo
-306
+312
 silent! normal! zo
-306
+315
 silent! normal! zo
-308
+315
 silent! normal! zo
-308
+317
 silent! normal! zo
-310
-silent! normal! zo
-310
-silent! normal! zo
-313
-silent! normal! zo
-313
+317
 silent! normal! zo
 319
 silent! normal! zo
 319
 silent! normal! zo
-328
+322
+silent! normal! zo
+322
 silent! normal! zo
 328
 silent! normal! zo
-332
+328
 silent! normal! zo
-332
+337
 silent! normal! zo
-335
-silent! normal! zo
-335
-silent! normal! zo
-336
-silent! normal! zo
-336
-silent! normal! zo
-338
-silent! normal! zo
-338
-silent! normal! zo
-340
-silent! normal! zo
-340
+337
 silent! normal! zo
 341
 silent! normal! zo
 341
 silent! normal! zo
-343
+344
 silent! normal! zo
-343
-silent! normal! zo
-345
+344
 silent! normal! zo
 345
 silent! normal! zo
-346
+345
 silent! normal! zo
-346
+347
 silent! normal! zo
-348
+347
 silent! normal! zo
-348
+349
 silent! normal! zo
-268
+349
 silent! normal! zo
-269
+350
 silent! normal! zo
-272
+350
 silent! normal! zo
-276
+352
 silent! normal! zo
-280
+352
 silent! normal! zo
-280
+354
 silent! normal! zo
-280
+354
 silent! normal! zo
-280
+355
 silent! normal! zo
-292
+355
 silent! normal! zo
-295
+357
 silent! normal! zo
-295
+357
 silent! normal! zo
-302
+277
 silent! normal! zo
-303
+278
 silent! normal! zo
-303
+281
 silent! normal! zo
-306
+285
 silent! normal! zo
-308
+289
 silent! normal! zo
-310
+289
 silent! normal! zo
-313
+289
+silent! normal! zo
+289
+silent! normal! zo
+301
+silent! normal! zo
+304
+silent! normal! zo
+304
+silent! normal! zo
+311
+silent! normal! zo
+312
+silent! normal! zo
+312
+silent! normal! zo
+315
+silent! normal! zo
+317
 silent! normal! zo
 319
 silent! normal! zo
+322
+silent! normal! zo
 328
 silent! normal! zo
-332
-silent! normal! zo
-335
-silent! normal! zo
-336
-silent! normal! zo
-338
-silent! normal! zo
-340
+337
 silent! normal! zo
 341
 silent! normal! zo
-343
+344
 silent! normal! zo
 345
 silent! normal! zo
-346
+347
 silent! normal! zo
-348
+349
 silent! normal! zo
-360
+350
 silent! normal! zo
-361
+352
 silent! normal! zo
-382
+354
 silent! normal! zo
-382
+355
 silent! normal! zo
-382
+357
 silent! normal! zo
-382
+369
 silent! normal! zo
-385
+370
 silent! normal! zo
-385
+391
 silent! normal! zo
-385
+391
 silent! normal! zo
-385
+391
 silent! normal! zo
-394
-silent! normal! zo
-394
+391
 silent! normal! zo
 394
 silent! normal! zo
 394
 silent! normal! zo
-396
+394
 silent! normal! zo
-396
+394
 silent! normal! zo
-396
+403
 silent! normal! zo
-396
+403
 silent! normal! zo
-400
+403
 silent! normal! zo
-400
+403
 silent! normal! zo
-401
+405
 silent! normal! zo
-401
+405
 silent! normal! zo
-406
+405
 silent! normal! zo
-406
+405
+silent! normal! zo
+409
+silent! normal! zo
+409
 silent! normal! zo
 410
 silent! normal! zo
 410
 silent! normal! zo
-411
-silent! normal! zo
-411
-silent! normal! zo
-412
-silent! normal! zo
-412
-silent! normal! zo
 415
 silent! normal! zo
 415
 silent! normal! zo
-417
+419
 silent! normal! zo
-417
+419
+silent! normal! zo
+420
+silent! normal! zo
+420
 silent! normal! zo
 421
 silent! normal! zo
 421
 silent! normal! zo
-432
+424
 silent! normal! zo
-432
+424
 silent! normal! zo
-438
+426
 silent! normal! zo
-438
+426
 silent! normal! zo
-442
+430
 silent! normal! zo
-442
+430
 silent! normal! zo
-443
+441
 silent! normal! zo
-443
+441
 silent! normal! zo
-443
+447
 silent! normal! zo
-443
+447
 silent! normal! zo
-443
+451
 silent! normal! zo
-443
+451
 silent! normal! zo
-443
+452
 silent! normal! zo
-443
+452
 silent! normal! zo
-443
+452
 silent! normal! zo
-443
+452
 silent! normal! zo
-443
+452
 silent! normal! zo
-443
+452
 silent! normal! zo
-443
+452
 silent! normal! zo
-443
+452
 silent! normal! zo
-382
+452
 silent! normal! zo
-382
+452
 silent! normal! zo
-385
+452
 silent! normal! zo
-385
+452
+silent! normal! zo
+452
+silent! normal! zo
+452
+silent! normal! zo
+391
+silent! normal! zo
+391
 silent! normal! zo
 394
 silent! normal! zo
 394
 silent! normal! zo
-396
+403
 silent! normal! zo
-396
+403
 silent! normal! zo
-400
+405
 silent! normal! zo
-401
+405
 silent! normal! zo
-406
+409
 silent! normal! zo
 410
 silent! normal! zo
-411
-silent! normal! zo
-412
-silent! normal! zo
 415
 silent! normal! zo
-417
+419
+silent! normal! zo
+420
 silent! normal! zo
 421
 silent! normal! zo
-432
+424
 silent! normal! zo
-438
+426
 silent! normal! zo
-442
+430
 silent! normal! zo
-443
-silent! normal! zo
-443
-silent! normal! zo
-443
-silent! normal! zo
-443
-silent! normal! zo
-443
-silent! normal! zo
-443
-silent! normal! zo
-443
-silent! normal! zo
-443
-silent! normal! zo
-448
-silent! normal! zo
-449
-silent! normal! zo
-455
-silent! normal! zo
-455
+453
 silent! normal! zo
 457
 silent! normal! zo
-476
+458
 silent! normal! zo
-476
+458
 silent! normal! zo
-476
+458
 silent! normal! zo
-476
+458
 silent! normal! zo
-476
+458
 silent! normal! zo
-476
+458
 silent! normal! zo
-476
+458
 silent! normal! zo
-482
+458
 silent! normal! zo
-482
+463
 silent! normal! zo
-495
+464
 silent! normal! zo
-500
+473
 silent! normal! zo
-502
+473
 silent! normal! zo
-504
+473
+silent! normal! zo
+480
+silent! normal! zo
+487
+silent! normal! zo
+487
+silent! normal! zo
+487
+silent! normal! zo
+487
+silent! normal! zo
+487
+silent! normal! zo
+487
+silent! normal! zo
+487
+silent! normal! zo
+493
+silent! normal! zo
+493
+silent! normal! zo
+501
 silent! normal! zo
 506
 silent! normal! zo
-514
+508
 silent! normal! zo
-514
+510
 silent! normal! zo
-521
+512
 silent! normal! zo
-521
+520
 silent! normal! zo
-528
+520
 silent! normal! zo
-528
+527
 silent! normal! zo
-536
+527
 silent! normal! zo
-536
+534
 silent! normal! zo
-546
+534
 silent! normal! zo
-546
+542
+silent! normal! zo
+542
+silent! normal! zo
+552
+silent! normal! zo
+552
+silent! normal! zo
+556
+silent! normal! zo
+556
+silent! normal! zo
+571
+silent! normal! zo
+571
+silent! normal! zo
+572
+silent! normal! zo
+572
+silent! normal! zo
+574
+silent! normal! zo
+574
+silent! normal! zo
+543
 silent! normal! zo
 550
-silent! normal! zo
-550
-silent! normal! zo
-565
-silent! normal! zo
-565
-silent! normal! zo
-566
-silent! normal! zo
-566
-silent! normal! zo
-568
-silent! normal! zo
-568
-silent! normal! zo
-538
-silent! normal! zo
-546
-silent! normal! zo
-547
-silent! normal! zo
-549
 silent! normal! zo
 551
 silent! normal! zo
 553
 silent! normal! zo
-556
+555
 silent! normal! zo
-560
+557
 silent! normal! zo
-575
+559
 silent! normal! zo
-576
+562
 silent! normal! zo
-577
+565
+silent! normal! zo
+578
 silent! normal! zo
 579
 silent! normal! zo
-583
+580
 silent! normal! zo
-584
+582
 silent! normal! zo
-617
+586
 silent! normal! zo
-617
-silent! normal! zo
-620
+587
 silent! normal! zo
 620
 silent! normal! zo
-617
+620
+silent! normal! zo
+623
+silent! normal! zo
+623
 silent! normal! zo
 620
 silent! normal! zo
-624
+623
 silent! normal! zo
-let s:l = 478 - ((49 * winheight(0) + 30) / 60)
+627
+silent! normal! zo
+let s:l = 216 - ((34 * winheight(0) + 30) / 60)
 if s:l < 1 | let s:l = 1 | endif
 exe s:l
 normal! zt
-478
-normal! 09|
+216
+normal! 042|
 wincmd w
 2wincmd w
 exe 'vert 1resize ' . ((&columns * 25 + 64) / 128)
