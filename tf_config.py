@@ -7,12 +7,14 @@ from tkinter import ttk
 from tkinter import filedialog
 from tkinter import font
 import os, re, json, string
-from functools import partial as fp
 from decimal import * 
 from collections import OrderedDict
-import insert_dialog
-
 import pprint
+
+import insert_dialog
+from validating_entry import ValidatingEntry,\
+        ArrayEntry, IntegerEntry, FloatEntry, StringEntry 
+from vertical_scroll_frame import VerticalScrollFrame
 
 #  Global constants
 SPLASHSCREEN_TEXT = \
@@ -60,13 +62,10 @@ class DataObject(object):
 
     def gen_flat_key_dict(self, jobj, key_path):  
         """Parses json object recursively and returns path and value."""                  
-        pprint.pprint(jobj)
-        print("Key path: ", key_path)
         if not isinstance(jobj, dict):       
             path_tuple = tuple(key_path.strip().split(' '))
 
             label = key_path.split(' ')[-1]
-            print("Label: ", label)
             path = key_path[:-(len(label))].strip(' ')
 
             if not self.json_dict_flat.get(path):
@@ -89,7 +88,6 @@ class DataObject(object):
             se += '"' + path[i] + '"' + match_all
 
         se += '"' + path[-1] + '"' + ':\s*(\[[^}]*?\]|".*?"|\d+\.*\d*)' 
-        print("Search expression: ", se)
 
         s = re.compile(se, re.DOTALL)
         match = s.search(self.json_str)
@@ -159,160 +157,6 @@ class DataObject(object):
             return True
         else:
             return False
-
-
-class VerticalScrollFrame(ttk.Frame):
-    """ 
-    A ttk frame allowing vertical scrolling.
-
-    Use the '.interior' attribute to place widgets inside the scrollable frame.
-    """
-    def __init__(self, parent, *args, **options):
-        # style variables
-        self.canvas_bg = "white" 
-
-        ttk.Frame.__init__(self, parent)
-        self.__createWidgets()
-        self.__setBindings()
-
-    def _on_mousewheel(self, event, scroll):
-        self.canvas.yview_scroll(int(scroll), "units")
-
-    def _bind_to_mousewheel(self, event):
-        self.canvas.bind_all("<Button-4>", 
-                fp(self._on_mousewheel, scroll=-1))
-        self.canvas.bind_all("<Button-5>", 
-                fp(self._on_mousewheel, scroll=1))
-
-    def _unbind_from_mousewheel(self, event):
-        self.canvas.unbind_all("<Button-4>")
-        self.canvas.unbind_all("<Button-5>")
-
-
-    def __createWidgets(self):
-        '''Create widgets of the scroll frame.'''
-        self.vscrollbar = ttk.Scrollbar(self, orient=tk.VERTICAL)
-        self.vscrollbar.pack(side=tk.RIGHT, fill=tk.Y, expand=tk.FALSE)
-        self.canvas = tk.Canvas(self,
-                                yscrollcommand=self.vscrollbar.set,
-                                background=self.canvas_bg)
-
-        self.canvas.configure(height=screen_height - (screen_height * 0.3))
-        self.canvas.pack(side=tk.LEFT, fill=tk.BOTH, expand=tk.TRUE)
-        self.vscrollbar.config(command=self.canvas.yview)
-
-        self.canvas.bind('<Enter>', self._bind_to_mousewheel)
-        self.canvas.bind('<Leave>', self._unbind_from_mousewheel)
-
-        # create a frame inside the canvas which will be scrolled with it
-        self.interior = ttk.Frame(self.canvas)
-                                  
-        self.interior_id = self.canvas.create_window(0, 0,
-                                                     window=self.interior,
-                                                     anchor=tk.NW,
-                                                     tags="self.interior")
-
-    def __setBindings(self):
-        '''Activate binding to configure scroll frame widgets.'''
-        self.canvas.bind('<Configure>',self.__configure_canvas_interiorframe)
-
-    def __configure_canvas_interiorframe(self, event):
-        '''Configure the interior frame size and the canvas scrollregion'''
-        #Force the update of .winfo_width() and winfo_height()
-        self.canvas.update_idletasks() 
-
-        #Internal parameters 
-        interiorReqHeight= self.interior.winfo_reqheight()
-        canvasWidth    = self.canvas.winfo_width()
-        canvasHeight   = self.canvas.winfo_height()
-
-        #Set interior frame width to canvas current width
-        self.canvas.itemconfigure(self.interior_id, width=canvasWidth)
-        
-        # Set interior frame height and canvas scrollregion
-        if canvasHeight > interiorReqHeight:
-            self.canvas.itemconfigure(self.interior_id,  height=canvasHeight)
-            self.canvas.config(scrollregion="0 0 {0} {1}".
-                               format(canvasWidth, canvasHeight))
-        else:
-            self.canvas.itemconfigure(self.interior_id, height=interiorReqHeight)
-            self.canvas.config(scrollregion="0 0 {0} {1}".
-                               format(canvasWidth, interiorReqHeight))
-
-    def move_to_focus(line_number):
-        self.canvas.xview_moveto(line_number)
-        self.canvas.yview_moveto(line_number)
-
-
-class ValidatingEntry(ttk.Entry):
-# base class for validating entry widgets
-    def __init__(self, parent, value="", **kwargs):
-        ttk.Entry.__init__(self, parent, **kwargs)
-        self.__value = value
-        self.__variable = tk.StringVar()
-        self.__variable.set(value)
-        self.__variable.trace("w", self.__callback)
-        self.config(textvariable=self.__variable)
-
-    def __callback(self, *dummy):
-        value = self.__variable.get()
-        newvalue = self.validate(value)
-        if newvalue is None:
-            self.__variable.set(self.__value)
-        elif newvalue != value:
-            self.__value = newvalue
-            self.__variable.set(self.newvalue)
-        else:
-            self.__value = value
-
-    def validate(self, value):
-        # override: return value, new value, or None if invalid
-        return value
-
-
-class IntegerEntry(ValidatingEntry):
-    def validate(self, value):
-        try:
-            if value:
-                v = int(value)
-            return value
-        except ValueError:
-            return None
-
-
-class FloatEntry(ValidatingEntry):
-    def validate(self, value):
-        try:
-            if value:
-                v = float(value)
-            return value
-        except ValueError:
-            return None
-
-
-class ArrayEntry(ValidatingEntry):
-    #  def __init__(self, parent, value="", **kwargs):
-    #      super().__init__(parent, value="", **kwargs)
-    #      print("ArrayEntry Value: ", value)
-
-    def validate(self, value):
-        try:
-            if value:
-                v = list(map(lambda x: int(x), value.split()))
-            return value
-        except ValueError:
-            return None
-
-
-class StringEntry(ValidatingEntry):
-    def validate(self, value):
-        try:
-            if value:
-                if '"' in value:
-                    raise ValueError
-            return value
-        except ValueError:
-            return None
 
 
 class MenuBar(ttk.Frame):
@@ -440,14 +284,11 @@ class KeyValueSection(ttk.Frame):
 
         self.parent.editor.splash.destroy()
         self.parent.editor.textfield.configure(width=self.parent.editor.textfield_width)
-
-        self.frame = VerticalScrollFrame(self)
+        self.frame = VerticalScrollFrame(self, (screen_height - (screen_height * 0.3)))
 
         self.frame.grid(row=0, column=0, sticky=tk.NSEW)
         
         for i, (section, obj) in enumerate(self.d_obj.json_dict_flat.items(), 1):
-            print("Section: ", section)
-            print("Obj: ", obj)
             frame = ttk.Frame(self.frame.interior)
             frame.grid(row=i, column=0, padx='20', sticky=tk.NSEW)
             ttk.Label(frame, style="label_style.TLabel",
@@ -604,92 +445,124 @@ class Editor(ttk.Frame):
 
 
 class CreateDialog(insert_dialog.Dialog):
-    def __init__(self, parent, data_object):
-        insert_dialog.Dialog.__init__(self, parent)
+    def __init__(self, parent, data_object, title):
+        self.tab_widgets = []
+        self.tabs = []
+        self.checked = tk.IntVar()
+        self.flat_keys = tk.StringVar()
+        insert_dialog.Dialog.__init__(self, parent, title)
         self.d_obj = data_object
 
     def body(self, root):
         
-        n = ttk.Notebook(root)
         self.options_frame = ttk.Frame(root)
-
-        # create tabs
-        self.t_array = ttk.Frame(n, padding=20)
-        self.t_float = ttk.Frame(n, padding=20)
-        self.t_integer = ttk.Frame(n, padding=20)
-        self.t_string = ttk.Frame(n, padding=20)
-
-        self.create_tab_content(self.t_array)
-
-        n.add(self.t_array, text='Array')
-        n.add(self.t_float, text='Float')
-        n.add(self.t_integer, text='Integer')
-        n.add(self.t_string, text='String')
-        n.pack()
-
-        return self.t_array # initial focus
-
-    def create_tab_content(self, tab_type):
-        # vars
-        flat_keys = tk.StringVar()
-        checked = tk.IntVar()
-
-        # create elements
-        key_list = ttk.Combobox(tab_type, textvariable=flat_keys)
-        obj_key_entry = StringEntry(tab_type, state=tk.DISABLED)
-        key_entry = StringEntry(tab_type)
-        value_entry = ArrayEntry(tab_type)
-
-        # options frame config and placement
         self.options_frame.pack()
 
+        self.n = ttk.Notebook(root)
+
+        # create tabs
+        t_array = ttk.Frame(self.n, padding=20)
+        t_float = ttk.Frame(self.n, padding=20)
+        t_integer = ttk.Frame(self.n, padding=20)
+        t_string = ttk.Frame(self.n, padding=20)
+
+        self.tab_widgets.append(self.create_tabs(t_array, "array"))
+        self.tab_widgets.append(self.create_tabs(t_float, "float"))
+        self.tab_widgets.append(self.create_tabs(t_integer, "int"))
+        self.tab_widgets.append(self.create_tabs(t_string, "string"))
+
         # checkbutton 
-        checked.set(0)
-        obj_cb = ttk.Checkbutton(self.options_frame,
-                                      variable=checked,
+        self.checked.set(0)
+        self.obj_cb = ttk.Checkbutton(self.options_frame,
+                                      variable=self.checked,
                                       text="Inside new object", 
                                       onvalue=1,
-                                      offvalue=0,
-                                      command=lambda e=obj_key_entry, v=checked:
-                                        self.toggle_objectname_field(e,v))
-        obj_cb.grid(row=0, column=0)
+                                      offvalue=0,)
+        self.obj_cb.grid(row=0, column=0)
+        self.obj_cb.configure(command=lambda e=[ x[1] for x in self.tab_widgets ],
+                v=self.checked: self.toggle_objectname_field(e,v))
+
+        self.n.add(t_array, text='Array')
+        self.n.add(t_float, text='Float')
+        self.n.add(t_integer, text='Integer')
+        self.n.add(t_string, text='String')
+        self.n.pack()
+
+        return t_array # initial focus
+
+    def create_tabs(self, tab, value_type):
+
+        # create elements
+        nodes = ttk.Combobox(tab, textvariable=self.flat_keys)
+        obj_key_entry = StringEntry(tab, state=tk.DISABLED)
+        key_entry = StringEntry(tab)
+
+        if value_type == "array":
+            value_entry = ArrayEntry(tab)
+        elif value_type == "float":
+            value_entry = FloatEntry(tab)
+        elif value_type == "int":
+            value_entry = IntegerEntry(tab)
+        elif value_type == "string":
+            value_entry = StringEntry(tab)
 
         # key list config and placement
-        key_list['values'] = (self.parent.data_object.flat_keys_list()) 
-        key_list.grid(row=0, column=0, sticky=tk.NW)
+        nodes['values'] = (self.parent.data_object.flat_keys_list()) 
+        nodes.grid(row=0, column=0, sticky=tk.NW)
 
         # Object key label
-        ttk.Label(tab_type, style="id_label_style.TLabel", text="Object Key"
+        ttk.Label(tab, style="id_label_style.TLabel", text="Object Key"
                  ).grid(row=1, column=0, sticky=tk.NW)
 
         # Object key entry
         obj_key_entry.grid(row=2, column=0, sticky=tk.NW)
 
         # Key label
-        key_label = ttk.Label(tab_type, style="id_label_style.TLabel", text="Key"
+        key_label = ttk.Label(tab, style="id_label_style.TLabel", text="Key"
                  ).grid(row=3, column=0, sticky=tk.NW)
 
         # Key entry
         key_entry.grid(row=4, column=0, sticky=tk.NW)
         
         # Value label
-        ttk.Label(tab_type, style="id_label_style.TLabel", text="Value"
+        ttk.Label(tab, style="id_label_style.TLabel", text="Value"
                  ).grid(row=5, column=0, sticky=tk.NW)
 
         # Value entry
         value_entry.grid(row=6, column=0, sticky=tk.NW)
 
-    def apply(self):
-        node = self.t_array.key_list.get()
-        key = self.key_entry.get().strip().replace(' ', '_').lower()
+        return [nodes, obj_key_entry, key_entry, value_entry]
 
-        value = self.value_entry.get()
+
+    def apply(self):
+
+        active_tab = self.n.index(self.n.select())       
+        print('Apply: active tab:', active_tab)        
+
+        node = self.tab_widgets[active_tab][0].get().strip().replace(' ', '_').lower()
+        key = self.tab_widgets[active_tab][2].get().strip().replace(' ', '_').lower()
+        value = self.tab_widgets[active_tab][3].get()
+
+        if active_tab == 0:
+            try:
+                value = [ int(x) for x in ' '.join(value.split()).split(' ') ]
+            except ValueError:
+                value = []
+        elif active_tab == 1:
+            value = float(value)
+        elif active_tab == 2:
+            value = int(value)
 
         if self.checked.get() == 1:
-            object_key = self.obj_key_entry.get().strip().replace(' ', '_').lower()
+            object_key = self.tab_widgets[active_tab][1].get().strip().replace(' ', '_').lower()
+            print("Object Key yes: ", object_key)
             aux = (node + " " + object_key + " " + key).strip()
         else:
             aux = (node + " " + key).strip()
+
+        print("Node: ", node)
+        print("Key: ", key)
+        print("Value: ", value)
 
         keys = tuple(aux.split(' '))
 
@@ -699,11 +572,12 @@ class CreateDialog(insert_dialog.Dialog):
         self.parent.key_value_section.create_entry_boxes()
         self.parent.editor.refresh()
 
-    def toggle_objectname_field(self, entry, var):
-        if var.get() == 0:
-            entry.configure(state=tk.DISABLED)
-        else:
-            entry.configure(state=tk.NORMAL)
+    def toggle_objectname_field(self, entry_widgets, var):
+        for ew in entry_widgets:
+            if var.get() == 0:
+                ew.configure(state=tk.DISABLED)
+            else:
+                ew.configure(state=tk.NORMAL)
 
 
 class MainApplication(ttk.Frame):
@@ -744,7 +618,7 @@ class MainApplication(ttk.Frame):
         self.parent.destroy()
 
     def create_dialog(self):
-        self.obj_dialog = CreateDialog(self, self.data_object)
+        self.obj_dialog = CreateDialog(self, self.data_object, "Create Object")
         self.parent.wait_window(self.obj_dialog.parent.parent)
 
 if __name__ == "__main__":
