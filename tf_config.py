@@ -60,13 +60,10 @@ class DataObject(object):
 
     def gen_flat_key_dict(self, jobj, key_path):  
         """Parses json object recursively and returns path and value."""                  
-        pprint.pprint(jobj)
-        print("Key path: ", key_path)
         if not isinstance(jobj, dict):       
             path_tuple = tuple(key_path.strip().split(' '))
 
             label = key_path.split(' ')[-1]
-            print("Label: ", label)
             path = key_path[:-(len(label))].strip(' ')
 
             if not self.json_dict_flat.get(path):
@@ -89,7 +86,6 @@ class DataObject(object):
             se += '"' + path[i] + '"' + match_all
 
         se += '"' + path[-1] + '"' + ':\s*(\[[^}]*?\]|".*?"|\d+\.*\d*)' 
-        print("Search expression: ", se)
 
         s = re.compile(se, re.DOTALL)
         match = s.search(self.json_str)
@@ -446,8 +442,6 @@ class KeyValueSection(ttk.Frame):
         self.frame.grid(row=0, column=0, sticky=tk.NSEW)
         
         for i, (section, obj) in enumerate(self.d_obj.json_dict_flat.items(), 1):
-            print("Section: ", section)
-            print("Obj: ", obj)
             frame = ttk.Frame(self.frame.interior)
             frame.grid(row=i, column=0, padx='20', sticky=tk.NSEW)
             ttk.Label(frame, style="label_style.TLabel",
@@ -638,12 +632,10 @@ class CreateDialog(insert_dialog.Dialog):
                                       variable=self.checked,
                                       text="Inside new object", 
                                       onvalue=1,
-                                      offvalue=0,
                                       command=lambda e=self.obj_key_entry, v=self.checked:
                                         self.toggle_objectname_field(e,v))
         self.obj_cb.grid(row=0, column=0)
 
-        # key list config and placement
         self.key_list['values'] = (self.parent.data_object.flat_keys_list()) 
         self.key_list.grid(row=0, column=0, sticky=tk.NW)
 
@@ -679,14 +671,19 @@ class CreateDialog(insert_dialog.Dialog):
     def apply(self):
         node = self.key_list.get().strip().replace(' ', '_').lower()
         key = self.key_entry.get().strip().replace(' ', '_').lower()
-
+        # Value has already been validated
         value = self.value_entry.get()
 
         if self.checked.get() == 1:
             object_key = self.obj_key_entry.get().strip().replace(' ', '_').lower()
+            print("Object Key: ", object_key) 
             aux = (node + " " + object_key + " " + key).strip()
         else:
             aux = (node + " " + key).strip()
+
+        print("Node: ", node) 
+        print("Key Entry: ", key) 
+        print("Value: ", value)
 
         keys = tuple(aux.split(' '))
 
