@@ -37,8 +37,11 @@ REGEX_NL = re.compile('\n')
 
 
 class DataObject(object):                
-    """Object holding configuration variables."""                                         
+
+    """Object holding configuration variables. """
+
     def __init__(self):                      
+        """TODO: to be defined1. """
         self.json_dict_flat = {} 
         self.json_dict = OrderedDict()
         self.dirty_tags = set() 
@@ -49,10 +52,21 @@ class DataObject(object):
 
     @property
     def json_str(self):
+        """TODO: Docstring for function.
+
+        :arg1: TODO
+        :returns: TODO
+
+        """
         return json.dumps(self.json_dict, indent=4)
     
     def import_file(self, json_file):   
-        """Import configurations from tf_conf.json."""                                    
+        """Import configurations from tf_conf.json.
+
+        :arg1: TODO
+        :returns: TODO
+
+        """
         try:                                 
             with open(json_file, 'r') as infile:
                 self.json_dict = json.load(infile)
@@ -61,7 +75,12 @@ class DataObject(object):
             print("Decoding the JSON config file has failed. Please make sure the format is correct.")
 
     def gen_flat_key_dict(self, jobj, key_path):  
-        """Parses json object recursively and returns path and value."""                  
+        """ Parses json object recursively and returns path and value.
+
+        :arg1: TODO
+        :returns: TODO
+
+        """
         if not isinstance(jobj, dict):       
             path_tuple = tuple(key_path.strip().split(' '))
 
@@ -81,7 +100,12 @@ class DataObject(object):
                 self.gen_flat_key_dict(value, key_path + ' ' + key)
 
     def gen_value_coords(self, json_str, path):
-        #  print("JSON String: ", json_str)
+        """TODO: Docstring for function.
+
+        :arg1: TODO
+        :returns: TODO
+
+        """
         match_all = '([^}])*'              
         se = ''
         for i in range(len(path) - 1):
@@ -98,7 +122,8 @@ class DataObject(object):
         return start, end
 
     def calc_match_position(self, string, match_index):
-        """Calculates the positions of the matched value in the editor window
+        """
+        Calculates the positions of the matched value in the editor window.
 
         :match:   matched string
         :returns: position in the form of line.column 
@@ -112,6 +137,12 @@ class DataObject(object):
         return Decimal(line) + Decimal('0.' + str(column))
 
     def dyn_dict_get(self, keys):          
+        """TODO: Docstring for function.
+
+        :arg1: TODO
+        :returns: TODO
+
+        """
         s = 'self.json_dict'  
 
         for i, el in enumerate(keys):   
@@ -120,6 +151,12 @@ class DataObject(object):
         return eval(s)
 
     def dyn_dict_set(self, keys, val):     
+        """TODO: Docstring for function.
+
+        :arg1: TODO
+        :returns: TODO
+
+        """
         s = 'self.json_dict'  
 
         for i in range(len(keys)):   
@@ -137,12 +174,30 @@ class DataObject(object):
         exec(s)  
 
     def get_coords(self, keys, position):
+        """TODO: Docstring for function.
+
+        :arg1: TODO
+        :returns: TODO
+
+        """
         return self.json_dict_flat[keys[0]][keys[1]]['coords'][position]
 
     def get_init_value(self, keys):
+        """TODO: Docstring for function.
+
+        :arg1: TODO
+        :returns: TODO
+
+        """
         return self.json_dict_flat[keys[0]][keys[1]]['value']
 
     def flat_keys_list(self):
+        """TODO: Docstring for function.
+
+        :arg1: TODO
+        :returns: TODO
+
+        """
         return list(self.json_dict_flat)
 
     @property
@@ -161,10 +216,10 @@ class DataObject(object):
 
 
 class MenuBar(ttk.Frame):
-    def __init__(self, parent, data_object=None, *args, **kwargs):
+    def __init__(self, parent, *args, **kwargs):
         ttk.Frame.__init__(self, parent, *args, **kwargs)
         self.parent = parent
-        self.d_obj = data_object 
+        self.do = self.parent.data_object
 
         # Create menu bar
         self.menubar = tk.Menu(self)
@@ -199,58 +254,77 @@ class MenuBar(ttk.Frame):
     
     # File menu methods
     def open(self, event=None):
+        print(self.parent.data_object.name)
         input_file_name = filedialog.askopenfilename(defaultextension=".json",
         filetypes=[("Configuration files", "*.json")])
         if input_file_name:
-            self.d_obj.name = input_file_name
-            self.parent.parent.title('{} - {}'.format(os.path.basename(self.d_obj.name),
+            self.parent.init_data_object()
+            self.do = self.parent.data_object
+            #  print("After object creation: \n", self.do.json_dict_flat)
+            self.do.name = input_file_name
+            self.parent.parent.title('{} - {}'.format(os.path.basename(self.parent.data_object.name),
             PROGRAM_NAME))
             self.parent.editor.textfield.configure(state=tk.NORMAL)
             self.parent.editor.textfield.delete(1.0, tk.END)
 
-            ##FIXME: Need to instantiate a new data object
-            ##FIXME
-            self.d_obj.json_dict_flat.clear()
-            self.d_obj.dirty_tags.clear()
-            self.d_obj.textfield_length = 0
-            self.d_obj.previous_value = ""
+            print(self.parent.data_object.name)
 
-            self.d_obj.import_file(input_file_name)
-            self.parent.editor.textfield.insert(1.0, self.d_obj.json_str)
+            self.parent.data_object.import_file(input_file_name)
+            #  print("Node list: ", self.parent.data_object.flat_keys_list())
+            self.parent.editor.textfield.insert(1.0, self.parent.data_object.json_str)
             self.parent.editor.textfield.configure(state=tk.DISABLED)
             self.parent.key_value_section.create_entry_boxes()
 
         # reset previos value 
-        self.d_obj.previous_value = "" 
+        self.parent.data_object.previous_value = "" 
 
     def save(self, event=None):
-        if len(self.d_obj.json_dict) == 0:
+        """TODO: Docstring for .
+
+        :arg1: TODO
+        :returns: TODO
+
+        """
+        if len(self.parent.data_object.json_dict) == 0:
             return
 
-        if not self.d_obj.name:
+        if not self.parent.data_object.name:
             self.save_as()
         else:
-            self.write_to_file(self.d_obj.name)
-            self.d_obj.dirty_tags.clear()
+            self.write_to_file(self.parent.data_object.name)
+            self.parent.data_object.dirty_tags.clear()
             self.parent.editor.refresh()
         return "break"
 
     def save_as(self, event=None):
-        if len(self.d_obj.json_dict) == 0:
+        """TODO: Docstring for .
+
+        :arg1: TODO
+        :returns: TODO
+
+        """
+        if len(self.parent.data_object.json_dict) == 0:
             return
 
         input_file_name = filedialog.asksaveasfilename(defaultextension=".json",
                 filetypes=[("Configuration Files", "*.json")]) 
         if input_file_name:
-            self.d_obj.name = input_file_name
-            self.write_to_file(self.d_obj.name)
+            self.parent.data_object.name = input_file_name
+            self.write_to_file(self.parent.data_object.name)
             self.parent.parent.title('{} - {}'
-                    .format(os.path.basename(self.d_obj.name), PROGRAM_NAME))
+                    .format(os.path.basename(self.parent.data_object.name), PROGRAM_NAME))
             return "break"
 
     def write_to_file(self, file_name):
+        """TODO: Docstring for .
+
+        :arg1: TODO
+        :returns: TODO
+
+        """
+
         try:
-            content = self.d_obj.json_dict
+            content = self.parent.data_object.json_dict
             with open(file_name, 'w') as outfile: 
                 json.dump(content, outfile)
         except IOError:
@@ -258,16 +332,22 @@ class MenuBar(ttk.Frame):
 
     # Edit menu methods
     def add_object(self, event=None, object_key="Default"):
+        """TODO: Docstring for .
+
+        :arg1: TODO
+        :returns: TODO
+
+        """
         self.parent.create_dialog()
                 
 
 class KeyValueSection(ttk.Frame):
     """ Section where configurations can be edited."""
 
-    def __init__(self, parent, data_object=None, *args, **kwargs):
+    def __init__(self, parent, *args, **kwargs):
+        """TODO: to be defined1. """
         ttk.Frame.__init__(self, parent, *args, **kwargs)
         self.parent = parent
-        self.d_obj = data_object
 
         # style variables
         self.rowconfigure(0, weight=1)
@@ -297,7 +377,7 @@ class KeyValueSection(ttk.Frame):
 
         self.frame.grid(row=0, column=0, sticky=tk.NSEW)
         
-        for i, (section, obj) in enumerate(self.d_obj.json_dict_flat.items(), 1):
+        for i, (section, obj) in enumerate(self.parent.data_object.json_dict_flat.items(), 1):
             frame = ttk.Frame(self.frame.interior)
             frame.grid(row=i, column=0, padx='20', sticky=tk.NSEW)
             ttk.Label(frame, style="label_style.TLabel",
@@ -337,20 +417,20 @@ class KeyValueSection(ttk.Frame):
         value = event.widget.get() 
 
         # set editor field length before changing it
-        self.d_obj.textfield_length = len(REGEX_NL.findall(self.d_obj.json_str,
+        self.parent.data_object.textfield_length = len(REGEX_NL.findall(self.parent.data_object.json_str,
             re.DOTALL)) + 1 
 
-        if isinstance(self.d_obj.get_init_value(flat_keys), int):
+        if isinstance(self.parent.data_object.get_init_value(flat_keys), int):
             try:
                 value = int(value)
             except ValueError:
                 value = ""
-        if isinstance(self.d_obj.get_init_value(flat_keys), float):
+        if isinstance(self.parent.data_object.get_init_value(flat_keys), float):
             try:
                 value = float(value)
             except ValueError:
                 value = ""
-        if isinstance(self.d_obj.get_init_value(flat_keys), list):
+        if isinstance(self.parent.data_object.get_init_value(flat_keys), list):
             try:
                 value = [ int(x) for x in ' '.join(value.split()).split(' ') ]
             except ValueError:
@@ -358,9 +438,9 @@ class KeyValueSection(ttk.Frame):
 
         keys = tuple((flat_keys[0] + " " + flat_keys[1]).split(' '))
         # save previous value for column comparison
-        self.d_obj.previous_value = self.d_obj.dyn_dict_get(keys)
+        self.parent.data_object.previous_value = self.parent.data_object.dyn_dict_get(keys)
         # save value to master dict
-        self.d_obj.dyn_dict_set(keys, value)
+        self.parent.data_object.dyn_dict_set(keys, value)
         # call the update method of the editor
         self.parent.editor.update_tags(flat_keys, value)
 
@@ -369,7 +449,7 @@ class Editor(ttk.Frame):
     def __init__(self, parent, data_object=None, *args, **kwargs):
         ttk.Frame.__init__(self, parent, *args, **kwargs)
         self.parent = parent
-        self.d_obj = data_object
+        self.parent.data_object = parent.data_object
 
         # style variables
         self.splashscreen_width = 80 
@@ -428,21 +508,21 @@ class Editor(ttk.Frame):
 
     def update_tags(self, flat_keys, value):
         print("Flat keys inside update_tags (Editor): ", flat_keys)
-        textfield_length = len(REGEX_NL.findall(self.d_obj.json_str, re.DOTALL)) + 1
-        line_diff = textfield_length - self.d_obj.textfield_length
-        row_diff = len(str(value)) - len(str(self.d_obj.previous_value)) + 10 
+        textfield_length = len(REGEX_NL.findall(self.parent.data_object.json_str, re.DOTALL)) + 1
+        line_diff = textfield_length - self.parent.data_object.textfield_length
+        row_diff = len(str(value)) - len(str(self.parent.data_object.previous_value)) + 10 
 
-        start = self.d_obj.get_coords(flat_keys, 0)
-        end = self.d_obj.get_coords(flat_keys, 1)
+        start = self.parent.data_object.get_coords(flat_keys, 0)
+        end = self.parent.data_object.get_coords(flat_keys, 1)
         
-        self.shift_positions(self.d_obj.json_dict_flat, end, line_diff, row_diff )
-        self.d_obj.dirty_tags.discard(flat_keys)
+        self.shift_positions(self.parent.data_object.json_dict_flat, end, line_diff, row_diff )
+        self.parent.data_object.dirty_tags.discard(flat_keys)
 
-        #  if self.d_obj.is_field_dirty(flat_keys, value):
-        self.d_obj.dirty_tags.add(flat_keys)
+        #  if self.parent.data_object.is_field_dirty(flat_keys, value):
+        self.parent.data_object.dirty_tags.add(flat_keys)
 
-        start = self.d_obj.get_coords(flat_keys, 0)
-        end = self.d_obj.get_coords(flat_keys, 1)
+        start = self.parent.data_object.get_coords(flat_keys, 0)
+        end = self.parent.data_object.get_coords(flat_keys, 1)
         print("start inside update_tags: ", start)
         print("end same same: ", end)
 
@@ -452,21 +532,21 @@ class Editor(ttk.Frame):
     def refresh(self):
         self.textfield.configure(state=tk.NORMAL)
         self.textfield.delete(1.0, tk.END)
-        self.textfield.insert(1.0, self.d_obj.json_str)
-        for el in self.d_obj.dirty_tags:
-            self.textfield.tag_add('match', self.d_obj.get_coords(el, 0),
-                                            self.d_obj.get_coords(el, 1))
+        self.textfield.insert(1.0, self.parent.data_object.json_str)
+        for el in self.parent.data_object.dirty_tags:
+            self.textfield.tag_add('match', self.parent.data_object.get_coords(el, 0),
+                                            self.parent.data_object.get_coords(el, 1))
         self.textfield.configure(state=tk.DISABLED)
 
 
 class CreateDialog(insert_dialog.Dialog):
     def __init__(self, parent, data_object, title):
-        print("CREATED NEW DIALOG")
+        self.do = data_object
         self.tab_widgets = []
         self.tab_ids = ["Array", "Float", "Integer", "String"]
         self.checked = tk.IntVar()
-        self.flat_keys = tk.StringVar()
-        self.data_object = data_object
+        self.flat_keys = self.do.flat_keys_list()
+        print("Node list: ", self.flat_keys)
         insert_dialog.Dialog.__init__(self, parent, title)
 
     def body(self, root):
@@ -498,7 +578,7 @@ class CreateDialog(insert_dialog.Dialog):
     def create_tabs(self, tab, value_type):
 
         # create elements
-        nodes = ttk.Combobox(tab, textvariable=self.flat_keys)
+        nodes = ttk.Combobox(tab)
         obj_key_entry = StringEntry(tab, state=tk.DISABLED)
         key_entry = StringEntry(tab)
 
@@ -512,7 +592,9 @@ class CreateDialog(insert_dialog.Dialog):
             value_entry = StringEntry(tab)
 
         # key list config and placement
-        nodes['values'] = (self.parent.data_object.flat_keys_list()) 
+        #  print("Json string: ", self.do.json_str)
+        #  print("Json dict: ", self.do.json_dict)
+        nodes['values'] = (self.flat_keys) 
         nodes.grid(row=0, column=0, sticky=tk.NW)
 
         # Object key label
@@ -566,9 +648,9 @@ class CreateDialog(insert_dialog.Dialog):
 
         keys = tuple(aux.split(' '))
 
-        self.parent.data_object.dyn_dict_set(keys, value)
+        self.do.dyn_dict_set(keys, value)
 
-        self.parent.data_object.gen_flat_key_dict(self.parent.data_object.json_dict, "")
+        self.do.gen_flat_key_dict(self.do.json_dict, "")
         self.parent.key_value_section.create_entry_boxes()
         print("Keys: ", keys)
         self.parent.editor.update_tags(keys, value)
@@ -586,15 +668,14 @@ class MainApplication(ttk.Frame):
     def __init__(self, parent, *args, **kwargs):
         ttk.Frame.__init__(self, parent, *args, **kwargs)
         self.parent = parent
-        # self.data_object = FileObj()
-        self.data_object = DataObject()
+        self.init_data_object()
 
         # Add menu bar
-        self.menubar = MenuBar(self, self.data_object)
+        self.menubar = MenuBar(self)
 
         # Create GUI elements
-        self.key_value_section = KeyValueSection(self, self.data_object)
-        self.editor = Editor(self, self.data_object)
+        self.key_value_section = KeyValueSection(self)
+        self.editor = Editor(self)
 
         # Place GUI elements
         self.editor.grid(row=0, column=0, sticky=tk.NS)
@@ -615,6 +696,10 @@ class MainApplication(ttk.Frame):
         # bind add object
         self.parent.bind('<Control-Shift-O>', self.menubar.add_object)
         self.parent.bind('<Control-Shift-o>', self.menubar.add_object)
+
+    def init_data_object(self):
+        print("New object created.")
+        self.data_object = DataObject()
 
     def quit_editor(self, event=None):
         self.parent.destroy()
