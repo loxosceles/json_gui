@@ -39,6 +39,7 @@ class Dialog(tk.Toplevel):
     #
     # construction hooks
 
+
     def body(self, master):
         # create dialog body.  return widget that should have
         # initial focus.  this method should be overridden
