@@ -348,7 +348,6 @@ class MenuBar(ttk.Frame):
         except IOError:
             pass
 
-    # Edit menu methods
     def add_object(self, event=None, object_key="Default"):
         """TODO: Docstring for .
 
@@ -357,7 +356,7 @@ class MenuBar(ttk.Frame):
 
         """
         self.parent.create_dialog()
-                
+
 
 class KeyValueSection(ttk.Frame):
     """ Section where configurations can be edited."""
@@ -732,6 +731,7 @@ class MainApplication(ttk.Frame):
     def create_dialog(self):
         self.obj_dialog = CreateDialog(self, "Create Object")
         self.parent.wait_window(self.obj_dialog.parent.parent)
+
 
 if __name__ == "__main__":
     root = tk.Tk()
