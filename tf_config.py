@@ -47,8 +47,35 @@ class DataObject(object):
         self.dirty_tags = set() 
         self._name = ""
         
-        self.textfield_length = 0
+        self._textfield_length = 0
         self.previous_value = "" 
+
+    @property
+    def json_str(self):
+        """TODO: Docstring for function.
+
+        :arg1: TODO
+        :returns: TODO
+
+        """
+
+        return json.dumps(self.json_dict, indent=4)
+
+    @property
+    def name(self):
+        return self._name
+
+    @property
+    def previous_textfield_length(self):
+        return self._textfield_length
+
+    @property
+    def current_textfield_length(self):
+        return len(REGEX_NL.findall(self.json_str, re.DOTALL)) + 2
+
+    @name.setter
+    def name(self, name):
+        self._name = name
 
     def import_file(self, json_file):   
         """Import configurations from tf_conf.json.
@@ -203,25 +230,9 @@ class DataObject(object):
             return True
         else:
             return False
-
-    @property
-    def json_str(self):
-        """TODO: Docstring for function.
-
-        :arg1: TODO
-        :returns: TODO
-
-        """
-
-        return json.dumps(self.json_dict, indent=4)
-
-    @property
-    def name(self):
-        return self._name
-
-    @name.setter
-    def name(self, name):
-        self._name = name
+    
+    def set_previous_textfield_length(self):
+        self._textfield_length = len(REGEX_NL.findall(self.json_str, re.DOTALL)) + 2
 
 
 class MenuBar(ttk.Frame):
@@ -426,8 +437,9 @@ class KeyValueSection(ttk.Frame):
         value = event.widget.get()
 
         # set editor field length before changing it
-        self.parent.data_object.textfield_length = len(
-                REGEX_NL.findall(self.parent.data_object.json_str, re.DOTALL)) + 2 
+        self.parent.data_object.set_previous_textfield_length()
+        #  self.parent.data_object.textfield_length = len(
+        #          REGEX_NL.findall(self.parent.data_object.json_str, re.DOTALL)) + 2
 
         if isinstance(self.parent.data_object.get_init_value(flat_keys), int):
             try:
@@ -452,10 +464,6 @@ class KeyValueSection(ttk.Frame):
         self.parent.data_object.dyn_dict_set(keys, value)
         # call the update method of the editor
         self.parent.editor.update_tags(flat_keys, value)
-
-    #  def destroy_key_value_frame(self):
-    #      #  for widget in self.frame.winfo_children():
-    #          #  widget.unbind_all("<FocusOut>")
 
 
 class Editor(ttk.Frame):
@@ -519,9 +527,13 @@ class Editor(ttk.Frame):
                     label['coords'][1] = self.vh_update(end_cds, v_shift)
 
     def update_tags(self, flat_keys, value):
-        textfield_length = len(REGEX_NL.findall(self.parent.data_object.json_str, re.DOTALL)) + 2
-        #  print("Textfield length: ", textfield_length)
-        line_diff = textfield_length - self.parent.data_object.textfield_length
+        prev_tf_length = self.parent.data_object.previous_textfield_length
+        curr_tf_length = self.parent.data_object.current_textfield_length
+
+        print("Textfield length (before) : ", prev_tf_length)
+        print("Textfield length (current): ", curr_tf_length)
+        line_diff = curr_tf_length - prev_tf_length
+        print("Linediff: ", line_diff)
         column_diff = len(str(value)) - len(str(self.parent.data_object.previous_value)) + 10 
 
         start = self.parent.data_object.get_coords(flat_keys, 0)
@@ -547,6 +559,13 @@ class Editor(ttk.Frame):
             self.textfield.tag_add('match', self.parent.data_object.get_coords(el, 0),
                                             self.parent.data_object.get_coords(el, 1))
         self.textfield.configure(state=tk.DISABLED)
+
+    def get_line_numbers(self):
+        output = ''
+        row, col = self.textfield.index("end").split('.')
+        for i in range(1, int(row)):
+            output += str(i)+ '\n'
+        return output
 
 
 class CreateDialog(insert_dialog.Dialog):
@@ -656,6 +675,7 @@ class CreateDialog(insert_dialog.Dialog):
 
         self.parent.data_object.gen_flat_key_dict(self.parent.data_object.json_dict, "")
         self.parent.key_value_section.create_entry_boxes()
+        self.parent.data_object.set_previous_textfield_length()
         self.parent.editor.update_tags(keys, value)
  
     def toggle_objectname_field(self, entry_widgets, var):

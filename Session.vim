@@ -1,6 +1,6 @@
 " /mnt/DATA/__programming/PROJECTS/config_tool/Session.vim:
 " Vim session script.
-" Created by session.vim 2.13.1 on 03 Mai 2018 at 22:53:29.
+" Created by session.vim 2.13.1 on 04 Mai 2018 at 01:28:33.
 " Open this file in Vim and run :source % to restore your session.
 
 set guioptions=aegimrLtT
@@ -155,7 +155,7 @@ if expand('%') == '' && !&modified && line('$') <= 1 && getline(1) == ''
   let s:wipebuf = bufnr('%')
 endif
 set shortmess=aoO
-badd +662 tf_config.py
+badd +365 tf_config.py
 badd +89 insert_dialog.py
 argglobal
 silent! argdel *
@@ -200,57 +200,61 @@ silent! normal! zE
 4,18fold
 20,37fold
 43,51fold
-53,67fold
-69,92fold
-94,114fold
-116,129fold
-131,143fold
-145,166fold
-168,175fold
-177,184fold
-186,193fold
-195,205fold
-208,216fold
-219,220fold
-223,224fold
-41,224fold
-40,224fold
-228,261fold
-263,286fold
-288,304fold
-306,323fold
-325,338fold
-341,348fold
-228,348fold
-227,348fold
-354,362fold
-364,370fold
-372,419fold
-421,454fold
-456,458fold
-456,458fold
-351,458fold
-462,480fold
-482,498fold
-500,508fold
-510,519fold
-521,540fold
-542,549fold
-462,549fold
-461,549fold
-553,559fold
-561,584fold
-586,626fold
-628,660fold
-662,667fold
-553,667fold
-552,667fold
-671,701fold
-703,704fold
-711,712fold
-714,716fold
-670,716fold
-718,727fold
+54,62fold
+65,66fold
+69,70fold
+73,74fold
+77,78fold
+80,94fold
+96,119fold
+121,141fold
+143,156fold
+158,170fold
+172,193fold
+195,202fold
+204,211fold
+213,220fold
+222,232fold
+234,235fold
+40,235fold
+239,272fold
+274,297fold
+299,315fold
+317,334fold
+336,349fold
+352,359fold
+239,359fold
+238,359fold
+365,373fold
+375,381fold
+383,430fold
+432,466fold
+362,466fold
+470,489fold
+490,507fold
+508,517fold
+518,528fold
+529,553fold
+554,562fold
+470,562fold
+563,569fold
+469,569fold
+572,578fold
+580,603fold
+605,645fold
+647,679fold
+681,686fold
+572,686fold
+571,686fold
+690,720fold
+722,723fold
+725,727fold
+729,730fold
+732,732fold
+732,734fold
+732,734fold
+689,734fold
+736,745fold
 4
 silent! normal! zo
 17
@@ -258,101 +262,139 @@ silent! normal! zo
 17
 silent! normal! zo
 17
-normal! zc
-17
-normal! zc
-17
-normal! zc
-4
 normal! zc
 20
 normal! zc
 40
 silent! normal! zo
-41
-silent! normal! zo
+43
+normal! zc
+54
+normal! zc
+65
+normal! zc
 69
 normal! zc
-94
+73
 normal! zc
-116
+77
 normal! zc
-131
+80
 normal! zc
-145
+96
 normal! zc
-168
+121
 normal! zc
-186
+143
+normal! zc
+158
+normal! zc
+172
 normal! zc
 195
 normal! zc
-208
+204
 normal! zc
-219
+213
 normal! zc
-223
+222
 normal! zc
-227
+234
+normal! zc
+238
 silent! normal! zo
-228
+239
 silent! normal! zo
-288
+239
 normal! zc
-306
+299
 normal! zc
-325
+317
 normal! zc
-341
+336
 normal! zc
-351
+362
 silent! normal! zo
-364
+365
 normal! zc
-456
+375
+normal! zc
+383
+normal! zc
+432
+normal! zc
+362
+normal! zc
+469
 silent! normal! zo
-456
-normal! zc
-461
+470
 silent! normal! zo
-462
+470
+normal! zc
+490
+normal! zc
+508
+normal! zc
+518
+normal! zc
+529
+normal! zc
+554
+normal! zc
+470
+normal! zc
+563
+normal! zc
+469
+normal! zc
+571
 silent! normal! zo
-462
-normal! zc
-482
-normal! zc
-500
-normal! zc
-510
-normal! zc
-542
-normal! zc
-552
+572
 silent! normal! zo
-553
+572
+normal! zc
+580
+normal! zc
+605
+normal! zc
+647
+normal! zc
+681
+normal! zc
+572
+normal! zc
+571
+normal! zc
+689
 silent! normal! zo
-553
+690
 normal! zc
-561
+722
 normal! zc
-586
+725
 normal! zc
-662
+729
 normal! zc
-670
+732
 silent! normal! zo
-671
+732
+silent! normal! zo
+732
 normal! zc
-711
+732
 normal! zc
-718
+732
 normal! zc
-let s:l = 654 - ((94 * winheight(0) + 30) / 60)
+689
+normal! zc
+736
+normal! zc
+let s:l = 351 - ((67 * winheight(0) + 30) / 60)
 if s:l < 1 | let s:l = 1 | endif
 exe s:l
 normal! zt
-654
-normal! 09|
+351
+normal! 0
 wincmd w
 2wincmd w
 exe 'vert 1resize ' . ((&columns * 25 + 61) / 123)
@@ -383,11 +425,11 @@ silent! normal! zE
 5,96fold
 5
 silent! normal! zo
-let s:l = 49 - ((48 * winheight(0) + 30) / 60)
+let s:l = 1 - ((0 * winheight(0) + 30) / 60)
 if s:l < 1 | let s:l = 1 | endif
 exe s:l
 normal! zt
-49
+1
 normal! 0
 tabnext 1
 set stal=1
