@@ -43,9 +43,9 @@ class DataObject(object):
 
     def __init__(self):
         """TODO: to be defined1. """
-        self.json_dict_flat = {}
+        self.json_dict_flat = OrderedDict()
+        self.json_file_repres = OrderedDict()
         self.json_dict = OrderedDict()
-        self.json_dict_file_representation = OrderedDict()
         self.dirty_tags = set()
         self._name = ""
 
@@ -91,10 +91,36 @@ class DataObject(object):
         try:
             with open(json_file, 'r') as infile:
                 self.json_dict = json.load(infile)
-                self.json_dict_file_representation = copy.deepcopy(self.json_dict)
+
+                self.gen_file_dict(self.json_dict, self.json_file_repres)
+                print("File repres: ", self.json_file_repres)
+
                 self.gen_flat_key_dict(self.json_dict, self.json_dict_flat)
+                print("Flat dict: ", self.json_dict_flat)
         except ValueError as e:
             print("Decoding the JSON config file has failed. Please make sure the format is correct.")
+
+    def gen_file_dict(self, json_dict, json_file_repres, key_path=""):
+        """ Parses json object recursively and returns path and value.
+
+        :arg1: TODO
+        :returns: TODO
+
+        """
+        if not isinstance(json_dict, dict):
+            path_tuple = tuple(key_path.strip().split(' '))
+
+            label = key_path.split(' ')[-1]
+            path = key_path[:-(len(label))].strip(' ')
+
+            if not json_file_repres.get(path):
+                json_file_repres[path] = {}
+
+            json_file_repres[path][label] = {}
+            json_file_repres[path][label]['original_value'] = json_dict
+        else:
+            for key, value in json_dict.items():
+                self.gen_file_dict(value, json_file_repres, key_path + ' ' + key)
 
     def gen_flat_key_dict(self, json_dict, json_dict_flat, key_path=""):
         """ Parses json object recursively and returns path and value.
@@ -114,7 +140,12 @@ class DataObject(object):
 
             json_dict_flat[path][label] = {}
             json_dict_flat[path][label]['buffered_value'] = json_dict
-            json_dict_flat[path][label]['original_value'] = json_dict_file_representation
+            try:
+                json_dict_flat[path][label]['original_value'] =\
+                        self.json_file_repres[path][label]['original_value']
+            except KeyError as e:
+                print(e)
+                json_dict_flat[path][label]['original_value'] = None
 
             start, end = self.gen_value_coords(self.json_str, path_tuple)
             json_dict_flat[path][label]['coords'] = [start, end]
@@ -214,7 +245,7 @@ class DataObject(object):
         :returns: TODO
 
         """
-        return self.json_dict_flat[keys[0]][keys[1]]['value']
+        return self.json_dict_flat[keys[0]][keys[1]]['buffered_value']
 
     def flat_keys_list(self):
         """TODO: Docstring for function.
@@ -232,7 +263,9 @@ class DataObject(object):
         :value:   current value
         :returns: True if the value differs from the original one, else False
         """
-        if self.json_dict_flat[keys[0]][keys[1]]['value'] != value:
+        print("new value: ", value)
+        print("original value: ", self.json_dict_flat[keys[0]][keys[1]]['original_value'])
+        if self.json_dict_flat[keys[0]][keys[1]]['original_value'] != value:
             return True
         else:
             return False
@@ -412,15 +445,15 @@ class KeyValueSection(ttk.Frame):
                 ttk.Label(frame, text=key, justify=tk.LEFT).grid(row=k,
                         column=j, sticky=tk.NW)
 
-                if isinstance(val['value'], int):
-                    entry = IntegerEntry(frame, value=val['value'])
-                elif isinstance(val['value'], float):
-                    entry = FloatEntry(frame, value=val['value'])
-                elif isinstance(val['value'], list):
-                    val = str(val['value']).strip('[]').replace(',', '')
+                if isinstance(val['buffered_value'], int):
+                    entry = IntegerEntry(frame, value=val['buffered_value'])
+                elif isinstance(val['buffered_value'], float):
+                    entry = FloatEntry(frame, value=val['buffered_value'])
+                elif isinstance(val['buffered_value'], list):
+                    val = str(val['buffered_value']).strip('[]').replace(',', '')
                     entry = ArrayEntry(frame, val)
                 else:
-                    entry = StringEntry(frame, value=val['value'])
+                    entry = StringEntry(frame, value=val['buffered_value'])
 
                 entry.config(justify=tk.LEFT)
 
@@ -684,7 +717,7 @@ class CreateDialog(insert_dialog.Dialog):
                 node = node + " " + object_key
             d[node] = {}
             d[node][key] = {}
-            d[node][key]['value'] = value
+            d[node][key]['buffered_value'] = value
             d[node][key]['coords'] = Decimal('0.0')
         else:
             if self.checked.get() == 1:

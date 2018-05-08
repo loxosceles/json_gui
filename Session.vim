@@ -1,6 +1,6 @@
 " /mnt/DATA/__programming/PROJECTS/config_tool/Session.vim:
 " Vim session script.
-" Created by session.vim 2.13.1 on 07 Mai 2018 at 19:24:08.
+" Created by session.vim 2.13.1 on 07 Mai 2018 at 21:01:37.
 " Open this file in Vim and run :source % to restore your session.
 
 set guioptions=aegimrLtT
@@ -184,81 +184,83 @@ silent! normal! zE
 70,73fold
 75,77fold
 79,81fold
-82,98fold
-99,124fold
-125,148fold
-149,163fold
-164,177fold
-178,200fold
-201,209fold
-210,218fold
-219,227fold
-228,239fold
-240,242fold
-41,242fold
-245,279fold
-280,299fold
-300,317fold
-318,336fold
-337,351fold
-352,360fold
-244,360fold
-365,374fold
-375,382fold
-383,433fold
-434,470fold
-362,470fold
-473,492fold
-493,510fold
-511,520fold
-521,531fold
-532,557fold
-558,566fold
-567,573fold
-472,573fold
-576,583fold
-584,610fold
-611,652fold
-653,709fold
-710,716fold
-575,716fold
-719,750fold
-751,753fold
-754,757fold
-758,760fold
-761,764fold
-718,764fold
-766,775fold
+82,124fold
+125,155fold
+156,179fold
+180,194fold
+195,208fold
+209,231fold
+232,240fold
+241,249fold
+250,258fold
+259,272fold
+273,275fold
+41,275fold
+278,312fold
+313,332fold
+333,350fold
+351,369fold
+370,384fold
+385,393fold
+277,393fold
+398,407fold
+408,415fold
+416,466fold
+467,503fold
+395,503fold
+506,525fold
+526,543fold
+544,553fold
+554,564fold
+565,590fold
+591,599fold
+600,606fold
+505,606fold
+609,616fold
+617,643fold
+644,685fold
+686,742fold
+743,749fold
+608,749fold
+752,783fold
+784,786fold
+787,790fold
+791,793fold
+794,797fold
+751,797fold
+799,808fold
 41
 silent! normal! zo
 44
 silent! normal! zo
-99
+82
 silent! normal! zo
-244
+125
 silent! normal! zo
-245
+259
 silent! normal! zo
-280
+277
 silent! normal! zo
-362
+395
 silent! normal! zo
-472
+467
 silent! normal! zo
-472
-normal! zc
-575
+505
 silent! normal! zo
-653
+565
 silent! normal! zo
-718
+608
 silent! normal! zo
-let s:l = 117 - ((116 * winheight(0) + 30) / 60)
+686
+silent! normal! zo
+751
+silent! normal! zo
+let s:l = 116 - ((37 * winheight(0) + 30) / 60)
 if s:l < 1 | let s:l = 1 | endif
 exe s:l
 normal! zt
-117
-normal! 054|
+116
+normal! 016|
 tabedit insert_dialog.py
 set splitbelow splitright
 set nosplitbelow
