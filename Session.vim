@@ -1,6 +1,6 @@
 " /mnt/DATA/__programming/PROJECTS/config_tool/Session.vim:
 " Vim session script.
-" Created by session.vim 2.13.1 on 07 Mai 2018 at 21:01:37.
+" Created by session.vim 2.13.1 on 08 Mai 2018 at 00:31:36.
 " Open this file in Vim and run :source % to restore your session.
 
 set guioptions=aegimrLtT
@@ -157,15 +157,34 @@ endif
 set shortmess=aoO
 badd +39 tf_config.py
 badd +95 insert_dialog.py
+badd +0 validating_entry.py
 argglobal
 silent! argdel *
 set stal=2
 edit tf_config.py
 set splitbelow splitright
+wincmd _ | wincmd |
+vsplit
+1wincmd h
+wincmd w
 set nosplitbelow
 set nosplitright
 wincmd t
 set winminheight=1 winheight=1 winminwidth=1 winwidth=1
+exe 'vert 1resize ' . ((&columns * 25 + 62) / 125)
+exe 'vert 2resize ' . ((&columns * 99 + 62) / 125)
+argglobal
+enew
+" file NERD_tree_1
+setlocal fdm=manual
+setlocal fde=0
+setlocal fmr={{{,}}}
+setlocal fdi=#
+setlocal fdl=0
+setlocal fml=1
+setlocal fdn=20
+setlocal nofen
+wincmd w
 argglobal
 setlocal fdm=manual
 setlocal fde=0
@@ -184,91 +203,118 @@ silent! normal! zE
 70,73fold
 75,77fold
 79,81fold
-82,124fold
-125,155fold
-156,179fold
+101,127fold
+82,127fold
+128,157fold
+158,179fold
 180,194fold
 195,208fold
 209,231fold
 232,240fold
-241,249fold
-250,258fold
-259,272fold
+241,251fold
+252,260fold
+261,272fold
 273,275fold
 41,275fold
 278,312fold
-313,332fold
-333,350fold
-351,369fold
-370,384fold
-385,393fold
-277,393fold
-398,407fold
-408,415fold
-416,466fold
-467,503fold
-395,503fold
-506,525fold
-526,543fold
-544,553fold
-554,564fold
-565,590fold
-591,599fold
-600,606fold
-505,606fold
-609,616fold
-617,643fold
-644,685fold
-686,742fold
-743,749fold
-608,749fold
-752,783fold
-784,786fold
-787,790fold
-791,793fold
-794,797fold
-751,797fold
-799,808fold
+313,328fold
+329,346fold
+347,365fold
+366,380fold
+381,389fold
+277,389fold
+394,403fold
+404,411fold
+412,462fold
+463,502fold
+391,502fold
+505,524fold
+525,542fold
+543,552fold
+553,563fold
+564,582fold
+583,591fold
+592,598fold
+504,598fold
+601,608fold
+609,633fold
+634,675fold
+676,690fold
+691,727fold
+728,734fold
+600,734fold
+737,768fold
+769,771fold
+772,775fold
+776,779fold
+780,782fold
+783,786fold
+736,786fold
+788,797fold
+4
+silent! normal! zo
 41
 silent! normal! zo
 44
 silent! normal! zo
 82
 silent! normal! zo
-125
+128
 silent! normal! zo
-259
+158
 silent! normal! zo
+241
+silent! normal! zo
+41
+normal! zc
 277
 silent! normal! zo
-395
+278
 silent! normal! zo
-467
+313
 silent! normal! zo
-505
+277
+normal! zc
+391
 silent! normal! zo
-565
+412
 silent! normal! zo
-608
+504
 silent! normal! zo
-686
+504
+normal! zc
+600
 silent! normal! zo
-751
+601
 silent! normal! zo
-let s:l = 116 - ((37 * winheight(0) + 30) / 60)
+676
+silent! normal! zo
+691
+silent! normal! zo
+728
+silent! normal! zo
+736
+silent! normal! zo
+736
+normal! zc
+let s:l = 681 - ((82 * winheight(0) + 31) / 62)
 if s:l < 1 | let s:l = 1 | endif
 exe s:l
 normal! zt
-116
-normal! 016|
-tabedit insert_dialog.py
+681
+normal! 0
+wincmd w
+2wincmd w
+exe 'vert 1resize ' . ((&columns * 25 + 62) / 125)
+exe 'vert 2resize ' . ((&columns * 99 + 62) / 125)
+tabedit validating_entry.py
 set splitbelow splitright
 set nosplitbelow
 set nosplitright
 wincmd t
 set winminheight=1 winheight=1 winminwidth=1 winwidth=1
 argglobal
-setlocal fdm=indent
+setlocal fdm=manual
 setlocal fde=0
 setlocal fmr={{{,}}}
 setlocal fdi=#
@@ -276,18 +322,52 @@ setlocal fdl=0
 setlocal fml=1
 setlocal fdn=20
 setlocal fen
-7
-silent! normal! zo
+silent! normal! zE
+let s:l = 65 - ((50 * winheight(0) + 31) / 62)
+if s:l < 1 | let s:l = 1 | endif
+exe s:l
+normal! zt
+65
+normal! 023|
+tabedit insert_dialog.py
+set splitbelow splitright
+set nosplitbelow
+set nosplitright
+wincmd t
+set winminheight=1 winheight=1 winminwidth=1 winwidth=1
+argglobal
+setlocal fdm=manual
+setlocal fde=0
+setlocal fmr={{{,}}}
+setlocal fdi=#
+setlocal fdl=0
+setlocal fml=1
+setlocal fdn=20
+setlocal fen
+silent! normal! zE
+13,13fold
+28,28fold
+33,33fold
+33,33fold
+33,33fold
+33,33fold
+33,33fold
+33,33fold
+9,37fold
+47,47fold
+70,79fold
+92,92fold
+96,96fold
 9
 silent! normal! zo
 70
 silent! normal! zo
-let s:l = 95 - ((61 * winheight(0) + 30) / 60)
+let s:l = 92 - ((57 * winheight(0) + 31) / 62)
 if s:l < 1 | let s:l = 1 | endif
 exe s:l
 normal! zt
-95
-normal! 0
+92
+normal! 09|
 tabnext 1
 set stal=1
 if exists('s:wipebuf')
@@ -307,6 +387,19 @@ let &so = s:so_save | let &siso = s:siso_save
 " by :mksession out of the box).
 
 1wincmd w
+tabnext 1
+let s:bufnr_save = bufnr("%")
+let s:cwd_save = getcwd()
+NERDTree /mnt/DATA/__programming/PROJECTS/config_tool
+if !getbufvar(s:bufnr_save, '&modified')
+  let s:wipebuflines = getbufline(s:bufnr_save, 1, '$')
+  if len(s:wipebuflines) <= 1 && empty(get(s:wipebuflines, 0, ''))
+    silent execute 'bwipeout' s:bufnr_save
+  endif
+endif
+execute "cd" fnameescape(s:cwd_save)
+1resize 62|vert 1resize 25|2resize 62|vert 2resize 99|
+2wincmd w
 tabnext 1
 if exists('s:wipebuf')
   if empty(bufname(s:wipebuf))

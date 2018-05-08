@@ -87,71 +87,73 @@ class DataObject(object):
 
         """
 
-        print("Importing file now!")
         try:
             with open(json_file, 'r') as infile:
                 self.json_dict = json.load(infile)
 
                 self.gen_file_dict(self.json_dict, self.json_file_repres)
-                print("File repres: ", self.json_file_repres)
 
-                self.gen_flat_key_dict(self.json_dict, self.json_dict_flat)
-                print("Flat dict: ", self.json_dict_flat)
+                self.gen_flat_key_dict(self.json_dict)
         except ValueError as e:
-            print("Decoding the JSON config file has failed. Please make sure the format is correct.")
+            print("Decoding the JSON config file has failed. Please make sure the\
+                    format is correct.")
 
-    def gen_file_dict(self, json_dict, json_file_repres, key_path=""):
-        """ Parses json object recursively and returns path and value.
+    def gen_file_dict(self, jsd, jsfrep, key_path=""):
+        """ Parse json object recursively and build a dictionary holding (flat)
+        path and value.
 
-        :arg1: TODO
-        :returns: TODO
+        This method serves as a representation of the read-in file. The resulting
+        dictionary will not be modified during execution. Instead, it holds the
+        original structure of the file.
+
+        :jsd:    The json dictionary which was built from the file
+        :jsfrep: The resulting dictionary as a representation of the file
 
         """
-        if not isinstance(json_dict, dict):
+        if not isinstance(jsd, dict):
             path_tuple = tuple(key_path.strip().split(' '))
 
             label = key_path.split(' ')[-1]
             path = key_path[:-(len(label))].strip(' ')
 
-            if not json_file_repres.get(path):
-                json_file_repres[path] = {}
+            if not jsfrep.get(path):
+                jsfrep[path] = {}
 
-            json_file_repres[path][label] = {}
-            json_file_repres[path][label]['original_value'] = json_dict
+            jsfrep[path][label] = {}
+            jsfrep[path][label]['original_value'] = jsd
         else:
-            for key, value in json_dict.items():
-                self.gen_file_dict(value, json_file_repres, key_path + ' ' + key)
+            for key, value in jsd.items():
+                self.gen_file_dict(value, jsfrep, key_path + ' ' + key)
 
-    def gen_flat_key_dict(self, json_dict, json_dict_flat, key_path=""):
+    def gen_flat_key_dict(self, jsd, key_path=""):
         """ Parses json object recursively and returns path and value.
 
         :arg1: TODO
         :returns: TODO
 
         """
-        if not isinstance(json_dict, dict):
+        if not isinstance(jsd, dict):
             path_tuple = tuple(key_path.strip().split(' '))
 
             label = key_path.split(' ')[-1]
             path = key_path[:-(len(label))].strip(' ')
 
-            if not json_dict_flat.get(path):
-                json_dict_flat[path] = {}
+            if not self.json_dict_flat.get(path):
+                self.json_dict_flat[path] = {}
 
-            json_dict_flat[path][label] = {}
-            json_dict_flat[path][label]['buffered_value'] = json_dict
+            self.json_dict_flat[path][label] = {}
+            self.json_dict_flat[path][label]['buffered_value'] = jsd
             try:
-                json_dict_flat[path][label]['original_value'] =\
+                self.json_dict_flat[path][label]['original_value'] =\
                         self.json_file_repres[path][label]['original_value']
             except KeyError as e:
-                print(e)
-                json_dict_flat[path][label]['original_value'] = None
+                self.json_dict_flat[path][label]['original_value'] = None
 
             start, end = self.gen_value_coords(self.json_str, path_tuple)
-            json_dict_flat[path][label]['coords'] = [start, end]
+            self.json_dict_flat[path][label]['coords'] = [start, end]
         else:
-            for key, value in json_dict.items():
-                self.gen_flat_key_dict(value, json_dict_flat, key_path + ' ' + key)
+            for key, value in jsd.items():
+                self.gen_flat_key_dict(value, key_path + ' ' + key)
 
     def gen_value_coords(self, json_str, path):
         """TODO: Docstring for function.
@@ -167,8 +169,6 @@ class DataObject(object):
             se += '"' + path[i] + '"' + match_all
 
         se += '"' + path[-1] + '"' + ':\s*(\[[^}]*?\]|".*?"|\d+\.*\d*)'
-        #  print("json str: ", json_str)
-        #  print("Search expression: ", se)
 
         s = re.compile(se, re.DOTALL)
         match = s.search(self.json_str)
@@ -238,14 +238,16 @@ class DataObject(object):
         """
         return self.json_dict_flat[keys[0]][keys[1]]['coords'][position]
 
-    def get_init_value(self, keys):
+    def get_value_dict_flat(self, flat_keys):
         """TODO: Docstring for function.
 
         :arg1: TODO
         :returns: TODO
 
         """
-        return self.json_dict_flat[keys[0]][keys[1]]['buffered_value']
+        root = flat_keys[0]
+        label = flat_keys[1]
+        return self.json_dict_flat[root][label]['buffered_value']
 
     def flat_keys_list(self):
         """TODO: Docstring for function.
@@ -263,8 +265,6 @@ class DataObject(object):
         :value:   current value
         :returns: True if the value differs from the original one, else False
         """
-        print("new value: ", value)
-        print("original value: ", self.json_dict_flat[keys[0]][keys[1]]['original_value'])
         if self.json_dict_flat[keys[0]][keys[1]]['original_value'] != value:
             return True
         else:
@@ -317,18 +317,14 @@ class MenuBar(ttk.Frame):
             self.parent.init_data_object()
             self.parent.destroy_entry_widgets()
             self.parent.data_object.name = input_file_name
-            self.parent.parent.title('{} - {}'.format(os.path.basename(self.parent.data_object.name),
-            PROGRAM_NAME))
+            self.parent.set_title()
             self.parent.editor.textfield.configure(state=tk.NORMAL)
             self.parent.editor.textfield.delete(1.0, tk.END)
-
             self.parent.data_object.import_file(input_file_name)
             self.parent.editor.textfield.insert(1.0, self.parent.data_object.json_str)
             self.parent.editor.textfield.configure(state=tk.DISABLED)
             self.parent.key_value_section.create_entry_boxes()
 
-        # reset previos value
-        #  self.parent.data_object.previous_value = ""
 
     def save(self, event=None):
         """TODO: Docstring for .
@@ -382,7 +378,7 @@ class MenuBar(ttk.Frame):
         except IOError:
             pass
 
-    def add_object(self, event=None, object_key="Default"):
+    def add_object(self, event=None):
         """TODO: Docstring for .
 
         :arg1: TODO
@@ -415,8 +411,6 @@ class KeyValueSection(ttk.Frame):
 
     def create_entry_boxes(self):
         """Update the key-value section with entry fields."""
-        #  print(self.parent.data_object.json_str)
-        #  print(self.parent.data_object.json_dict_flat)
 
         self.label_style = ttk.Style()
         self.label_style.configure("label_style.TLabel",
@@ -445,58 +439,63 @@ class KeyValueSection(ttk.Frame):
                 ttk.Label(frame, text=key, justify=tk.LEFT).grid(row=k,
                         column=j, sticky=tk.NW)
 
-                if isinstance(val['buffered_value'], int):
-                    entry = IntegerEntry(frame, value=val['buffered_value'])
-                elif isinstance(val['buffered_value'], float):
-                    entry = FloatEntry(frame, value=val['buffered_value'])
-                elif isinstance(val['buffered_value'], list):
-                    val = str(val['buffered_value']).strip('[]').replace(',', '')
+                v  = val['buffered_value']
+
+                if isinstance(v, int):
+                    entry = IntegerEntry(frame, value=v)
+                elif isinstance(v, float):
+                    entry = FloatEntry(frame, value=v)
+                elif isinstance(v, list):
+                    val = str(v).strip('[]').replace(',', '')
                     entry = ArrayEntry(frame, val)
                 else:
-                    entry = StringEntry(frame, value=val['buffered_value'])
+                    entry = StringEntry(frame, value=v)
 
                 entry.config(justify=tk.LEFT)
 
                 entry.grid(row=k+1, column=j, sticky=tk.NW)
                 entry.bind("<FocusOut>", lambda event, flat_keys=(section, key):
-                    self.save_field(event, flat_keys))
+                    self.buffer_entry_value(event, flat_keys))
                 self.entry_list.append(entry)
 
                 j, k = self._accomodate_rows(j, k)
 
-    def save_field(self, event, flat_keys):
+    def buffer_entry_value(self, event, flat_keys):
         # FIXME: get position of event inside canvas
         #  print(event.widget.winfo_y())
         #  print(self.frame.canvas.coords(entry))
 
         value = event.widget.get()
 
-        # set editor field length before changing it
-        self.parent.data_object.set_previous_textfield_length()
-        #  self.parent.data_object.textfield_length = len(
-        #          REGEX_NL.findall(self.parent.data_object.json_str, re.DOTALL)) + 2
 
-        if isinstance(self.parent.data_object.get_init_value(flat_keys), int):
+        fd_value = self.parent.data_object.get_value_dict_flat(flat_keys)
+
+        if isinstance(fd_value, int):
             try:
                 value = int(value)
             except ValueError:
                 value = ""
-        if isinstance(self.parent.data_object.get_init_value(flat_keys), float):
+        if isinstance(fd_value, float):
             try:
                 value = float(value)
             except ValueError:
                 value = ""
-        if isinstance(self.parent.data_object.get_init_value(flat_keys), list):
+        if isinstance(fd_value, list):
             try:
                 value = [ int(x) for x in ' '.join(value.split()).split(' ') ]
             except ValueError:
                 value = []
 
-        keys = tuple((flat_keys[0] + " " + flat_keys[1]).split(' '))
+        # set textfield field length before it changes (on save)
+        self.parent.data_object.set_previous_textfield_length()
+
         # save previous value for column comparison
+        keys = tuple((flat_keys[0] + " " + flat_keys[1]).split(' '))
         self.parent.data_object.previous_value = self.parent.data_object.dyn_dict_get(keys)
+
         # save value to master dict
         self.parent.data_object.dyn_dict_set(keys, value)
+
         # call the update method of the editor
         self.parent.editor.update_tags(flat_keys, value)
 
@@ -563,14 +562,10 @@ class Editor(ttk.Frame):
                     label['coords'][1] = self.vh_update(end_cds, v_shift)
 
     def update_tags(self, flat_keys, value):
-        print("inside update tags - flat keys: ", flat_keys)
         prev_tf_length = self.parent.data_object.previous_textfield_length
         curr_tf_length = self.parent.data_object.current_textfield_length
-
-        print("Textfield length (before) : ", prev_tf_length)
-        print("Textfield length (current): ", curr_tf_length)
         line_diff = curr_tf_length - prev_tf_length
-        print("Linediff: ", line_diff)
+        #FIXME: + 10 should not be necessary (but without it some brackets aren't marked consistently in red)
         column_diff = len(str(value)) - len(str(self.parent.data_object.previous_value)) + 10
 
         start = self.parent.data_object.get_coords(flat_keys, 0)
@@ -581,9 +576,6 @@ class Editor(ttk.Frame):
 
         if self.parent.data_object.is_field_dirty(flat_keys, value):
             self.parent.data_object.dirty_tags.add(flat_keys)
-
-        #  start = self.parent.data_object.get_coords(flat_keys, 0)
-        #  end = self.parent.data_object.get_coords(flat_keys, 1)
 
         self.refresh()
         self.textfield.see(end)
@@ -615,8 +607,6 @@ class CreateDialog(insert_dialog.Dialog):
         insert_dialog.Dialog.__init__(self, parent, title)
 
     def body(self, root):
-        #  print(self.parent.data_object.json_dict)
-        #  print(self.parent.data_object.json_dict_flat)
         self.options_frame = ttk.Frame(root)
         self.options_frame.pack()
 
@@ -683,6 +673,21 @@ class CreateDialog(insert_dialog.Dialog):
 
         return [nodes, obj_key_entry, key_entry, value_entry]
 
+    def validate(self):
+        active_tab = self.n.index(self.n.select())
+        node =  self.tab_widgets[active_tab][0].get()
+        key =   self.tab_widgets[active_tab][2].get()
+        value = self.tab_widgets[active_tab][3].get()
+
+        if self.checked.get() == 1:
+            object_key = self.tab_widgets[active_tab][1].get()
+            if node == '' or object_key == '' or key == '' or value == '':
+                return 0
+        else:
+            if node == '' or key == '' or value == '':
+                return 0
+        return 1
+
     def apply(self):
         active_tab = self.n.index(self.n.select())
 
@@ -704,35 +709,15 @@ class CreateDialog(insert_dialog.Dialog):
 
         if self.checked.get() == 1:
             object_key = self.tab_widgets[active_tab][1].get().strip().replace(' ', '_').lower()
-            aux = (node + " " + object_key + " " + key).strip()
-        else:
-            aux = (node + " " + key).strip()
+            node = node + " " + object_key
 
-        keys = tuple(aux.split(' '))
-        print("generated keys: ", keys)
-
-        d = {}
-        if node:
-            if self.checked.get() == 1:
-                node = node + " " + object_key
-            d[node] = {}
-            d[node][key] = {}
-            d[node][key]['buffered_value'] = value
-            d[node][key]['coords'] = Decimal('0.0')
-        else:
-            if self.checked.get() == 1:
-                d[object_key] = {}
-                d[object_key][key] = value
-            else:
-                d[key] = value
+        keys= tuple((node + " " + key).strip().split(' '))
 
         flat_keys =  (node, key)
-        print("Flat key: ", flat_keys)
 
         self.parent.data_object.dyn_dict_set(keys, value)
 
-        self.parent.data_object.gen_flat_key_dict(self.parent.data_object.json_dict,
-                self.parent.data_object.json_dict_flat)
+        self.parent.data_object.gen_flat_key_dict(self.parent.data_object.json_dict)
 
         self.parent.destroy_entry_widgets()
         self.parent.key_value_section.create_entry_boxes()
@@ -740,9 +725,9 @@ class CreateDialog(insert_dialog.Dialog):
         self.parent.data_object.set_previous_textfield_length()
         self.parent.editor.update_tags(flat_keys, value)
 
-    def toggle_objectname_field(self, entry_widgets, var):
+    def toggle_objectname_field(self, entry_widgets, checkbox):
         for ew in entry_widgets:
-            if var.get() == 0:
+            if checkbox.get() == 0:
                 ew.configure(state=tk.DISABLED)
             else:
                 ew.configure(state=tk.NORMAL)
@@ -783,6 +768,10 @@ class MainApplication(ttk.Frame):
 
     def init_data_object(self):
         self.data_object = DataObject()
+
+    def set_title(self):
+        self.parent.title('{} - {}'.format(os.path.basename(
+                self.data_object.name), PROGRAM_NAME))
 
     def destroy_entry_widgets(self):
         for entry in self.key_value_section.entry_list:

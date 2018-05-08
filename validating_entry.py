@@ -55,9 +55,6 @@ class FloatEntry(ValidatingEntry):
 
 
 class ArrayEntry(ValidatingEntry):
-    #  def __init__(self, parent, value="", **kwargs):
-    #      super().__init__(parent, value="", **kwargs)
-    #      print("ArrayEntry Value: ", value)
 
     def validate(self, value):
         try:
