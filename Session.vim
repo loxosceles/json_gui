@@ -1,6 +1,6 @@
 " /mnt/DATA/__programming/PROJECTS/config_tool/Session.vim:
 " Vim session script.
-" Created by session.vim 2.13.1 on 04 Mai 2018 at 01:48:29.
+" Created by session.vim 2.13.1 on 07 Mai 2018 at 19:24:08.
 " Open this file in Vim and run :source % to restore your session.
 
 set guioptions=aegimrLtT
@@ -94,7 +94,6 @@ let SuperTabMappingTabLiteral = "<C-v>"
 let NERDTreeMapRefresh = "r"
 let NERDTreeBookmarksSort = "1"
 let NERDTreeHighlightCursorline = "1"
-let UltiSnipsEnableSnipMate =  1 
 let NERDLPlace = "[>"
 let EasyMotion_use_migemo =  0 
 let NERDDefaultAlign = "left"
@@ -103,6 +102,7 @@ let NERDCreateDefaultMappings = "1"
 let NERDTreeMapCWD = "CD"
 let NERDTreeNaturalSort = "0"
 let EasyMotion_verbose =  1 
+let UltiSnipsEnableSnipMate =  1 
 let NERDTreeMapPreviewVSplit = "gs"
 let NERDTreeMapUpdir = "u"
 let NERDTreeMapJumpRoot = "P"
@@ -118,13 +118,13 @@ let EasyMotion_cursor_highlight =  1
 let NERDRemoveAltComs = "1"
 let NERDTreeCascadeOpenSingleChildDir = "1"
 let NERDTreeMapOpenVSplit = "s"
+let EasyMotion_startofline =  1 
 let NERDTreeMapJumpLastChild = "J"
 let SuperTabLongestEnhanced =  0 
 let NERDTrimTrailingWhitespace =  1 
 let NERDTreeMapDeleteBookmark = "D"
 let UltiSnipsListSnippets = "<c-tab>"
 let NERDBlockComIgnoreEmpty = "0"
-let EasyMotion_startofline =  1 
 let NERDTreeMapJumpNextSibling = "<C-j>"
 let EasyMotion_inc_highlight =  1 
 let UltiSnipsEditSplit = "normal"
@@ -155,26 +155,18 @@ if expand('%') == '' && !&modified && line('$') <= 1 && getline(1) == ''
   let s:wipebuf = bufnr('%')
 endif
 set shortmess=aoO
-badd +365 tf_config.py
-badd +89 insert_dialog.py
+badd +39 tf_config.py
+badd +95 insert_dialog.py
 argglobal
 silent! argdel *
 set stal=2
 edit tf_config.py
 set splitbelow splitright
-wincmd _ | wincmd |
-vsplit
-1wincmd h
-wincmd w
 set nosplitbelow
 set nosplitright
 wincmd t
 set winminheight=1 winheight=1 winminwidth=1 winwidth=1
-exe 'vert 1resize ' . ((&columns * 25 + 61) / 123)
-exe 'vert 2resize ' . ((&columns * 97 + 61) / 123)
 argglobal
-enew
-" file NERD_tree_2
 setlocal fdm=manual
 setlocal fde=0
 setlocal fmr={{{,}}}
@@ -182,212 +174,91 @@ setlocal fdi=#
 setlocal fdl=0
 setlocal fml=1
 setlocal fdn=20
-setlocal nofen
-wincmd w
-argglobal
-setlocal fdm=manual
-setlocal fde=0
-setlocal fmr={{{,}}}
-setlocal fdi=#
-setlocal fdl=20
-setlocal fml=1
-setlocal fdn=20
 setlocal fen
 silent! normal! zE
-17,17fold
-17,17fold
-17,17fold
-4,19fold
-20,38fold
-43,52fold
-54,63fold
-65,67fold
-69,71fold
-73,75fold
-77,79fold
-80,95fold
-96,120fold
-121,142fold
-143,157fold
-158,171fold
-172,194fold
-195,203fold
-204,212fold
-213,221fold
-222,233fold
-234,236fold
-40,236fold
-239,273fold
-274,298fold
-299,316fold
-317,335fold
-336,350fold
-351,359fold
-238,359fold
-364,372fold
-364,373fold
-374,381fold
-382,430fold
-431,466fold
-361,466fold
-469,488fold
-507,516fold
-517,527fold
-528,552fold
-553,561fold
-469,561fold
-562,568fold
-468,568fold
-571,578fold
-579,603fold
-604,645fold
-646,679fold
-680,686fold
-570,686fold
-689,720fold
-721,723fold
-724,727fold
-728,730fold
-731,731fold
-731,734fold
-688,734fold
-736,745fold
-4
+4,20fold
+21,39fold
+44,54fold
+56,65fold
+67,69fold
+70,73fold
+75,77fold
+79,81fold
+82,98fold
+99,124fold
+125,148fold
+149,163fold
+164,177fold
+178,200fold
+201,209fold
+210,218fold
+219,227fold
+228,239fold
+240,242fold
+41,242fold
+245,279fold
+280,299fold
+300,317fold
+318,336fold
+337,351fold
+352,360fold
+244,360fold
+365,374fold
+375,382fold
+383,433fold
+434,470fold
+362,470fold
+473,492fold
+493,510fold
+511,520fold
+521,531fold
+532,557fold
+558,566fold
+567,573fold
+472,573fold
+576,583fold
+584,610fold
+611,652fold
+653,709fold
+710,716fold
+575,716fold
+719,750fold
+751,753fold
+754,757fold
+758,760fold
+761,764fold
+718,764fold
+766,775fold
+41
 silent! normal! zo
-17
+44
 silent! normal! zo
-17
+99
 silent! normal! zo
-17
-normal! zc
-4
-normal! zc
-20
-normal! zc
-40
+244
 silent! normal! zo
-43
-normal! zc
-54
-normal! zc
-65
-normal! zc
-69
-normal! zc
-73
-normal! zc
-77
-normal! zc
-80
-normal! zc
-96
-normal! zc
-121
-normal! zc
-143
-normal! zc
-158
-normal! zc
-172
-normal! zc
-195
-normal! zc
-204
-normal! zc
-213
-normal! zc
-222
-normal! zc
-234
-normal! zc
-40
-normal! zc
-238
+245
 silent! normal! zo
-239
-normal! zc
-299
-normal! zc
-317
-normal! zc
-351
-normal! zc
-361
+280
 silent! normal! zo
-364
+362
 silent! normal! zo
-364
-normal! zc
-374
-normal! zc
-382
-normal! zc
-431
-normal! zc
-361
-normal! zc
-468
+472
 silent! normal! zo
-469
+472
+normal! zc
+575
 silent! normal! zo
-469
-normal! zc
-507
-normal! zc
-517
-normal! zc
-528
-normal! zc
-553
-normal! zc
-562
-normal! zc
-468
-normal! zc
-570
+653
 silent! normal! zo
-571
-normal! zc
-579
-normal! zc
-604
-normal! zc
-646
-normal! zc
-680
-normal! zc
-570
-normal! zc
-688
+718
 silent! normal! zo
-689
-normal! zc
-721
-normal! zc
-724
-normal! zc
-728
-normal! zc
-731
-silent! normal! zo
-731
-normal! zc
-731
-normal! zc
-688
-normal! zc
-736
-normal! zc
-let s:l = 338 - ((337 * winheight(0) + 30) / 60)
+let s:l = 117 - ((116 * winheight(0) + 30) / 60)
 if s:l < 1 | let s:l = 1 | endif
 exe s:l
 normal! zt
-338
-normal! 0
-wincmd w
-2wincmd w
-exe 'vert 1resize ' . ((&columns * 25 + 61) / 123)
-exe 'vert 2resize ' . ((&columns * 97 + 61) / 123)
+117
+normal! 054|
 tabedit insert_dialog.py
 set splitbelow splitright
 set nosplitbelow
@@ -395,7 +266,7 @@ set nosplitright
 wincmd t
 set winminheight=1 winheight=1 winminwidth=1 winwidth=1
 argglobal
-setlocal fdm=manual
+setlocal fdm=indent
 setlocal fde=0
 setlocal fmr={{{,}}}
 setlocal fdi=#
@@ -403,22 +274,17 @@ setlocal fdl=0
 setlocal fml=1
 setlocal fdn=20
 setlocal fen
-silent! normal! zE
-7,41fold
-43,47fold
-49,66fold
-68,79fold
-81,88fold
-90,92fold
-94,96fold
-5,96fold
-5
+7
 silent! normal! zo
-let s:l = 1 - ((0 * winheight(0) + 30) / 60)
+9
+silent! normal! zo
+70
+silent! normal! zo
+let s:l = 95 - ((61 * winheight(0) + 30) / 60)
 if s:l < 1 | let s:l = 1 | endif
 exe s:l
 normal! zt
-1
+95
 normal! 0
 tabnext 1
 set stal=1
@@ -439,19 +305,6 @@ let &so = s:so_save | let &siso = s:siso_save
 " by :mksession out of the box).
 
 1wincmd w
-tabnext 1
-let s:bufnr_save = bufnr("%")
-let s:cwd_save = getcwd()
-NERDTree /mnt/DATA/__programming/PROJECTS/config_tool
-if !getbufvar(s:bufnr_save, '&modified')
-  let s:wipebuflines = getbufline(s:bufnr_save, 1, '$')
-  if len(s:wipebuflines) <= 1 && empty(get(s:wipebuflines, 0, ''))
-    silent execute 'bwipeout' s:bufnr_save
-  endif
-endif
-execute "cd" fnameescape(s:cwd_save)
-1resize 60|vert 1resize 25|2resize 60|vert 2resize 97|
-2wincmd w
 tabnext 1
 if exists('s:wipebuf')
   if empty(bufname(s:wipebuf))
