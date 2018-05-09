@@ -1,6 +1,6 @@
 " /mnt/DATA/__programming/PROJECTS/config_tool/Session.vim:
 " Vim session script.
-" Created by session.vim 2.13.1 on 08 Mai 2018 at 00:31:36.
+" Created by session.vim 2.13.1 on 08 Mai 2018 at 23:45:55.
 " Open this file in Vim and run :source % to restore your session.
 
 set guioptions=aegimrLtT
@@ -155,7 +155,7 @@ if expand('%') == '' && !&modified && line('$') <= 1 && getline(1) == ''
   let s:wipebuf = bufnr('%')
 endif
 set shortmess=aoO
-badd +39 tf_config.py
+badd +681 tf_config.py
 badd +95 insert_dialog.py
 badd +0 validating_entry.py
 argglobal
@@ -195,113 +195,99 @@ setlocal fml=1
 setlocal fdn=20
 setlocal fen
 silent! normal! zE
-4,20fold
-21,39fold
-44,54fold
-56,65fold
-67,69fold
-70,73fold
-75,77fold
-79,81fold
-101,127fold
-82,127fold
-128,157fold
-158,179fold
-180,194fold
-195,208fold
-209,231fold
-232,240fold
-241,251fold
-252,260fold
-261,272fold
-273,275fold
-41,275fold
-278,312fold
-313,328fold
-329,346fold
-347,365fold
-366,380fold
-381,389fold
-277,389fold
-394,403fold
-404,411fold
-412,462fold
-463,502fold
-391,502fold
-505,524fold
-525,542fold
-543,552fold
-553,563fold
-564,582fold
-583,591fold
-592,598fold
-504,598fold
-601,608fold
-609,633fold
-634,675fold
-676,690fold
-691,727fold
-728,734fold
-600,734fold
-737,768fold
-769,771fold
-772,775fold
-776,779fold
-780,782fold
-783,786fold
-736,786fold
-788,797fold
+4,22fold
+23,41fold
+46,56fold
+58,67fold
+69,71fold
+72,75fold
+77,79fold
+81,83fold
+84,102fold
+103,129fold
+103,129fold
+130,159fold
+160,181fold
+182,196fold
+197,210fold
+211,233fold
+234,242fold
+243,253fold
+254,267fold
+268,281fold
+282,293fold
+294,296fold
+43,296fold
+299,333fold
+334,349fold
+350,367fold
+368,386fold
+387,401fold
+402,410fold
+298,410fold
+415,424fold
+425,432fold
+433,483fold
+484,523fold
+412,523fold
+526,545fold
+546,563fold
+564,573fold
+574,584fold
+585,603fold
+604,612fold
+613,619fold
+525,619fold
+622,630fold
+631,655fold
+656,697fold
+698,712fold
+713,749fold
+750,756fold
+621,756fold
+759,790fold
+791,793fold
+794,797fold
+798,801fold
+802,804fold
+805,808fold
+758,808fold
+810,819fold
 4
 silent! normal! zo
-41
+43
 silent! normal! zo
-44
+103
 silent! normal! zo
-82
+298
 silent! normal! zo
-128
+299
 silent! normal! zo
-158
+334
 silent! normal! zo
-241
-silent! normal! zo
-41
+298
 normal! zc
-277
-silent! normal! zo
-278
-silent! normal! zo
-313
-silent! normal! zo
-277
-normal! zc
-391
-silent! normal! zo
 412
 silent! normal! zo
-504
+525
 silent! normal! zo
-504
+525
 normal! zc
-600
+621
 silent! normal! zo
-601
+698
 silent! normal! zo
-676
-silent! normal! zo
-691
-silent! normal! zo
-728
-silent! normal! zo
-736
-silent! normal! zo
-736
+621
 normal! zc
-let s:l = 681 - ((82 * winheight(0) + 31) / 62)
+758
+silent! normal! zo
+758
+normal! zc
+let s:l = 103 - ((82 * winheight(0) + 30) / 60)
 if s:l < 1 | let s:l = 1 | endif
 exe s:l
 normal! zt
-681
+103
 normal! 0
 wincmd w
 2wincmd w
@@ -323,7 +309,7 @@ setlocal fml=1
 setlocal fdn=20
 setlocal fen
 silent! normal! zE
-let s:l = 65 - ((50 * winheight(0) + 31) / 62)
+let s:l = 65 - ((48 * winheight(0) + 30) / 60)
 if s:l < 1 | let s:l = 1 | endif
 exe s:l
 normal! zt
@@ -362,7 +348,7 @@ silent! normal! zE
 silent! normal! zo
 70
 silent! normal! zo
-let s:l = 92 - ((57 * winheight(0) + 31) / 62)
+let s:l = 92 - ((55 * winheight(0) + 30) / 60)
 if s:l < 1 | let s:l = 1 | endif
 exe s:l
 normal! zt
@@ -398,7 +384,7 @@ if !getbufvar(s:bufnr_save, '&modified')
   endif
 endif
 execute "cd" fnameescape(s:cwd_save)
-1resize 62|vert 1resize 25|2resize 62|vert 2resize 99|
+1resize 60|vert 1resize 25|2resize 60|vert 2resize 99|
 2wincmd w
 tabnext 1
 if exists('s:wipebuf')

@@ -10,6 +10,8 @@ from tkinter import font
 import os, re, json, string
 from decimal import *
 from collections import OrderedDict
+from orderedset import OrderedSet
+#  from sortedcontainers import SortedList, SortedSet, SortedDict
 import copy
 import pprint
 
@@ -249,14 +251,33 @@ class DataObject(object):
         label = flat_keys[1]
         return self.json_dict_flat[root][label]['buffered_value']
 
-    def flat_keys_list(self):
-        """TODO: Docstring for function.
+    def node_list(self):
+        path_set = OrderedSet()
+        def get_list(d, key_path=''):
+            if not isinstance(d, dict):
+                return
+            else:
+                for key, value in d.items():
+                    path_set.add(key_path.strip())
+                    get_list(value, key_path + ' ' + key)
 
-        :arg1: TODO
-        :returns: TODO
+        get_list(self.json_dict)
+        path_set.discard('')
+        return list(path_set)
 
-        """
-        return list(self.json_dict_flat)
+    def node_label_list(self):
+        path_set = OrderedSet()
+        def get_list(d, key_path=''):
+            if not isinstance(d, dict):
+                return path_set.add(key_path.strip())
+            else:
+                for key, value in d.items():
+                    path_set.add(key_path.strip())
+                    get_list(value, key_path + ' ' + key)
+
+        get_list(self.json_dict)
+        path_set.discard('')
+        return list(path_set)
 
     def is_field_dirty(self, keys, value):
         """Boolean method which checks if a field has been modified.
@@ -603,7 +624,8 @@ class CreateDialog(insert_dialog.Dialog):
         self.tab_widgets = []
         self.tab_ids = ["Array", "Float", "Integer", "String"]
         self.checked = tk.IntVar()
-        self.flat_keys = self.parent.data_object.flat_keys_list()
+        #  self.flat_keys = self.parent.data_object.flat_keys_list()
+        self.flat_keys = self.parent.data_object.node_list()
         insert_dialog.Dialog.__init__(self, parent, title)
 
     def body(self, root):
