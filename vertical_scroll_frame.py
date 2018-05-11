@@ -6,14 +6,14 @@ from tkinter import ttk
 from functools import partial as fp
 
 class VerticalScrollFrame(ttk.Frame):
-    """ 
+    """
     A ttk frame allowing vertical scrolling.
 
     Use the '.interior' attribute to place widgets inside the scrollable frame.
     """
     def __init__(self, parent, height, *args, **options):
         # style variables
-        self.canvas_bg = "white" 
+        self.canvas_bg = "white"
         self.canvas_height = height
 
         ttk.Frame.__init__(self, parent)
@@ -24,9 +24,9 @@ class VerticalScrollFrame(ttk.Frame):
         self.canvas.yview_scroll(int(scroll), "units")
 
     def _bind_to_mousewheel(self, event):
-        self.canvas.bind_all("<Button-4>", 
+        self.canvas.bind_all("<Button-4>",
                 fp(self._on_mousewheel, scroll=-1))
-        self.canvas.bind_all("<Button-5>", 
+        self.canvas.bind_all("<Button-5>",
                 fp(self._on_mousewheel, scroll=1))
 
     def _unbind_from_mousewheel(self, event):
@@ -52,7 +52,7 @@ class VerticalScrollFrame(ttk.Frame):
 
         # create a frame inside the canvas which will be scrolled with it
         self.interior = ttk.Frame(self.canvas)
-                                  
+
         self.interior_id = self.canvas.create_window(0, 0,
                                                      window=self.interior,
                                                      anchor=tk.NW,
@@ -65,16 +65,16 @@ class VerticalScrollFrame(ttk.Frame):
     def __configure_canvas_interiorframe(self, event):
         '''Configure the interior frame size and the canvas scrollregion'''
         #Force the update of .winfo_width() and winfo_height()
-        self.canvas.update_idletasks() 
+        self.canvas.update_idletasks()
 
-        #Internal parameters 
+        #Internal parameters
         interiorReqHeight= self.interior.winfo_reqheight()
         canvasWidth    = self.canvas.winfo_width()
         canvasHeight   = self.canvas.winfo_height()
 
         #Set interior frame width to canvas current width
         self.canvas.itemconfigure(self.interior_id, width=canvasWidth)
-        
+
         # Set interior frame height and canvas scrollregion
         if canvasHeight > interiorReqHeight:
             self.canvas.itemconfigure(self.interior_id,  height=canvasHeight)

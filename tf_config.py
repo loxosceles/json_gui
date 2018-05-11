@@ -15,7 +15,7 @@ from orderedset import OrderedSet
 import copy
 import pprint
 
-import insert_dialog
+import dialog_window
 from validating_entry import ValidatingEntry,\
         ArrayEntry, IntegerEntry, FloatEntry, StringEntry
 from vertical_scroll_frame import VerticalScrollFrame
@@ -127,35 +127,42 @@ class DataObject(object):
             for key, value in jsd.items():
                 self.gen_file_dict(value, jsfrep, key_path + ' ' + key)
 
-    def gen_flat_key_dict(self, jsd, key_path=""):
+    def gen_flat_key_dict(self, jsd, key_path=None):
         """ Parses json object recursively and returns path and value.
 
         :arg1: TODO
         :returns: TODO
 
         """
-        if not isinstance(jsd, dict):
-            path_tuple = tuple(key_path.strip().split(' '))
+        if key_path == None:
+            key_path = ""
+        self.json_dict_flat.clear()
 
-            label = key_path.split(' ')[-1]
-            path = key_path[:-(len(label))].strip(' ')
+        def gen_dict(d, key_path):
+            if not isinstance(d, dict):
+                path_tuple = tuple(key_path.strip().split(' '))
 
-            if not self.json_dict_flat.get(path):
-                self.json_dict_flat[path] = {}
+                label = key_path.split(' ')[-1]
+                path = key_path[:-(len(label))].strip(' ')
 
-            self.json_dict_flat[path][label] = {}
-            self.json_dict_flat[path][label]['buffered_value'] = jsd
-            try:
-                self.json_dict_flat[path][label]['original_value'] =\
-                        self.json_file_repres[path][label]['original_value']
-            except KeyError as e:
-                self.json_dict_flat[path][label]['original_value'] = None
+                if not self.json_dict_flat.get(path):
+                    self.json_dict_flat[path] = {}
 
-            start, end = self.gen_value_coords(self.json_str, path_tuple)
-            self.json_dict_flat[path][label]['coords'] = [start, end]
-        else:
-            for key, value in jsd.items():
-                self.gen_flat_key_dict(value, key_path + ' ' + key)
+                self.json_dict_flat[path][label] = {}
+                self.json_dict_flat[path][label]['buffered_value'] = d
+                try:
+                    self.json_dict_flat[path][label]['original_value'] =\
+                            self.json_file_repres[path][label]['original_value']
+                except KeyError as e:
+                    self.json_dict_flat[path][label]['original_value'] = None
+
+                start, end = self.gen_value_coords(self.json_str, path_tuple)
+                self.json_dict_flat[path][label]['coords'] = [start, end]
+            else:
+                for key, value in d.items():
+                    gen_dict(value, key_path + ' ' + key)
+
+        gen_dict(jsd, key_path)
 
     def gen_value_coords(self, json_str, path):
         """TODO: Docstring for function.
@@ -228,6 +235,16 @@ class DataObject(object):
             s += " = " + str('"' + val + '"')
         else:
             s += " = " + str(val)
+
+        exec(s)
+
+    def dyn_dict_delete(self, keys):
+        print(keys)
+        s = 'del self.json_dict'
+
+        for i in range(len(keys)):
+            s += "[keys[" + str(i) + "]]"
+            print(s)
 
         exec(s)
 
@@ -327,6 +344,10 @@ class MenuBar(ttk.Frame):
         self.edit_menu.add_command(label='Add Object', accelerator='Shift + Ctrl + O',
                 compound=tk.LEFT, command=self.add_object)
 
+        # Delete object
+        self.edit_menu.add_command(label='Delete Object', accelerator='Shift + Ctrl + D',
+                compound=tk.LEFT, command=self.delete_object)
+
         # Create about menu
         self.about_menu = tk.Menu(self.menubar, tearoff=0)
         self.menubar.add_cascade(label='About', menu=self.about_menu)
@@ -336,7 +357,6 @@ class MenuBar(ttk.Frame):
         filetypes=[("Configuration files", "*.json")])
         if input_file_name:
             self.parent.init_data_object()
-            self.parent.destroy_entry_widgets()
             self.parent.data_object.name = input_file_name
             self.parent.set_title()
             self.parent.editor.textfield.configure(state=tk.NORMAL)
@@ -344,7 +364,7 @@ class MenuBar(ttk.Frame):
             self.parent.data_object.import_file(input_file_name)
             self.parent.editor.textfield.insert(1.0, self.parent.data_object.json_str)
             self.parent.editor.textfield.configure(state=tk.DISABLED)
-            self.parent.key_value_section.create_entry_boxes()
+            self.parent.key_value_section.create_entry_widgets()
 
 
     def save(self, event=None):
@@ -408,6 +428,15 @@ class MenuBar(ttk.Frame):
         """
         self.parent.create_dialog()
 
+    def delete_object(self, event=None):
+        """TODO: Docstring for delete_object
+
+        :arg1: TODO
+        :returns: TODO
+
+        """
+        self.parent.delete_dialog()
+
 
 class KeyValueSection(ttk.Frame):
     """ Section where configurations can be edited."""
@@ -415,8 +444,9 @@ class KeyValueSection(ttk.Frame):
     def __init__(self, parent, *args, **kwargs):
         """TODO: to be defined1. """
         ttk.Frame.__init__(self, parent, *args, **kwargs)
+        self.frame = VerticalScrollFrame(self, (screen_height - (screen_height * 0.3)))
         self.parent = parent
-        self.entry_list = []
+        #  self.entry_list = []
 
         # style variables
         self.rowconfigure(0, weight=1)
@@ -430,7 +460,7 @@ class KeyValueSection(ttk.Frame):
             k +=2
             return 0, k
 
-    def create_entry_boxes(self):
+    def create_entry_widgets(self):
         """Update the key-value section with entry fields."""
 
         self.label_style = ttk.Style()
@@ -443,6 +473,7 @@ class KeyValueSection(ttk.Frame):
         self.parent.editor.splash.destroy()
         self.parent.editor.textfield.configure(width=self.parent.editor.textfield_width)
 
+        self.frame.destroy()
         self.frame = VerticalScrollFrame(self, (screen_height - (screen_height * 0.3)))
         self.frame.grid(row=0, column=0, sticky=tk.NSEW)
 
@@ -477,7 +508,7 @@ class KeyValueSection(ttk.Frame):
                 entry.grid(row=k+1, column=j, sticky=tk.NW)
                 entry.bind("<FocusOut>", lambda event, flat_keys=(section, key):
                     self.buffer_entry_value(event, flat_keys))
-                self.entry_list.append(entry)
+                #  self.entry_list.append(entry)
 
                 j, k = self._accomodate_rows(j, k)
 
@@ -518,7 +549,7 @@ class KeyValueSection(ttk.Frame):
         self.parent.data_object.dyn_dict_set(keys, value)
 
         # call the update method of the editor
-        self.parent.editor.update_tags(flat_keys, value)
+        self.parent.editor.update_tags(value, flat_keys)
 
 
 
@@ -582,24 +613,27 @@ class Editor(ttk.Frame):
                     label['coords'][0] = self.vh_update(start_cds, v_shift)
                     label['coords'][1] = self.vh_update(end_cds, v_shift)
 
-    def update_tags(self, flat_keys, value):
+    def update_tags(self, value, flat_keys=None):
         prev_tf_length = self.parent.data_object.previous_textfield_length
         curr_tf_length = self.parent.data_object.current_textfield_length
         line_diff = curr_tf_length - prev_tf_length
         #FIXME: + 10 should not be necessary (but without it some brackets aren't marked consistently in red)
         column_diff = len(str(value)) - len(str(self.parent.data_object.previous_value)) + 10
 
-        start = self.parent.data_object.get_coords(flat_keys, 0)
-        end = self.parent.data_object.get_coords(flat_keys, 1)
+        if flat_keys:
+            start = self.parent.data_object.get_coords(flat_keys, 0)
+            end = self.parent.data_object.get_coords(flat_keys, 1)
 
-        self.shift_positions(self.parent.data_object.json_dict_flat, end, line_diff, column_diff )
-        self.parent.data_object.dirty_tags.discard(flat_keys)
+            self.shift_positions(self.parent.data_object.json_dict_flat, end, line_diff, column_diff )
+            self.parent.data_object.dirty_tags.discard(flat_keys)
 
-        if self.parent.data_object.is_field_dirty(flat_keys, value):
-            self.parent.data_object.dirty_tags.add(flat_keys)
+            if self.parent.data_object.is_field_dirty(flat_keys, value):
+                self.parent.data_object.dirty_tags.add(flat_keys)
 
-        self.refresh()
-        self.textfield.see(end)
+            self.refresh()
+            self.textfield.see(end)
+        else:
+            self.refresh()
 
     def refresh(self):
         self.textfield.configure(state=tk.NORMAL)
@@ -618,15 +652,14 @@ class Editor(ttk.Frame):
         return output
 
 
-class CreateDialog(insert_dialog.Dialog):
+class CreateDialog(dialog_window.Dialog):
     def __init__(self, parent, title):
         self.parent = parent
         self.tab_widgets = []
         self.tab_ids = ["Array", "Float", "Integer", "String"]
         self.checked = tk.IntVar()
-        #  self.flat_keys = self.parent.data_object.flat_keys_list()
-        self.flat_keys = self.parent.data_object.node_list()
-        insert_dialog.Dialog.__init__(self, parent, title)
+        self.node_list = self.parent.data_object.node_list()
+        dialog_window.Dialog.__init__(self, parent, title)
 
     def body(self, root):
         self.options_frame = ttk.Frame(root)
@@ -668,30 +701,35 @@ class CreateDialog(insert_dialog.Dialog):
         elif value_type == "String":
             value_entry = StringEntry(tab)
 
+        # Node label
+        ttk.Label(tab, style="id_label_style.TLabel", text="Node"
+                 ).grid(row=0, column=0, sticky=tk.NW)
+
         # key list config and placement
-        nodes['values'] = (self.flat_keys)
-        nodes.grid(row=0, column=0, sticky=tk.NW)
+        nodes['values'] = (self.node_list)
+        nodes.current(0)
+        nodes.grid(row=1, column=0, sticky=tk.NW)
 
         # Object key label
         ttk.Label(tab, style="id_label_style.TLabel", text="Object Key"
-                 ).grid(row=1, column=0, sticky=tk.NW)
+                 ).grid(row=2, column=0, sticky=tk.NW)
 
         # Object key entry
-        obj_key_entry.grid(row=2, column=0, sticky=tk.NW)
+        obj_key_entry.grid(row=3, column=0, sticky=tk.NW)
 
         # Key label
         key_label = ttk.Label(tab, style="id_label_style.TLabel", text="Key"
-                 ).grid(row=3, column=0, sticky=tk.NW)
+                 ).grid(row=4, column=0, sticky=tk.NW)
 
         # Key entry
-        key_entry.grid(row=4, column=0, sticky=tk.NW)
+        key_entry.grid(row=5, column=0, sticky=tk.NW)
 
         # Value label
         ttk.Label(tab, style="id_label_style.TLabel", text="Value"
-                 ).grid(row=5, column=0, sticky=tk.NW)
+                 ).grid(row=6, column=0, sticky=tk.NW)
 
         # Value entry
-        value_entry.grid(row=6, column=0, sticky=tk.NW)
+        value_entry.grid(row=7, column=0, sticky=tk.NW)
 
         return [nodes, obj_key_entry, key_entry, value_entry]
 
@@ -741,11 +779,10 @@ class CreateDialog(insert_dialog.Dialog):
 
         self.parent.data_object.gen_flat_key_dict(self.parent.data_object.json_dict)
 
-        self.parent.destroy_entry_widgets()
-        self.parent.key_value_section.create_entry_boxes()
+        self.parent.key_value_section.create_entry_widgets()
 
         self.parent.data_object.set_previous_textfield_length()
-        self.parent.editor.update_tags(flat_keys, value)
+        self.parent.editor.update_tags(value, flat_keys)
 
     def toggle_objectname_field(self, entry_widgets, checkbox):
         for ew in entry_widgets:
@@ -753,6 +790,45 @@ class CreateDialog(insert_dialog.Dialog):
                 ew.configure(state=tk.DISABLED)
             else:
                 ew.configure(state=tk.NORMAL)
+
+
+class DeleteDialog(dialog_window.Dialog):
+    def __init__(self, parent, title):
+        self.parent = parent
+        self.node_label_list = self.parent.data_object.node_label_list()
+        dialog_window.Dialog.__init__(self, parent, title)
+
+    def body(self, root):
+        self.frame = ttk.Frame(root)
+        self.frame.pack()
+        self.nodes = ttk.Combobox(self.frame, state='readonly')
+
+        # Node label
+        ttk.Label(self.frame, style="id_label_style.TLabel", text="Node"
+                 ).grid(row=0, column=0, sticky=tk.NW)
+
+        self.nodes['values'] = (self.node_label_list)
+        self.nodes.current(0)
+        self.nodes.grid(row=1, column=0, sticky=tk.NW)
+
+    def apply(self):
+        node = self.nodes.get()
+        node = tuple((node).strip().split(' '))
+
+        print("Json dict before")
+        print(self.parent.data_object.json_dict)
+        self.parent.data_object.dyn_dict_delete(node)
+        print("Json dict after")
+        print(self.parent.data_object.json_dict)
+
+        self.parent.data_object.gen_flat_key_dict(self.parent.data_object.json_dict)
+        print("Json dict flat after")
+        print(self.parent.data_object.json_dict_flat)
+
+        self.parent.key_value_section.create_entry_widgets()
+
+        self.parent.data_object.set_previous_textfield_length()
+        self.parent.editor.update_tags("")
 
 
 class MainApplication(ttk.Frame):
@@ -765,12 +841,12 @@ class MainApplication(ttk.Frame):
         self.editor = Editor(self)
         self.key_value_section = KeyValueSection(self)
 
+        # Place GUI elements
+        self.key_value_section.grid(row = 0, column = 1)
+        self.editor.grid(row=0, column=0, sticky=tk.NS)
+
         # Add menu bar
         self.menubar = MenuBar(self)
-
-        # Place GUI elements
-        self.editor.grid(row=0, column=0, sticky=tk.NS)
-        self.key_value_section.grid(row = 0, column = 1)
 
         # bind open shortcut
         self.parent.bind('<Control-O>', self.menubar.open)
@@ -787,7 +863,9 @@ class MainApplication(ttk.Frame):
         # bind add object
         self.parent.bind('<Control-Shift-O>', self.menubar.add_object)
         self.parent.bind('<Control-Shift-o>', self.menubar.add_object)
-
+        # bind delete object
+        self.parent.bind('<Control-Shift-D>', self.menubar.delete_object)
+        self.parent.bind('<Control-Shift-d>', self.menubar.delete_object)
     def init_data_object(self):
         self.data_object = DataObject()
 
@@ -795,16 +873,16 @@ class MainApplication(ttk.Frame):
         self.parent.title('{} - {}'.format(os.path.basename(
                 self.data_object.name), PROGRAM_NAME))
 
-    def destroy_entry_widgets(self):
-        for entry in self.key_value_section.entry_list:
-            entry.destroy()
-
     def quit_editor(self, event=None):
         self.parent.destroy()
 
     def create_dialog(self):
-        self.obj_dialog = CreateDialog(self, "Create Object")
-        self.parent.wait_window(self.obj_dialog.parent.parent)
+        self.create_dlg = CreateDialog(self, "Create Object")
+        self.parent.wait_window(self.create_dlg.parent.parent)
+
+    def delete_dialog(self):
+        self.delete_dlg = DeleteDialog(self, "Delete Object")
+        self.parent.wait_window(self.delete_dlg.parent.parent)
 
 
 if __name__ == "__main__":
