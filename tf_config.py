@@ -269,18 +269,30 @@ class DataObject(object):
         return self.json_dict_flat[root][label]['buffered_value']
 
     def node_list(self):
-        path_set = OrderedSet()
+        node_set = OrderedSet()
+        node_key_dict = OrderedDict()
+
         def get_list(d, key_path=''):
             if not isinstance(d, dict):
+                label = key_path.split(' ')[-1]
+                path = key_path[:-(len(label))].strip(' ')
+                if node_key_dict.get(path):
+                    node_key_dict[path].append(label)
+                else:
+                    node_key_dict[path] = [label]
+                node_set.add(path)
                 return
             else:
                 for key, value in d.items():
-                    path_set.add(key_path.strip())
+                    if isinstance(key, dict) and value.items() == False:
+                        node_set.add(key)
+                    node_set.add(key_path.strip())
                     get_list(value, key_path + ' ' + key)
 
         get_list(self.json_dict)
-        path_set.discard('')
-        return list(path_set)
+        node_set.discard('')
+        print("Node key dict: ", node_key_dict)
+        return list(node_set), node_key_dict
 
     def node_label_list(self):
         path_set = OrderedSet()
@@ -795,21 +807,30 @@ class CreateDialog(dialog_window.Dialog):
 class DeleteDialog(dialog_window.Dialog):
     def __init__(self, parent, title):
         self.parent = parent
-        self.node_label_list = self.parent.data_object.node_label_list()
+        #  self.node_label_list = self.parent.data_object.node_label_list()
+        self.node_list, self.node_labels = self.parent.data_object.node_list()
         dialog_window.Dialog.__init__(self, parent, title)
 
     def body(self, root):
         self.frame = ttk.Frame(root)
         self.frame.pack()
         self.nodes = ttk.Combobox(self.frame, state='readonly')
+        self.key = ttk.Combobox(self.frame, state='readonly')
 
-        # Node label
+        # Nodes label
         ttk.Label(self.frame, style="id_label_style.TLabel", text="Node"
                  ).grid(row=0, column=0, sticky=tk.NW)
 
-        self.nodes['values'] = (self.node_label_list)
+        self.nodes['values'] = (self.node_list)
+        self.nodes.bind("<<ComboboxSelected>>", self._update_label_cb)
         self.nodes.current(0)
         self.nodes.grid(row=1, column=0, sticky=tk.NW)
+
+        # Labels label
+        ttk.Label(self.frame, style="id_label_style.TLabel", text="Key"
+                 ).grid(row=2, column=0, sticky=tk.NW)
+        self.key.grid(row=3, column=0, sticky=tk.NW)
+
 
     def apply(self):
         node = self.nodes.get()
@@ -829,6 +850,13 @@ class DeleteDialog(dialog_window.Dialog):
 
         self.parent.data_object.set_previous_textfield_length()
         self.parent.editor.update_tags("")
+
+    def _update_label_cb(self, event=None):
+        try:
+            self.key.config(values=self.node_labels[event.widget.get()])
+            self.key.current(0)
+        except KeyError:
+            self.key.config(values=[])
 
 
 class MainApplication(ttk.Frame):

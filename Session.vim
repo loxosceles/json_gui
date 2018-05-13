@@ -1,6 +1,6 @@
 " /mnt/DATA/__programming/PROJECTS/config_tool/Session.vim:
 " Vim session script.
-" Created by session.vim 2.13.1 on 10 Mai 2018 at 22:51:30.
+" Created by session.vim 2.13.1 on 13 Mai 2018 at 03:58:53.
 " Open this file in Vim and run :source % to restore your session.
 
 set guioptions=aegimrLtT
@@ -155,10 +155,10 @@ if expand('%') == '' && !&modified && line('$') <= 1 && getline(1) == ''
   let s:wipebuf = bufnr('%')
 endif
 set shortmess=aoO
-badd +758 tf_config.py
+badd +103 tf_config.py
 badd +1 validating_entry.py
-badd +1 /mnt/DATA/__programming/PROJECTS/config_tool/dialog_window.py
-badd +0 vertical_scroll_frame.py
+badd +1 dialog_window.py
+badd +1 vertical_scroll_frame.py
 argglobal
 silent! argdel *
 set stal=2
@@ -172,8 +172,8 @@ set nosplitbelow
 set nosplitright
 wincmd t
 set winminheight=1 winheight=1 winminwidth=1 winwidth=1
-exe 'vert 1resize ' . ((&columns * 25 + 62) / 125)
-exe 'vert 2resize ' . ((&columns * 99 + 62) / 125)
+exe 'vert 1resize ' . ((&columns * 25 + 54) / 109)
+exe 'vert 2resize ' . ((&columns * 83 + 54) / 109)
 argglobal
 enew
 " file NERD_tree_2
@@ -215,99 +215,104 @@ silent! normal! zE
 241,250fold
 251,259fold
 260,270fold
-271,284fold
-285,298fold
-299,310fold
-311,313fold
-43,313fold
-316,354fold
-355,369fold
-370,387fold
-388,406fold
-407,421fold
-422,430fold
-431,439fold
-315,439fold
-444,454fold
-455,462fold
-463,514fold
-515,554fold
-441,554fold
-557,576fold
-577,594fold
-595,604fold
-605,615fold
-616,636fold
-637,645fold
-646,652fold
-556,652fold
-655,662fold
-663,687fold
-688,734fold
-735,749fold
-750,785fold
-786,792fold
-654,792fold
-794,831fold
-834,867fold
-868,870fold
-871,874fold
-875,877fold
-878,878fold
-878,881fold
-882,884fold
-833,885fold
-887,896fold
-4
-silent! normal! zo
+271,296fold
+297,310fold
+311,322fold
+323,325fold
+43,325fold
+328,366fold
+367,381fold
+382,399fold
+400,418fold
+419,433fold
+434,442fold
+443,451fold
+327,451fold
+456,466fold
+467,474fold
+475,526fold
+527,566fold
+453,566fold
+569,588fold
+589,606fold
+607,616fold
+617,627fold
+628,649fold
+650,658fold
+659,665fold
+568,665fold
+668,675fold
+676,700fold
+701,747fold
+748,762fold
+763,798fold
+799,805fold
+667,805fold
+814,833fold
+807,860fold
+863,896fold
+897,899fold
+900,903fold
+904,906fold
+907,907fold
+907,910fold
+911,913fold
+862,914fold
+916,925fold
 43
-silent! normal! zo
-46
-silent! normal! zo
-84
 silent! normal! zo
 103
 silent! normal! zo
-315
+271
 silent! normal! zo
-315
+327
+silent! normal! zo
+327
 normal! zc
-441
+453
 silent! normal! zo
-515
+527
 silent! normal! zo
-556
-silent! normal! zo
-616
-silent! normal! zo
-654
-silent! normal! zo
-663
-silent! normal! zo
-750
-silent! normal! zo
-794
-silent! normal! zo
-833
-silent! normal! zo
-875
-silent! normal! zo
-878
-silent! normal! zo
-878
-silent! normal! zo
-878
+453
 normal! zc
-let s:l = 634 - ((57 * winheight(0) + 30) / 60)
+568
+silent! normal! zo
+628
+silent! normal! zo
+568
+normal! zc
+667
+silent! normal! zo
+676
+silent! normal! zo
+763
+silent! normal! zo
+667
+normal! zc
+807
+silent! normal! zo
+814
+silent! normal! zo
+862
+silent! normal! zo
+904
+silent! normal! zo
+907
+silent! normal! zo
+862
+normal! zc
+916
+silent! normal! zo
+let s:l = 858 - ((39 * winheight(0) + 20) / 41)
 if s:l < 1 | let s:l = 1 | endif
 exe s:l
 normal! zt
-634
-normal! 013|
+858
+normal! 024|
 wincmd w
 2wincmd w
-exe 'vert 1resize ' . ((&columns * 25 + 62) / 125)
-exe 'vert 2resize ' . ((&columns * 99 + 62) / 125)
+exe 'vert 1resize ' . ((&columns * 25 + 54) / 109)
+exe 'vert 2resize ' . ((&columns * 83 + 54) / 109)
 tabedit vertical_scroll_frame.py
 set splitbelow splitright
 set nosplitbelow
@@ -324,7 +329,7 @@ setlocal fml=1
 setlocal fdn=20
 setlocal fen
 silent! normal! zE
-let s:l = 11 - ((0 * winheight(0) + 30) / 60)
+let s:l = 11 - ((0 * winheight(0) + 20) / 41)
 if s:l < 1 | let s:l = 1 | endif
 exe s:l
 normal! zt
@@ -346,13 +351,13 @@ setlocal fml=1
 setlocal fdn=20
 setlocal fen
 silent! normal! zE
-let s:l = 65 - ((48 * winheight(0) + 30) / 60)
+let s:l = 65 - ((33 * winheight(0) + 20) / 41)
 if s:l < 1 | let s:l = 1 | endif
 exe s:l
 normal! zt
 65
 normal! 023|
-tabedit /mnt/DATA/__programming/PROJECTS/config_tool/dialog_window.py
+tabedit dialog_window.py
 set splitbelow splitright
 set nosplitbelow
 set nosplitright
@@ -367,7 +372,7 @@ setlocal fdl=0
 setlocal fml=1
 setlocal fdn=20
 setlocal fen
-let s:l = 1 - ((0 * winheight(0) + 30) / 60)
+let s:l = 1 - ((0 * winheight(0) + 20) / 41)
 if s:l < 1 | let s:l = 1 | endif
 exe s:l
 normal! zt
@@ -403,7 +408,7 @@ if !getbufvar(s:bufnr_save, '&modified')
   endif
 endif
 execute "cd" fnameescape(s:cwd_save)
-1resize 60|vert 1resize 25|2resize 60|vert 2resize 99|
+1resize 41|vert 1resize 25|2resize 41|vert 2resize 83|
 2wincmd w
 tabnext 1
 if exists('s:wipebuf')
