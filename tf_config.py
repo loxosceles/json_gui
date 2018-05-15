@@ -38,6 +38,7 @@ SPLASHSCREEN_TEXT = \
 """
 PROGRAM_NAME = 'Tensorflow Configuration Tool'
 REGEX_NL = re.compile('\n')
+ARROW_SYM = ' \u2799 '
 
 
 class DataObject(object):
@@ -150,6 +151,7 @@ class DataObject(object):
 
                 self.json_dict_flat[path][label] = {}
                 self.json_dict_flat[path][label]['buffered_value'] = d
+
                 try:
                     self.json_dict_flat[path][label]['original_value'] =\
                             self.json_file_repres[path][label]['original_value']
@@ -284,6 +286,8 @@ class DataObject(object):
                 return
             else:
                 for key, value in d.items():
+                    print("Key inside get_list() :", key)
+                    print("Value inside get_list() :", key)
                     if isinstance(key, dict) and value.items() == False:
                         node_set.add(key)
                     node_set.add(key_path.strip())
@@ -341,10 +345,10 @@ class MenuBar(ttk.Frame):
                 compound=tk.LEFT, command=self.open)
         # Save
         self.file_menu.add_command(label='Save', accelerator='Ctrl + S',
-                compound=tk.LEFT, command=self.save)
+                compound=tk.LEFT, state=tk.DISABLED, command=self.save)
         # Save as
         self.file_menu.add_command(label='Save as..', accelerator='Shift + Ctrl + S',
-                compound=tk.LEFT, command=self.save_as)
+                compound=tk.LEFT, state=tk.DISABLED, command=self.save_as)
         # Quit
         self.file_menu.add_command(label='Quit', accelerator='Ctrl + Q',
                 compound=tk.LEFT, command=self.parent.quit)
@@ -358,7 +362,7 @@ class MenuBar(ttk.Frame):
 
         # Delete object
         self.edit_menu.add_command(label='Delete Object', accelerator='Shift + Ctrl + D',
-                compound=tk.LEFT, command=self.delete_object)
+                compound=tk.LEFT, state=tk.DISABLED, command=self.delete_object)
 
         # Create about menu
         self.about_menu = tk.Menu(self.menubar, tearoff=0)
@@ -377,7 +381,12 @@ class MenuBar(ttk.Frame):
             self.parent.editor.textfield.insert(1.0, self.parent.data_object.json_str)
             self.parent.editor.textfield.configure(state=tk.DISABLED)
             self.parent.key_value_section.create_entry_widgets()
+            self.enable_menu_entries()
 
+    def enable_menu_entries(self):
+            self.edit_menu.entryconfig('Delete Object', state=tk.NORMAL)
+            self.file_menu.entryconfig('Save', state=tk.NORMAL)
+            self.file_menu.entryconfig('Save as..', state=tk.NORMAL)
 
     def save(self, event=None):
         """TODO: Docstring for .
@@ -490,10 +499,12 @@ class KeyValueSection(ttk.Frame):
         self.frame.grid(row=0, column=0, sticky=tk.NSEW)
 
         for i, (section, obj) in enumerate(self.parent.data_object.json_dict_flat.items(), 1):
+            print(section)
+            print(obj)
             frame = ttk.Frame(self.frame.interior)
             frame.grid(row=i, column=0, padx='20', sticky=tk.NSEW)
             ttk.Label(frame, style="label_style.TLabel",
-                      text=string.capwords(section.replace('_', ' '))
+                      text=string.capwords(section.replace(' ', ARROW_SYM).replace('_' , ' '))
                   ).grid(row=0, column=0, sticky=tk.NW)
 
             j = 0
@@ -670,8 +681,10 @@ class CreateDialog(dialog_window.Dialog):
         self.tab_widgets = []
         self.tab_ids = ["Array", "Float", "Integer", "String"]
         self.checked = tk.IntVar()
-        self.node_list = self.parent.data_object.node_list()
+        self.node_list, self.node_labels = self.parent.data_object.node_list()
         dialog_window.Dialog.__init__(self, parent, title)
+        if not self.parent.data_object.name:
+            self.parent.menubar.enable_menu_entries()
 
     def body(self, root):
         self.options_frame = ttk.Frame(root)
@@ -719,7 +732,11 @@ class CreateDialog(dialog_window.Dialog):
 
         # key list config and placement
         nodes['values'] = (self.node_list)
-        nodes.current(0)
+        try:
+            nodes.current(0)
+        except tk.TclError as e:
+            pass
+
         nodes.grid(row=1, column=0, sticky=tk.NW)
 
         # Object key label
@@ -763,8 +780,8 @@ class CreateDialog(dialog_window.Dialog):
     def apply(self):
         active_tab = self.n.index(self.n.select())
 
-        node = self.tab_widgets[active_tab][0].get().strip().replace(' ', '_').lower()
-        key = self.tab_widgets[active_tab][2].get().strip().replace(' ', '_').lower()
+        node = self.tab_widgets[active_tab][0].get().strip()#.replace(' ', '_').lower()
+        key = self.tab_widgets[active_tab][2].get().strip()#.replace(' ', '_').lower()
         value = self.tab_widgets[active_tab][3].get()
 
         if active_tab == 0:
@@ -836,15 +853,10 @@ class DeleteDialog(dialog_window.Dialog):
         node = self.nodes.get()
         node = tuple((node).strip().split(' '))
 
-        print("Json dict before")
-        print(self.parent.data_object.json_dict)
         self.parent.data_object.dyn_dict_delete(node)
-        print("Json dict after")
-        print(self.parent.data_object.json_dict)
 
         self.parent.data_object.gen_flat_key_dict(self.parent.data_object.json_dict)
-        print("Json dict flat after")
-        print(self.parent.data_object.json_dict_flat)
+        print("Flat dict after delete: ", self.parent.data_object.json_dict_flat)
 
         self.parent.key_value_section.create_entry_widgets()
 
