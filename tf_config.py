@@ -11,7 +11,10 @@ import os, re, json, string
 from decimal import *
 from collections import OrderedDict
 from orderedset import OrderedSet
-#  from sortedcontainers import SortedList, SortedSet, SortedDict
+
+from functools import reduce
+import operator
+
 import copy
 import pprint
 
@@ -128,23 +131,17 @@ class DataObject(object):
             for key, value in jsd.items():
                 self.gen_file_dict(value, jsfrep, key_path + ' ' + key)
 
-    def gen_flat_key_dict(self, jsd, key_path=None):
+    def gen_flat_key_dict(self, jsd):
         """ Parses json object recursively and returns path and value.
 
         :arg1: TODO
         :returns: TODO
 
         """
-        if key_path == None:
-            key_path = ""
-        self.json_dict_flat.clear()
-
-        def gen_dict(d, key_path):
+        def gen_dict(d, pset=tuple()):
             if not isinstance(d, dict):
-                path_tuple = tuple(key_path.strip().split(' '))
-
-                label = key_path.split(' ')[-1]
-                path = key_path[:-(len(label))].strip(' ')
+                label = pset[-1]
+                path = pset[:-1]
 
                 if not self.json_dict_flat.get(path):
                     self.json_dict_flat[path] = {}
@@ -158,13 +155,15 @@ class DataObject(object):
                 except KeyError as e:
                     self.json_dict_flat[path][label]['original_value'] = None
 
-                start, end = self.gen_value_coords(self.json_str, path_tuple)
+                start, end = self.gen_value_coords(self.json_str, pset)
                 self.json_dict_flat[path][label]['coords'] = [start, end]
             else:
                 for key, value in d.items():
-                    gen_dict(value, key_path + ' ' + key)
+                    gen_dict(value, pset + (key,))
 
-        gen_dict(jsd, key_path)
+        self.json_dict_flat.clear()
+        gen_dict(jsd)
+        print(self.json_dict_flat)
 
     def gen_value_coords(self, json_str, path):
         """TODO: Docstring for function.
@@ -203,42 +202,11 @@ class DataObject(object):
 
         return Decimal(line) + Decimal('0.' + str(column))
 
-    def dyn_dict_get(self, keys):
-        """TODO: Docstring for function.
+    def dyn_dict_get(self, flat_keys):
+        return reduce(operator.getitem, flat_keys, self.json_dict)
 
-        :arg1: TODO
-        :returns: TODO
-
-        """
-        s = 'self.json_dict'
-
-        for i, el in enumerate(keys):
-            s += "[keys[" + str(i) + "]]"
-
-        return eval(s)
-
-    def dyn_dict_set(self, keys, val):
-        """TODO: Docstring for function.
-
-        :arg1: TODO
-        :returns: TODO
-
-        """
-        s = 'self.json_dict'
-
-        for i in range(len(keys)):
-            s += "[keys[" + str(i) + "]]"
-            try:
-                eval(s)
-            except KeyError:
-                exec(s + " = {}")
-
-        if isinstance(val, str):
-            s += " = " + str('"' + val + '"')
-        else:
-            s += " = " + str(val)
-
-        exec(s)
+    def dyn_dict_set(self, flat_keys, value):
+        self.dyn_dict_get(flat_keys[:-1])[flat_keys[-1]] = value
 
     def dyn_dict_delete(self, keys):
         print(keys)
@@ -250,14 +218,16 @@ class DataObject(object):
 
         exec(s)
 
-    def get_coords(self, keys, position):
+    def get_coords(self, flat_keys, position):
         """TODO: Docstring for function.
 
         :arg1: TODO
         :returns: TODO
 
         """
-        return self.json_dict_flat[keys[0]][keys[1]]['coords'][position]
+        path = flat_keys[:-1]
+        label = flat_keys[-1]
+        return self.json_dict_flat[path][label]['coords'][position]
 
     def get_value_dict_flat(self, flat_keys):
         """TODO: Docstring for function.
@@ -266,9 +236,9 @@ class DataObject(object):
         :returns: TODO
 
         """
-        root = flat_keys[0]
-        label = flat_keys[1]
-        return self.json_dict_flat[root][label]['buffered_value']
+        path = flat_keys[:-1]
+        label = flat_keys[-1]
+        return self.json_dict_flat[path][label]['buffered_value']
 
     def node_list(self):
         node_set = OrderedSet()
@@ -312,14 +282,16 @@ class DataObject(object):
         path_set.discard('')
         return list(path_set)
 
-    def is_field_dirty(self, keys, value):
+    def is_field_dirty(self, flat_keys, value):
         """Boolean method which checks if a field has been modified.
 
         :keys:    flat keys in order to find the value
         :value:   current value
         :returns: True if the value differs from the original one, else False
         """
-        if self.json_dict_flat[keys[0]][keys[1]]['original_value'] != value:
+        path = flat_keys[:-1]
+        label = flat_keys[-1]
+        if self.json_dict_flat[path][label]['original_value'] != value:
             return True
         else:
             return False
@@ -498,19 +470,20 @@ class KeyValueSection(ttk.Frame):
         self.frame = VerticalScrollFrame(self, (screen_height - (screen_height * 0.3)))
         self.frame.grid(row=0, column=0, sticky=tk.NSEW)
 
-        for i, (section, obj) in enumerate(self.parent.data_object.json_dict_flat.items(), 1):
-            #  print(section)
-            #  print(obj)
+        for i, (path, label) in enumerate(self.parent.data_object.json_dict_flat.items(), 1):
+            #  print(path)
+            #  print(label)
             frame = ttk.Frame(self.frame.interior)
             frame.grid(row=i, column=0, padx='20', sticky=tk.NSEW)
             ttk.Label(frame, style="label_style.TLabel",
-                      text=string.capwords(section.replace(' ', ARROW_SYM).replace('_' , ' '))
+                      #text=string.capwords(path.replace(' ', ARROW_SYM).replace('_' , ' '))
+                      text=(' ' + ARROW_SYM + ' ').join(path)
                   ).grid(row=0, column=0, sticky=tk.NW)
 
             j = 0
             k = i
 
-            for key, val in obj.items():
+            for key, val in label.items():
                 ttk.Label(frame, text=key, justify=tk.LEFT).grid(row=k,
                         column=j, sticky=tk.NW)
 
@@ -529,7 +502,7 @@ class KeyValueSection(ttk.Frame):
                 entry.config(justify=tk.LEFT)
 
                 entry.grid(row=k+1, column=j, sticky=tk.NW)
-                entry.bind("<FocusOut>", lambda event, flat_keys=(section, key):
+                entry.bind("<FocusOut>", lambda event, flat_keys=(path + (key,)):
                     self.buffer_entry_value(event, flat_keys))
 
                 j, k = self._accomodate_rows(j, k)
@@ -538,9 +511,10 @@ class KeyValueSection(ttk.Frame):
         # FIXME: get position of event inside canvas
         #  print(event.widget.winfo_y())
         #  print(self.frame.canvas.coords(entry))
+        #
+        #print("Flat keys insie buffer_entry_value: ", flat_keys)
 
         value = event.widget.get()
-
 
         fd_value = self.parent.data_object.get_value_dict_flat(flat_keys)
 
@@ -564,11 +538,10 @@ class KeyValueSection(ttk.Frame):
         self.parent.data_object.set_previous_textfield_length()
 
         # save previous value for column comparison
-        keys = tuple((flat_keys[0] + " " + flat_keys[1]).split(' '))
-        self.parent.data_object.previous_value = self.parent.data_object.dyn_dict_get(keys)
+        self.parent.data_object.previous_value = self.parent.data_object.dyn_dict_get(flat_keys)
 
         # save value to master dict
-        self.parent.data_object.dyn_dict_set(keys, value)
+        self.parent.data_object.dyn_dict_set(flat_keys, value)
 
         # call the update method of the editor
         self.parent.editor.update_tags(value, flat_keys)

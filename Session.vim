@@ -1,6 +1,6 @@
 " /mnt/DATA/__programming/PROJECTS/config_tool/Session.vim:
 " Vim session script.
-" Created by session.vim 2.13.1 on 15 Mai 2018 at 10:55:55.
+" Created by session.vim 2.13.1 on 15 Mai 2018 at 15:03:04.
 " Open this file in Vim and run :source % to restore your session.
 
 set guioptions=aegimrLtT
@@ -155,7 +155,7 @@ if expand('%') == '' && !&modified && line('$') <= 1 && getline(1) == ''
   let s:wipebuf = bufnr('%')
 endif
 set shortmess=aoO
-badd +380 tf_config.py
+badd +246 tf_config.py
 badd +1 validating_entry.py
 badd +1 dialog_window.py
 badd +1 vertical_scroll_frame.py
@@ -196,110 +196,105 @@ setlocal fml=1
 setlocal fdn=20
 setlocal fen
 silent! normal! zE
-4,22fold
-23,42fold
-47,57fold
-59,68fold
-70,72fold
-73,76fold
-78,80fold
-82,84fold
-85,103fold
-104,130fold
-104,130fold
-131,168fold
-169,190fold
-191,205fold
-206,219fold
-220,242fold
-243,252fold
-253,261fold
-262,272fold
-273,300fold
-301,314fold
-315,326fold
-327,329fold
-44,329fold
-332,370fold
-371,385fold
-386,390fold
-391,408fold
-409,427fold
-428,442fold
-443,451fold
-452,460fold
-331,460fold
-465,475fold
-476,483fold
-484,536fold
-537,576fold
-462,576fold
-579,598fold
-599,616fold
-617,626fold
-627,637fold
-638,659fold
-660,668fold
-669,675fold
-578,675fold
-678,687fold
-688,712fold
-713,763fold
-764,778fold
-779,814fold
-815,821fold
-677,821fold
-824,829fold
-830,849fold
-874,907fold
-908,910fold
-911,914fold
-915,917fold
-918,918fold
-918,921fold
-922,924fold
-873,925fold
-927,936fold
-23
+4,25fold
+26,45fold
+50,60fold
+62,71fold
+73,75fold
+76,79fold
+81,83fold
+85,87fold
+88,106fold
+107,133fold
+107,133fold
+134,167fold
+168,189fold
+190,204fold
+205,207fold
+208,210fold
+211,220fold
+221,231fold
+232,242fold
+243,270fold
+271,284fold
+285,298fold
+299,301fold
+304,342fold
+343,357fold
+358,362fold
+363,380fold
+381,399fold
+400,414fold
+415,423fold
+424,432fold
+303,432fold
+437,447fold
+448,455fold
+456,509fold
+510,549fold
+434,549fold
+552,571fold
+572,589fold
+590,599fold
+600,610fold
+611,632fold
+633,641fold
+642,648fold
+551,648fold
+651,660fold
+661,685fold
+686,736fold
+737,751fold
+752,787fold
+788,794fold
+650,794fold
+797,802fold
+803,822fold
+847,880fold
+881,883fold
+884,887fold
+888,890fold
+891,891fold
+891,894fold
+895,897fold
+846,898fold
+900,909fold
+107
 silent! normal! zo
-44
+221
 silent! normal! zo
-104
+303
 silent! normal! zo
-131
+434
 silent! normal! zo
-253
+456
 silent! normal! zo
-273
+510
 silent! normal! zo
-331
+551
 silent! normal! zo
-462
+600
 silent! normal! zo
-484
+611
 silent! normal! zo
-578
+633
 silent! normal! zo
-638
+650
 silent! normal! zo
-660
+752
 silent! normal! zo
-677
+846
 silent! normal! zo
-779
+891
 silent! normal! zo
-873
-silent! normal! zo
-918
-silent! normal! zo
-918
+891
 normal! zc
-let s:l = 850 - ((86 * winheight(0) + 25) / 50)
+let s:l = 514 - ((24 * winheight(0) + 25) / 50)
 if s:l < 1 | let s:l = 1 | endif
 exe s:l
 normal! zt
-850
-normal! 0
+514
+normal! 010|
 wincmd w
 2wincmd w
 exe 'vert 1resize ' . ((&columns * 25 + 67) / 134)
@@ -363,11 +358,11 @@ setlocal fdl=0
 setlocal fml=1
 setlocal fdn=20
 setlocal fen
-let s:l = 1 - ((0 * winheight(0) + 25) / 50)
+let s:l = 4 - ((3 * winheight(0) + 25) / 50)
 if s:l < 1 | let s:l = 1 | endif
 exe s:l
 normal! zt
-1
+4
 normal! 0
 tabnext 1
 set stal=1
