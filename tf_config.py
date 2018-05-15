@@ -499,8 +499,8 @@ class KeyValueSection(ttk.Frame):
         self.frame.grid(row=0, column=0, sticky=tk.NSEW)
 
         for i, (section, obj) in enumerate(self.parent.data_object.json_dict_flat.items(), 1):
-            print(section)
-            print(obj)
+            #  print(section)
+            #  print(obj)
             frame = ttk.Frame(self.frame.interior)
             frame.grid(row=i, column=0, padx='20', sticky=tk.NSEW)
             ttk.Label(frame, style="label_style.TLabel",
@@ -531,7 +531,6 @@ class KeyValueSection(ttk.Frame):
                 entry.grid(row=k+1, column=j, sticky=tk.NW)
                 entry.bind("<FocusOut>", lambda event, flat_keys=(section, key):
                     self.buffer_entry_value(event, flat_keys))
-                #  self.entry_list.append(entry)
 
                 j, k = self._accomodate_rows(j, k)
 

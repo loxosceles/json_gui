@@ -1,6 +1,6 @@
 " /mnt/DATA/__programming/PROJECTS/config_tool/Session.vim:
 " Vim session script.
-" Created by session.vim 2.13.1 on 15 Mai 2018 at 01:18:10.
+" Created by session.vim 2.13.1 on 15 Mai 2018 at 10:55:55.
 " Open this file in Vim and run :source % to restore your session.
 
 set guioptions=aegimrLtT
@@ -172,8 +172,8 @@ set nosplitbelow
 set nosplitright
 wincmd t
 set winminheight=1 winheight=1 winminwidth=1 winwidth=1
-exe 'vert 1resize ' . ((&columns * 25 + 52) / 105)
-exe 'vert 2resize ' . ((&columns * 79 + 52) / 105)
+exe 'vert 1resize ' . ((&columns * 25 + 67) / 134)
+exe 'vert 2resize ' . ((&columns * 108 + 67) / 134)
 argglobal
 enew
 " file NERD_tree_2
@@ -231,35 +231,35 @@ silent! normal! zE
 331,460fold
 465,475fold
 476,483fold
-484,537fold
-538,577fold
-462,577fold
-580,599fold
-600,617fold
-618,627fold
-628,638fold
-639,660fold
-661,669fold
-670,676fold
-579,676fold
-679,688fold
-689,713fold
-714,764fold
-765,779fold
-780,815fold
-816,822fold
-678,822fold
-825,830fold
-831,850fold
-875,908fold
-909,911fold
-912,915fold
-916,918fold
-919,919fold
-919,922fold
-923,925fold
-874,926fold
-928,937fold
+484,536fold
+537,576fold
+462,576fold
+579,598fold
+599,616fold
+617,626fold
+627,637fold
+638,659fold
+660,668fold
+669,675fold
+578,675fold
+678,687fold
+688,712fold
+713,763fold
+764,778fold
+779,814fold
+815,821fold
+677,821fold
+824,829fold
+830,849fold
+874,907fold
+908,910fold
+911,914fold
+915,917fold
+918,918fold
+918,921fold
+922,924fold
+873,925fold
+927,936fold
 23
 silent! normal! zo
 44
@@ -276,32 +276,34 @@ silent! normal! zo
 silent! normal! zo
 462
 silent! normal! zo
-579
+484
 silent! normal! zo
-639
+578
 silent! normal! zo
-661
+638
 silent! normal! zo
-678
+660
 silent! normal! zo
-780
+677
 silent! normal! zo
-874
+779
 silent! normal! zo
-919
+873
 silent! normal! zo
-919
+918
+silent! normal! zo
+918
 normal! zc
-let s:l = 805 - ((136 * winheight(0) + 25) / 50)
+let s:l = 850 - ((86 * winheight(0) + 25) / 50)
 if s:l < 1 | let s:l = 1 | endif
 exe s:l
 normal! zt
-805
+850
 normal! 0
 wincmd w
 2wincmd w
-exe 'vert 1resize ' . ((&columns * 25 + 52) / 105)
-exe 'vert 2resize ' . ((&columns * 79 + 52) / 105)
+exe 'vert 1resize ' . ((&columns * 25 + 67) / 134)
+exe 'vert 2resize ' . ((&columns * 108 + 67) / 134)
 tabedit vertical_scroll_frame.py
 set splitbelow splitright
 set nosplitbelow
@@ -397,7 +399,7 @@ if !getbufvar(s:bufnr_save, '&modified')
   endif
 endif
 execute "cd" fnameescape(s:cwd_save)
-1resize 50|vert 1resize 25|2resize 50|vert 2resize 79|
+1resize 50|vert 1resize 25|2resize 50|vert 2resize 108|
 2wincmd w
 tabnext 1
 if exists('s:wipebuf')
