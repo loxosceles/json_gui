@@ -97,15 +97,15 @@ class DataObject(object):
             with open(json_file, 'r') as infile:
                 self.json_dict = json.load(infile)
 
-                self.gen_file_dict(self.json_dict)
+                self.gen_file_dict()
                 print("Json file repres: ", self.json_dict, self.json_file_repres)
 
-                self.gen_flat_key_dict(self.json_dict)
+                self.gen_flat_key_dict()
         except ValueError as e:
             print("Decoding the JSON config file has failed. Please make sure the\
                     format is correct.")
 
-    def gen_file_dict(self, jsd):
+    def gen_file_dict(self):
         """ Parse json object recursively and build a dictionary holding (flat)
         path and value.
 
@@ -133,9 +133,9 @@ class DataObject(object):
                     _gen_dict(value, pset + (key,))
 
         self.json_file_repres.clear()
-        _gen_dict(jsd)
+        _gen_dict(self.json_file_repres)
 
-    def gen_flat_key_dict(self, jsd):
+    def gen_flat_key_dict(self):
         """ Parses json object recursively and returns path and value.
 
         :arg1: TODO
@@ -166,7 +166,7 @@ class DataObject(object):
                     gen_dict(value, pset + (key,))
 
         self.json_dict_flat.clear()
-        gen_dict(jsd)
+        gen_dict(self.json_dict)
 
     def gen_value_coords(self, json_str, path):
         """TODO: Docstring for function.
@@ -209,17 +209,14 @@ class DataObject(object):
         return reduce(operator.getitem, flat_keys, self.json_dict)
 
     def dyn_dict_set(self, flat_keys, value):
-        self.dyn_dict_get(flat_keys[:-1])[flat_keys[-1]] = value
+        try:
+            self.dyn_dict_get(flat_keys[:-1])[flat_keys[-1]] = value
+        except KeyError:
+            self.dyn_dict_get(flat_keys[:-2])[flat_keys[-2]] = {}
+            self.dyn_dict_get(flat_keys[:-1])[flat_keys[-1]] = value
 
-    def dyn_dict_delete(self, keys):
-        print(keys)
-        s = 'del self.json_dict'
-
-        for i in range(len(keys)):
-            s += "[keys[" + str(i) + "]]"
-            print(s)
-
-        exec(s)
+    def dyn_dict_delete(self, flat_keys):
+        del self.dyn_dict_get(flat_keys[:-1])[flat_keys[-1]]
 
     def get_coords(self, flat_keys, position):
         """TODO: Docstring for function.
@@ -259,31 +256,16 @@ class DataObject(object):
                 return
             else:
                 for key, value in d.items():
-                    print("Key inside get_list() :", key)
-                    print("Value inside get_list() :", key)
-                    if isinstance(key, dict) and value.items() == False:
+                    if isinstance(d, dict) and bool(value) == False:
                         node_set.add(key)
                     node_set.add(key_path.strip())
                     get_list(value, key_path + ' ' + key)
 
         get_list(self.json_dict)
         node_set.discard('')
-        print("Node key dict: ", node_key_dict)
+        #  print("Node key dict: ", node_key_dict)
+        pprint.pprint(node_key_dict)
         return list(node_set), node_key_dict
-
-    def node_label_list(self):
-        path_set = OrderedSet()
-        def get_list(d, key_path=''):
-            if not isinstance(d, dict):
-                return path_set.add(key_path.strip())
-            else:
-                for key, value in d.items():
-                    path_set.add(key_path.strip())
-                    get_list(value, key_path + ' ' + key)
-
-        get_list(self.json_dict)
-        path_set.discard('')
-        return list(path_set)
 
     def is_field_dirty(self, flat_keys, value):
         """Boolean method which checks if a field has been modified.
@@ -755,7 +737,7 @@ class CreateDialog(dialog_window.Dialog):
     def apply(self):
         active_tab = self.n.index(self.n.select())
 
-        node = self.tab_widgets[active_tab][0].get().strip()#.replace(' ', '_').lower()
+        node = tuple(self.tab_widgets[active_tab][0].get().strip().split(' '))
         key = self.tab_widgets[active_tab][2].get().strip()#.replace(' ', '_').lower()
         value = self.tab_widgets[active_tab][3].get()
 
@@ -773,15 +755,20 @@ class CreateDialog(dialog_window.Dialog):
 
         if self.checked.get() == 1:
             object_key = self.tab_widgets[active_tab][1].get().strip().replace(' ', '_').lower()
-            node = node + " " + object_key
+            node = node + (object_key,)
 
-        keys= tuple((node + " " + key).strip().split(' '))
+        #keys= tuple((node + " " + key).strip().split(' '))
 
-        flat_keys =  (node, key)
+        print("Node: ", node)
+        print("Key: ", key)
+        flat_keys =  (node + (key,))
+        print("Flat keys: ", flat_keys)
 
-        self.parent.data_object.dyn_dict_set(keys, value)
+        #  self.parent.data_object.dyn_dict_get(flat_keys)
 
-        self.parent.data_object.gen_flat_key_dict(self.parent.data_object.json_dict)
+        self.parent.data_object.dyn_dict_set(flat_keys, value)
+
+        self.parent.data_object.gen_flat_key_dict()
 
         self.parent.key_value_section.create_entry_widgets()
 
@@ -799,7 +786,6 @@ class CreateDialog(dialog_window.Dialog):
 class DeleteDialog(dialog_window.Dialog):
     def __init__(self, parent, title):
         self.parent = parent
-        #  self.node_label_list = self.parent.data_object.node_label_list()
         self.node_list, self.node_labels = self.parent.data_object.node_list()
         dialog_window.Dialog.__init__(self, parent, title)
 
@@ -817,21 +803,30 @@ class DeleteDialog(dialog_window.Dialog):
         self.nodes.bind("<<ComboboxSelected>>", self._update_label_cb)
         self.nodes.current(0)
         self.nodes.grid(row=1, column=0, sticky=tk.NW)
+        try:
+            self.key.config(values=self.node_labels[self.node_list[0]], state=tk.NORMAL)
+            self.key.current(0)
+        except:
+            self.key.set('')
+            self.key.config(state=tk.DISABLED)
 
         # Labels label
         ttk.Label(self.frame, style="id_label_style.TLabel", text="Key"
                  ).grid(row=2, column=0, sticky=tk.NW)
         self.key.grid(row=3, column=0, sticky=tk.NW)
 
-
     def apply(self):
-        node = self.nodes.get()
-        node = tuple((node).strip().split(' '))
+        node = tuple(self.nodes.get().strip().split(' '))
+        key = self.key.get().strip()#.replace(' ', '_').lower()
+
+        if key:
+            node = node + (key,)
+
+        print(node)
 
         self.parent.data_object.dyn_dict_delete(node)
 
-        self.parent.data_object.gen_flat_key_dict(self.parent.data_object.json_dict)
-        print("Flat dict after delete: ", self.parent.data_object.json_dict_flat)
+        self.parent.data_object.gen_flat_key_dict()
 
         self.parent.key_value_section.create_entry_widgets()
 
@@ -840,10 +835,11 @@ class DeleteDialog(dialog_window.Dialog):
 
     def _update_label_cb(self, event=None):
         try:
-            self.key.config(values=self.node_labels[event.widget.get()])
+            self.key.config(values=self.node_labels[event.widget.get()], state=tk.NORMAL)
             self.key.current(0)
         except KeyError:
-            self.key.config(values=[])
+            self.key.set('')
+            self.key.config(state=tk.DISABLED)
 
 
 class MainApplication(ttk.Frame):

@@ -1,6 +1,6 @@
 " /mnt/DATA/__programming/PROJECTS/config_tool/Session.vim:
 " Vim session script.
-" Created by session.vim 2.13.1 on 15 Mai 2018 at 16:05:22.
+" Created by session.vim 2.13.1 on 15 Mai 2018 at 18:25:10.
 " Open this file in Vim and run :source % to restore your session.
 
 set guioptions=aegimrLtT
@@ -211,83 +211,103 @@ silent! normal! zE
 171,192fold
 193,207fold
 208,210fold
-211,213fold
-214,223fold
-224,234fold
-235,245fold
-246,273fold
-274,287fold
-288,301fold
-302,304fold
-307,345fold
-346,360fold
-361,365fold
-366,383fold
-384,402fold
-403,417fold
-418,426fold
-427,435fold
-306,435fold
-440,450fold
-451,458fold
-459,512fold
-513,552fold
-437,552fold
-555,574fold
-575,592fold
-593,602fold
-603,613fold
-614,635fold
-636,644fold
-645,651fold
-554,651fold
-654,663fold
-664,688fold
-689,739fold
-740,754fold
-755,790fold
-791,797fold
-653,797fold
-800,805fold
-806,825fold
-850,883fold
-884,886fold
-887,890fold
-891,893fold
-894,894fold
-894,897fold
-898,900fold
-849,901fold
-903,912fold
-88
+211,217fold
+218,220fold
+221,231fold
+232,242fold
+243,269fold
+270,283fold
+284,286fold
+289,327fold
+328,342fold
+343,347fold
+348,365fold
+366,384fold
+385,399fold
+400,408fold
+409,417fold
+288,417fold
+422,432fold
+433,440fold
+441,494fold
+495,534fold
+419,534fold
+537,556fold
+557,574fold
+575,584fold
+585,595fold
+596,617fold
+618,626fold
+627,633fold
+536,633fold
+636,645fold
+646,670fold
+671,721fold
+722,736fold
+737,777fold
+778,784fold
+635,784fold
+787,791fold
+792,817fold
+818,835fold
+836,843fold
+786,843fold
+846,879fold
+880,882fold
+883,886fold
+887,889fold
+890,890fold
+890,893fold
+894,896fold
+845,897fold
+899,908fold
+4
 silent! normal! zo
 108
 silent! normal! zo
-306
+138
 silent! normal! zo
-437
+243
 silent! normal! zo
-554
+288
 silent! normal! zo
-614
-silent! normal! zo
-636
-silent! normal! zo
-653
-silent! normal! zo
-755
-silent! normal! zo
-849
-silent! normal! zo
-894
-silent! normal! zo
-894
+288
 normal! zc
-let s:l = 629 - ((190 * winheight(0) + 25) / 50)
+419
+silent! normal! zo
+419
+normal! zc
+536
+silent! normal! zo
+536
+normal! zc
+635
+silent! normal! zo
+646
+silent! normal! zo
+737
+silent! normal! zo
+786
+silent! normal! zo
+792
+silent! normal! zo
+818
+silent! normal! zo
+836
+silent! normal! zo
+845
+silent! normal! zo
+890
+silent! normal! zo
+890
+normal! zc
+845
+normal! zc
+let s:l = 265 - ((114 * winheight(0) + 25) / 50)
 if s:l < 1 | let s:l = 1 | endif
 exe s:l
 normal! zt
-629
+265
 normal! 017|
 wincmd w
 2wincmd w
