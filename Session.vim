@@ -1,6 +1,6 @@
 " /mnt/DATA/__programming/PROJECTS/config_tool/Session.vim:
 " Vim session script.
-" Created by session.vim 2.13.1 on 15 Mai 2018 at 15:03:04.
+" Created by session.vim 2.13.1 on 15 Mai 2018 at 16:05:22.
 " Open this file in Vim and run :source % to restore your session.
 
 set guioptions=aegimrLtT
@@ -204,97 +204,91 @@ silent! normal! zE
 76,79fold
 81,83fold
 85,87fold
-88,106fold
-107,133fold
-107,133fold
-134,167fold
-168,189fold
-190,204fold
-205,207fold
+88,107fold
+108,137fold
+108,137fold
+138,170fold
+171,192fold
+193,207fold
 208,210fold
-211,220fold
-221,231fold
-232,242fold
-243,270fold
-271,284fold
-285,298fold
-299,301fold
-304,342fold
-343,357fold
-358,362fold
-363,380fold
-381,399fold
-400,414fold
-415,423fold
-424,432fold
-303,432fold
-437,447fold
-448,455fold
-456,509fold
-510,549fold
-434,549fold
-552,571fold
-572,589fold
-590,599fold
-600,610fold
-611,632fold
-633,641fold
-642,648fold
-551,648fold
-651,660fold
-661,685fold
-686,736fold
-737,751fold
-752,787fold
-788,794fold
-650,794fold
-797,802fold
-803,822fold
-847,880fold
-881,883fold
-884,887fold
-888,890fold
-891,891fold
-891,894fold
-895,897fold
-846,898fold
-900,909fold
-107
+211,213fold
+214,223fold
+224,234fold
+235,245fold
+246,273fold
+274,287fold
+288,301fold
+302,304fold
+307,345fold
+346,360fold
+361,365fold
+366,383fold
+384,402fold
+403,417fold
+418,426fold
+427,435fold
+306,435fold
+440,450fold
+451,458fold
+459,512fold
+513,552fold
+437,552fold
+555,574fold
+575,592fold
+593,602fold
+603,613fold
+614,635fold
+636,644fold
+645,651fold
+554,651fold
+654,663fold
+664,688fold
+689,739fold
+740,754fold
+755,790fold
+791,797fold
+653,797fold
+800,805fold
+806,825fold
+850,883fold
+884,886fold
+887,890fold
+891,893fold
+894,894fold
+894,897fold
+898,900fold
+849,901fold
+903,912fold
+88
 silent! normal! zo
-221
+108
 silent! normal! zo
-303
+306
 silent! normal! zo
-434
+437
 silent! normal! zo
-456
+554
 silent! normal! zo
-510
+614
 silent! normal! zo
-551
+636
 silent! normal! zo
-600
+653
 silent! normal! zo
-611
+755
 silent! normal! zo
-633
+849
 silent! normal! zo
-650
+894
 silent! normal! zo
-752
-silent! normal! zo
-846
-silent! normal! zo
-891
-silent! normal! zo
-891
+894
 normal! zc
-let s:l = 514 - ((24 * winheight(0) + 25) / 50)
+let s:l = 629 - ((190 * winheight(0) + 25) / 50)
 if s:l < 1 | let s:l = 1 | endif
 exe s:l
 normal! zt
-514
-normal! 010|
+629
+normal! 017|
 wincmd w
 2wincmd w
 exe 'vert 1resize ' . ((&columns * 25 + 67) / 134)

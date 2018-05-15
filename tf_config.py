@@ -97,14 +97,15 @@ class DataObject(object):
             with open(json_file, 'r') as infile:
                 self.json_dict = json.load(infile)
 
-                self.gen_file_dict(self.json_dict, self.json_file_repres)
+                self.gen_file_dict(self.json_dict)
+                print("Json file repres: ", self.json_dict, self.json_file_repres)
 
                 self.gen_flat_key_dict(self.json_dict)
         except ValueError as e:
             print("Decoding the JSON config file has failed. Please make sure the\
                     format is correct.")
 
-    def gen_file_dict(self, jsd, jsfrep, key_path=""):
+    def gen_file_dict(self, jsd):
         """ Parse json object recursively and build a dictionary holding (flat)
         path and value.
 
@@ -116,20 +117,23 @@ class DataObject(object):
         :jsfrep: The resulting dictionary as a representation of the file
 
         """
-        if not isinstance(jsd, dict):
-            path_tuple = tuple(key_path.strip().split(' '))
+        def _gen_dict(d, pset=tuple()):
+            if not isinstance(d, dict):
+                label = pset[-1]
+                path = pset[:-1]
 
-            label = key_path.split(' ')[-1]
-            path = key_path[:-(len(label))].strip(' ')
+                if not self.json_file_repres.get(path):
+                    self.json_file_repres[path] = {}
 
-            if not jsfrep.get(path):
-                jsfrep[path] = {}
+                self.json_file_repres[path][label] = {}
+                self.json_file_repres[path][label]['original_value'] = d
 
-            jsfrep[path][label] = {}
-            jsfrep[path][label]['original_value'] = jsd
-        else:
-            for key, value in jsd.items():
-                self.gen_file_dict(value, jsfrep, key_path + ' ' + key)
+            else:
+                for key, value in d.items():
+                    _gen_dict(value, pset + (key,))
+
+        self.json_file_repres.clear()
+        _gen_dict(jsd)
 
     def gen_flat_key_dict(self, jsd):
         """ Parses json object recursively and returns path and value.
@@ -163,7 +167,6 @@ class DataObject(object):
 
         self.json_dict_flat.clear()
         gen_dict(jsd)
-        print(self.json_dict_flat)
 
     def gen_value_coords(self, json_str, path):
         """TODO: Docstring for function.
