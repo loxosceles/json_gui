@@ -482,7 +482,7 @@ class KeyValueSection(ttk.Frame):
             ttk.Label(frame, style="label_style.TLabel",
                       #text=string.capwords(path.replace(' ', ARROW_SYM).replace('_' , ' '))
                       text=(' ' + ARROW_SYM + ' ').join(path)
-                  ).grid(row=0, column=0, sticky=tk.NW)
+                  ).grid(row=0, column=0, columnspan=2, sticky=tk.NW)
 
             j = 0
             k = i
@@ -542,6 +542,7 @@ class KeyValueSection(ttk.Frame):
         self.parent.data_object.set_previous_textfield_length()
 
         # save previous value for column comparison
+        # FIXME: Move this to data object
         self.parent.data_object.previous_value = self.parent.data_object.dyn_dict_get(flat_keys)
 
         # save value to master dict
