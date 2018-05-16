@@ -206,14 +206,33 @@ class DataObject(object):
         return Decimal(line) + Decimal('0.' + str(column))
 
     def dyn_dict_get(self, flat_keys):
-        return reduce(operator.getitem, flat_keys, self.json_dict)
+        print("Flat keys inside dyn getter: ", flat_keys)
+        print("json dict: ", self.json_dict)
+        try:
+            return reduce(operator.getitem, flat_keys, self.json_dict)
+        except KeyError:
+            pass
 
     def dyn_dict_set(self, flat_keys, value):
-        try:
-            self.dyn_dict_get(flat_keys[:-1])[flat_keys[-1]] = value
-        except KeyError:
-            self.dyn_dict_get(flat_keys[:-2])[flat_keys[-2]] = {}
-            self.dyn_dict_get(flat_keys[:-1])[flat_keys[-1]] = value
+        print("Flat keys inside dyn setter: ", flat_keys)
+        print("Value: ", value)
+        dic = self.json_dict
+
+        for key in flat_keys[:-1]:
+            dic = dic.setdefault(key, {})
+        dic[flat_keys[-1]] = value
+        #  try:
+        #      self.dyn_dict_get(flat_keys[:-1])[flat_keys[-1]] = value
+        #  except TypeError as e:
+        #      print(e)
+        #      reduce(operator.getitem, flat_keys[:-1], self.json_dict)
+        #  except KeyError:
+        #      print("Error")
+        #      self.dyn_dict_get(flat_keys[:-2])[flat_keys[-2]] = {}
+        #      self.dyn_dict_get(flat_keys[:-1])[flat_keys[-1]] = value
+        print(self.json_dict)
+
+
 
     def dyn_dict_delete(self, flat_keys):
         del self.dyn_dict_get(flat_keys[:-1])[flat_keys[-1]]
@@ -244,26 +263,26 @@ class DataObject(object):
         node_set = OrderedSet()
         node_key_dict = OrderedDict()
 
-        def get_list(d, key_path=''):
+        def get_list(d, pset=tuple()):
             if not isinstance(d, dict):
-                label = key_path.split(' ')[-1]
-                path = key_path[:-(len(label))].strip(' ')
+                label = pset[-1]
+                path = pset[:-1]
                 if node_key_dict.get(path):
                     node_key_dict[path].append(label)
                 else:
                     node_key_dict[path] = [label]
-                node_set.add(path)
+                node_set.add(path,)
+                print("After node_set write: ", node_set)
                 return
             else:
                 for key, value in d.items():
                     if isinstance(d, dict) and bool(value) == False:
-                        node_set.add(key)
-                    node_set.add(key_path.strip())
-                    get_list(value, key_path + ' ' + key)
+                        node_set.add(pset + (key,))
+                        print("inside if: ", node_set)
+                    get_list(value, pset + (key,))
 
         get_list(self.json_dict)
         node_set.discard('')
-        #  print("Node key dict: ", node_key_dict)
         pprint.pprint(node_key_dict)
         return list(node_set), node_key_dict
 
@@ -738,6 +757,10 @@ class CreateDialog(dialog_window.Dialog):
         active_tab = self.n.index(self.n.select())
 
         node = tuple(self.tab_widgets[active_tab][0].get().strip().split(' '))
+
+        if not self.parent.data_object.dyn_dict_get(node):
+            node = self.tab_widgets[active_tab][0].get().strip(),
+
         key = self.tab_widgets[active_tab][2].get().strip()#.replace(' ', '_').lower()
         value = self.tab_widgets[active_tab][3].get()
 
@@ -757,14 +780,8 @@ class CreateDialog(dialog_window.Dialog):
             object_key = self.tab_widgets[active_tab][1].get().strip().replace(' ', '_').lower()
             node = node + (object_key,)
 
-        #keys= tuple((node + " " + key).strip().split(' '))
-
-        print("Node: ", node)
-        print("Key: ", key)
         flat_keys =  (node + (key,))
         print("Flat keys: ", flat_keys)
-
-        #  self.parent.data_object.dyn_dict_get(flat_keys)
 
         self.parent.data_object.dyn_dict_set(flat_keys, value)
 
@@ -801,14 +818,10 @@ class DeleteDialog(dialog_window.Dialog):
 
         self.nodes['values'] = (self.node_list)
         self.nodes.bind("<<ComboboxSelected>>", self._update_label_cb)
+        self.nodes.bind("<FocusIn>", self._update_label_cb)
+        self.nodes.focus_set()
         self.nodes.current(0)
         self.nodes.grid(row=1, column=0, sticky=tk.NW)
-        try:
-            self.key.config(values=self.node_labels[self.node_list[0]], state=tk.NORMAL)
-            self.key.current(0)
-        except:
-            self.key.set('')
-            self.key.config(state=tk.DISABLED)
 
         # Labels label
         ttk.Label(self.frame, style="id_label_style.TLabel", text="Key"
@@ -817,12 +830,10 @@ class DeleteDialog(dialog_window.Dialog):
 
     def apply(self):
         node = tuple(self.nodes.get().strip().split(' '))
-        key = self.key.get().strip()#.replace(' ', '_').lower()
+        key = self.key.get().strip()
 
         if key:
             node = node + (key,)
-
-        print(node)
 
         self.parent.data_object.dyn_dict_delete(node)
 
@@ -835,7 +846,7 @@ class DeleteDialog(dialog_window.Dialog):
 
     def _update_label_cb(self, event=None):
         try:
-            self.key.config(values=self.node_labels[event.widget.get()], state=tk.NORMAL)
+            self.key.config(values=self.node_labels[tuple(event.widget.get().split(' '))], state=tk.NORMAL)
             self.key.current(0)
         except KeyError:
             self.key.set('')

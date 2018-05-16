@@ -1,6 +1,6 @@
 " /mnt/DATA/__programming/PROJECTS/config_tool/Session.vim:
 " Vim session script.
-" Created by session.vim 2.13.1 on 15 Mai 2018 at 18:25:10.
+" Created by session.vim 2.13.1 on 15 Mai 2018 at 23:51:31.
 " Open this file in Vim and run :source % to restore your session.
 
 set guioptions=aegimrLtT
@@ -164,28 +164,10 @@ silent! argdel *
 set stal=2
 edit tf_config.py
 set splitbelow splitright
-wincmd _ | wincmd |
-vsplit
-1wincmd h
-wincmd w
 set nosplitbelow
 set nosplitright
 wincmd t
 set winminheight=1 winheight=1 winminwidth=1 winwidth=1
-exe 'vert 1resize ' . ((&columns * 25 + 67) / 134)
-exe 'vert 2resize ' . ((&columns * 108 + 67) / 134)
-argglobal
-enew
-" file NERD_tree_2
-setlocal fdm=manual
-setlocal fde=0
-setlocal fmr={{{,}}}
-setlocal fdi=#
-setlocal fdl=0
-setlocal fml=1
-setlocal fdn=20
-setlocal nofen
-wincmd w
 argglobal
 setlocal fdm=manual
 setlocal fde=0
@@ -210,109 +192,93 @@ silent! normal! zE
 138,170fold
 171,192fold
 193,207fold
-208,210fold
-211,217fold
-218,220fold
-221,231fold
-232,242fold
-243,269fold
-270,283fold
-284,286fold
-289,327fold
-328,342fold
-343,347fold
-348,365fold
-366,384fold
-385,399fold
-400,408fold
-409,417fold
-288,417fold
-422,432fold
-433,440fold
-441,494fold
-495,534fold
-419,534fold
-537,556fold
-557,574fold
-575,584fold
-585,595fold
-596,617fold
-618,626fold
-627,633fold
-536,633fold
-636,645fold
-646,670fold
-671,721fold
-722,736fold
-737,777fold
-778,784fold
-635,784fold
-787,791fold
-792,817fold
-818,835fold
-836,843fold
-786,843fold
-846,879fold
-880,882fold
-883,886fold
-887,889fold
-890,890fold
-890,893fold
-894,896fold
-845,897fold
-899,908fold
+208,215fold
+216,236fold
+237,239fold
+240,250fold
+251,261fold
+262,288fold
+289,302fold
+303,305fold
+308,346fold
+347,361fold
+362,366fold
+367,384fold
+385,403fold
+404,418fold
+419,427fold
+428,436fold
+307,436fold
+441,451fold
+452,459fold
+460,513fold
+514,553fold
+438,553fold
+556,575fold
+576,593fold
+594,603fold
+604,614fold
+615,636fold
+637,645fold
+646,652fold
+555,652fold
+655,664fold
+665,689fold
+690,740fold
+741,755fold
+756,794fold
+795,801fold
+654,801fold
+804,808fold
+809,830fold
+831,846fold
+847,854fold
+803,854fold
+857,890fold
+891,893fold
+894,897fold
+898,900fold
+901,901fold
+901,904fold
+905,907fold
+856,908fold
+910,919fold
 4
 silent! normal! zo
 108
 silent! normal! zo
-138
+208
 silent! normal! zo
-243
+216
 silent! normal! zo
-288
+307
 silent! normal! zo
-288
+438
+silent! normal! zo
+514
+silent! normal! zo
+555
+silent! normal! zo
+555
 normal! zc
-419
+654
 silent! normal! zo
-419
+756
+silent! normal! zo
+803
+silent! normal! zo
+856
+silent! normal! zo
+901
+silent! normal! zo
+901
 normal! zc
-536
-silent! normal! zo
-536
-normal! zc
-635
-silent! normal! zo
-646
-silent! normal! zo
-737
-silent! normal! zo
-786
-silent! normal! zo
-792
-silent! normal! zo
-818
-silent! normal! zo
-836
-silent! normal! zo
-845
-silent! normal! zo
-890
-silent! normal! zo
-890
-normal! zc
-845
-normal! zc
-let s:l = 265 - ((114 * winheight(0) + 25) / 50)
+let s:l = 809 - ((156 * winheight(0) + 25) / 50)
 if s:l < 1 | let s:l = 1 | endif
 exe s:l
 normal! zt
-265
-normal! 017|
-wincmd w
-2wincmd w
-exe 'vert 1resize ' . ((&columns * 25 + 67) / 134)
-exe 'vert 2resize ' . ((&columns * 108 + 67) / 134)
+809
+normal! 0
 tabedit vertical_scroll_frame.py
 set splitbelow splitright
 set nosplitbelow
@@ -397,19 +363,6 @@ let &so = s:so_save | let &siso = s:siso_save
 " by :mksession out of the box).
 
 1wincmd w
-tabnext 1
-let s:bufnr_save = bufnr("%")
-let s:cwd_save = getcwd()
-NERDTree /mnt/DATA/__programming/PROJECTS/config_tool
-if !getbufvar(s:bufnr_save, '&modified')
-  let s:wipebuflines = getbufline(s:bufnr_save, 1, '$')
-  if len(s:wipebuflines) <= 1 && empty(get(s:wipebuflines, 0, ''))
-    silent execute 'bwipeout' s:bufnr_save
-  endif
-endif
-execute "cd" fnameescape(s:cwd_save)
-1resize 50|vert 1resize 25|2resize 50|vert 2resize 108|
-2wincmd w
 tabnext 1
 if exists('s:wipebuf')
   if empty(bufname(s:wipebuf))
