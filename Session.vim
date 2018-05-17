@@ -1,6 +1,6 @@
 " /mnt/DATA/__programming/PROJECTS/config_tool/Session.vim:
 " Vim session script.
-" Created by session.vim 2.13.1 on 16 Mai 2018 at 12:34:18.
+" Created by session.vim 2.13.1 on 16 Mai 2018 at 22:52:07.
 " Open this file in Vim and run :source % to restore your session.
 
 set guioptions=aegimrLtT
@@ -187,107 +187,110 @@ silent! normal! zE
 81,83fold
 85,87fold
 88,107fold
-108,137fold
-108,137fold
-138,170fold
-171,192fold
-193,207fold
-208,215fold
-216,236fold
-237,239fold
-240,250fold
-251,261fold
-262,288fold
-289,302fold
-303,305fold
-47,305fold
-308,346fold
-347,361fold
-362,366fold
-367,384fold
-385,403fold
-404,418fold
-419,427fold
-428,436fold
-307,436fold
-441,451fold
-452,459fold
-460,513fold
-514,554fold
-438,554fold
-557,576fold
-577,594fold
-595,604fold
-605,615fold
-616,637fold
-638,646fold
-647,653fold
-556,653fold
-656,665fold
-666,690fold
-691,741fold
-742,756fold
-757,795fold
-796,802fold
-655,802fold
-805,809fold
-810,831fold
-832,847fold
-848,855fold
-804,855fold
-858,891fold
-892,894fold
-895,898fold
-899,901fold
-902,902fold
-902,905fold
-906,908fold
-857,909fold
-911,920fold
+108,138fold
+108,138fold
+139,171fold
+172,193fold
+194,208fold
+209,216fold
+217,237fold
+238,240fold
+241,251fold
+252,262fold
+263,289fold
+290,303fold
+304,306fold
+47,306fold
+309,347fold
+348,362fold
+363,367fold
+368,385fold
+386,404fold
+405,419fold
+420,428fold
+429,437fold
+308,437fold
+442,452fold
+453,460fold
+461,511fold
+512,552fold
+439,552fold
+555,574fold
+575,592fold
+593,602fold
+603,613fold
+614,635fold
+636,644fold
+554,644fold
+647,656fold
+657,681fold
+682,732fold
+733,747fold
+748,786fold
+787,793fold
+646,793fold
+796,800fold
+801,822fold
+823,838fold
+839,846fold
+795,846fold
+849,882fold
+883,885fold
+886,889fold
+890,892fold
+893,893fold
+893,896fold
+897,899fold
+848,900fold
+902,911fold
 47
+silent! normal! zo
+88
 silent! normal! zo
 108
 silent! normal! zo
 108
+silent! normal! zo
+139
+silent! normal! zo
+308
+silent! normal! zo
+308
 normal! zc
-47
+439
+silent! normal! zo
+461
+silent! normal! zo
+554
+silent! normal! zo
+614
+silent! normal! zo
+636
+silent! normal! zo
+646
+silent! normal! zo
+748
+silent! normal! zo
+646
 normal! zc
-307
+795
 silent! normal! zo
-307
+795
 normal! zc
-438
+848
 silent! normal! zo
-460
+893
 silent! normal! zo
-556
-silent! normal! zo
-556
+893
 normal! zc
-655
-silent! normal! zo
-757
-silent! normal! zo
-655
+848
 normal! zc
-804
-silent! normal! zo
-804
-normal! zc
-857
-silent! normal! zo
-902
-silent! normal! zo
-902
-normal! zc
-857
-normal! zc
-let s:l = 485 - ((24 * winheight(0) + 30) / 60)
+let s:l = 127 - ((36 * winheight(0) + 30) / 60)
 if s:l < 1 | let s:l = 1 | endif
 exe s:l
 normal! zt
-485
-normal! 059|
+127
+normal! 033|
 tabedit vertical_scroll_frame.py
 set splitbelow splitright
 set nosplitbelow
@@ -326,7 +329,7 @@ setlocal fml=1
 setlocal fdn=20
 setlocal fen
 silent! normal! zE
-let s:l = 65 - ((46 * winheight(0) + 30) / 60)
+let s:l = 65 - ((44 * winheight(0) + 30) / 60)
 if s:l < 1 | let s:l = 1 | endif
 exe s:l
 normal! zt

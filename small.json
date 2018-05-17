@@ -1,1 +1,1 @@
-{"estimator": {}, "input_matrices": {"hop": 20, "window": 40}, "sample_obj": {"string": "some_string", "nested_sample_obj": {"some_array": [77, 31, 234], "whatever": "some other"}}, "train_input_fn": {"batch_size": 100, "num_epochs": "None", "shuffle": "True"}}
+{"estimator": {"estimator_object": {"key for estimator obj": [3, 3, 3]}}, "input_matrices": {"hop": 20, "window": 40}, "sample_obj": {"string": "some_string", "nested_sample_obj": {"some_array": [77, 31, 23]}}, "train_input_fn": {"batch_size": 100, "num_epochs": "None", "shuffle": "True"}}

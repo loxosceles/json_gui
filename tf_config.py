@@ -98,7 +98,7 @@ class DataObject(object):
                 self.json_dict = json.load(infile)
 
                 self.gen_file_dict()
-                print("Json file repres: ", self.json_dict, self.json_file_repres)
+                print("Json file repres: ", self.json_file_repres)
 
                 self.gen_flat_key_dict()
         except ValueError as e:
@@ -118,6 +118,7 @@ class DataObject(object):
 
         """
         def _gen_dict(d, pset=tuple()):
+            print("inside _gen_dict")
             if not isinstance(d, dict):
                 label = pset[-1]
                 path = pset[:-1]
@@ -133,7 +134,7 @@ class DataObject(object):
                     _gen_dict(value, pset + (key,))
 
         self.json_file_repres.clear()
-        _gen_dict(self.json_file_repres)
+        _gen_dict(self.json_dict)
 
     def gen_flat_key_dict(self):
         """ Parses json object recursively and returns path and value.
@@ -475,12 +476,9 @@ class KeyValueSection(ttk.Frame):
         self.frame.grid(row=0, column=0, sticky=tk.NSEW)
 
         for i, (path, label) in enumerate(self.parent.data_object.json_dict_flat.items(), 1):
-            #  print(path)
-            #  print(label)
             frame = ttk.Frame(self.frame.interior)
             frame.grid(row=i, column=0, padx='20', sticky=tk.NSEW)
             ttk.Label(frame, style="label_style.TLabel",
-                      #text=string.capwords(path.replace(' ', ARROW_SYM).replace('_' , ' '))
                       text=(' ' + ARROW_SYM + ' ').join(path)
                   ).grid(row=0, column=0, columnspan=2, sticky=tk.NW)
 
@@ -643,13 +641,6 @@ class Editor(ttk.Frame):
             self.textfield.tag_add('match', self.parent.data_object.get_coords(el, 0),
                                             self.parent.data_object.get_coords(el, 1))
         self.textfield.configure(state=tk.DISABLED)
-
-    def get_line_numbers(self):
-        output = ''
-        row, col = self.textfield.index("end").split('.')
-        for i in range(1, int(row)):
-            output += str(i)+ '\n'
-        return output
 
 
 class CreateDialog(dialog_window.Dialog):
