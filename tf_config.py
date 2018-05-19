@@ -106,7 +106,7 @@ class DataObject(object):
                     format is correct.")
 
     def gen_file_dict(self):
-        """ Parse json object recursively and build a dictionary holding (flat)
+        """ Parse json object recursivly and build a dictionary holding (flat)
         path and value.
 
         This method serves as a representation of the read-in file. The resulting
@@ -117,11 +117,11 @@ class DataObject(object):
         :jsfrep: The resulting dictionary as a representation of the file
 
         """
-        def _gen_dict(d, pset=tuple()):
+        def _gen_dict(d, path_tuple=tuple()):
             print("inside _gen_dict")
             if not isinstance(d, dict):
-                label = pset[-1]
-                path = pset[:-1]
+                label = path_tuple[-1]
+                path = path_tuple[:-1]
 
                 if not self.json_file_repres.get(path):
                     self.json_file_repres[path] = {}
@@ -131,7 +131,7 @@ class DataObject(object):
 
             else:
                 for key, value in d.items():
-                    _gen_dict(value, pset + (key,))
+                    _gen_dict(value, path_tuple + (key,))
 
         self.json_file_repres.clear()
         _gen_dict(self.json_dict)
@@ -143,10 +143,10 @@ class DataObject(object):
         :returns: TODO
 
         """
-        def gen_dict(d, pset=tuple()):
+        def gen_dict(d, path_tuple=tuple()):
             if not isinstance(d, dict):
-                label = pset[-1]
-                path = pset[:-1]
+                label = path_tuple[-1]
+                path = path_tuple[:-1]
 
                 if not self.json_dict_flat.get(path):
                     self.json_dict_flat[path] = {}
@@ -160,11 +160,11 @@ class DataObject(object):
                 except KeyError as e:
                     self.json_dict_flat[path][label]['original_value'] = None
 
-                start, end = self.gen_value_coords(self.json_str, pset)
+                start, end = self.gen_value_coords(self.json_str, path_tuple)
                 self.json_dict_flat[path][label]['coords'] = [start, end]
             else:
                 for key, value in d.items():
-                    gen_dict(value, pset + (key,))
+                    gen_dict(value, path_tuple + (key,))
 
         self.json_dict_flat.clear()
         gen_dict(self.json_dict)
@@ -264,27 +264,25 @@ class DataObject(object):
         node_set = OrderedSet()
         node_key_dict = OrderedDict()
 
-        def get_list(d, pset=tuple()):
+        def get_list(d, path_tuple=tuple()):
             if not isinstance(d, dict):
-                label = pset[-1]
-                path = pset[:-1]
+                label = path_tuple[-1]
+                path = path_tuple[:-1]
                 if node_key_dict.get(path):
                     node_key_dict[path].append(label)
                 else:
                     node_key_dict[path] = [label]
-                node_set.add(path,)
-                print("After node_set write: ", node_set)
                 return
             else:
                 for key, value in d.items():
-                    if isinstance(d, dict) and bool(value) == False:
-                        node_set.add(pset + (key,))
-                        print("inside if: ", node_set)
-                    get_list(value, pset + (key,))
+                    if not isinstance(value, dict):
+                        node_set.add(path_tuple)
+                    else:
+                        node_set.add(path_tuple + (key,))
+                    get_list(value, path_tuple + (key,))
 
         get_list(self.json_dict)
         node_set.discard('')
-        pprint.pprint(node_key_dict)
         return list(node_set), node_key_dict
 
     def is_field_dirty(self, flat_keys, value):
@@ -618,20 +616,18 @@ class Editor(ttk.Frame):
         #FIXME: + 10 should not be necessary (but without it some brackets aren't marked consistently in red)
         column_diff = len(str(value)) - len(str(self.parent.data_object.previous_value)) + 10
 
-        if flat_keys:
-            start = self.parent.data_object.get_coords(flat_keys, 0)
-            end = self.parent.data_object.get_coords(flat_keys, 1)
 
-            self.shift_positions(self.parent.data_object.json_dict_flat, end, line_diff, column_diff )
-            self.parent.data_object.dirty_tags.discard(flat_keys)
+        start = self.parent.data_object.get_coords(flat_keys, 0)
+        end = self.parent.data_object.get_coords(flat_keys, 1)
 
-            if self.parent.data_object.is_field_dirty(flat_keys, value):
-                self.parent.data_object.dirty_tags.add(flat_keys)
+        self.shift_positions(self.parent.data_object.json_dict_flat, end, line_diff, column_diff )
+        self.parent.data_object.dirty_tags.discard(flat_keys)
 
-            self.refresh()
-            self.textfield.see(end)
-        else:
-            self.refresh()
+        if self.parent.data_object.is_field_dirty(flat_keys, value):
+            self.parent.data_object.dirty_tags.add(flat_keys)
+
+        self.refresh()
+        self.textfield.see(end)
 
     def refresh(self):
         self.textfield.configure(state=tk.NORMAL)
@@ -650,9 +646,12 @@ class CreateDialog(dialog_window.Dialog):
         self.tab_ids = ["Array", "Float", "Integer", "String"]
         self.checked = tk.IntVar()
         self.node_list, self.node_labels = self.parent.data_object.node_list()
-        dialog_window.Dialog.__init__(self, parent, title)
+        #  self.resizable(width=False, height=False)
+        #  self..config(width=200)
         if not self.parent.data_object.name:
             self.parent.menubar.enable_menu_entries()
+
+        dialog_window.Dialog.__init__(self, parent, title)
 
     def body(self, root):
         self.options_frame = ttk.Frame(root)
@@ -808,6 +807,7 @@ class DeleteDialog(dialog_window.Dialog):
         ttk.Label(self.frame, style="id_label_style.TLabel", text="Node"
                  ).grid(row=0, column=0, sticky=tk.NW)
 
+        print("Self node list: ", self.node_list)
         self.nodes['values'] = (self.node_list)
         self.nodes.bind("<<ComboboxSelected>>", self._update_label_cb)
         self.nodes.bind("<FocusIn>", self._update_label_cb)
@@ -827,14 +827,24 @@ class DeleteDialog(dialog_window.Dialog):
         if key:
             node = node + (key,)
 
+        flat_keys =  node
+        print("node3 inside body delete: ", node)
+        print("key inside body delete: ", key)
+        value = self.parent.data_object.dyn_dict_get(flat_keys)
+        print("Flat keys inside body delete: ", flat_keys)
+        print()
+        print("value inside delte: ", value)
+        print()
+
+        self.parent.data_object.set_previous_textfield_length()
+
         self.parent.data_object.dyn_dict_delete(node)
 
         self.parent.data_object.gen_flat_key_dict()
 
         self.parent.key_value_section.create_entry_widgets()
-
-        self.parent.data_object.set_previous_textfield_length()
-        self.parent.editor.update_tags("")
+        self.parent.data_object.dirty_tags.discard(flat_keys)
+        self.parent.editor.refresh()
 
     def _update_label_cb(self, event=None):
         try:
