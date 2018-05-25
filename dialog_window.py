@@ -8,6 +8,7 @@ class Dialog(tk.Toplevel):
 
         tk.Toplevel.__init__(self, parent)
         self.transient(parent)
+        self.resizable(height=False, width=False)
 
         if title:
             self.title(title)
@@ -94,3 +95,9 @@ class Dialog(tk.Toplevel):
     def apply(self):
 
         pass # override
+    def _calc_cb_length(self):
+        upper = 40
+        lower = 10
+        return max(min(max([ len(''.join(x)) + 1
+            for x in self.node_list ]) - 6, upper), lower)
+

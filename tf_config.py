@@ -11,6 +11,7 @@ import os, re, json, string
 from decimal import *
 from collections import OrderedDict
 from orderedset import OrderedSet
+from copy import deepcopy
 
 from functools import reduce
 import operator
@@ -66,7 +67,6 @@ class DataObject(object):
         :returns: TODO
 
         """
-
         return json.dumps(self.json_dict, indent=4)
 
     @property
@@ -92,13 +92,11 @@ class DataObject(object):
         :returns: TODO
 
         """
-
         try:
             with open(json_file, 'r') as infile:
                 self.json_dict = json.load(infile)
 
                 self.gen_file_dict()
-                print("Json file repres: ", self.json_file_repres)
 
                 self.gen_flat_key_dict()
         except ValueError as e:
@@ -118,7 +116,6 @@ class DataObject(object):
 
         """
         def _gen_dict(d, path_tuple=tuple()):
-            print("inside _gen_dict")
             if not isinstance(d, dict):
                 label = path_tuple[-1]
                 path = path_tuple[:-1]
@@ -176,8 +173,7 @@ class DataObject(object):
         :returns: TODO
 
         """
-        #  match_all = '([^}])*'
-        match_all = '([^}]|[^}]{[^}]*})*'
+        match_all = '([^}]|[^}]{[^}]*})*[^{]*'
         se = ''
         for i in range(len(path) - 1):
             se += '"' + path[i] + '"' + match_all
@@ -207,16 +203,12 @@ class DataObject(object):
         return Decimal(line) + Decimal('0.' + str(column))
 
     def dyn_dict_get(self, flat_keys):
-        print("Flat keys inside dyn getter: ", flat_keys)
-        print("json dict: ", self.json_dict)
         try:
             return reduce(operator.getitem, flat_keys, self.json_dict)
         except KeyError:
             pass
 
     def dyn_dict_set(self, flat_keys, value):
-        print("Flat keys inside dyn setter: ", flat_keys)
-        print("Value: ", value)
         dic = self.json_dict
 
         for key in flat_keys[:-1]:
@@ -231,9 +223,7 @@ class DataObject(object):
         #      print("Error")
         #      self.dyn_dict_get(flat_keys[:-2])[flat_keys[-2]] = {}
         #      self.dyn_dict_get(flat_keys[:-1])[flat_keys[-1]] = value
-        print(self.json_dict)
-
-
+        #  print(self.json_dict)
 
     def dyn_dict_delete(self, flat_keys):
         del self.dyn_dict_get(flat_keys[:-1])[flat_keys[-1]]
@@ -301,6 +291,11 @@ class DataObject(object):
 
     def set_previous_textfield_length(self):
         self._textfield_length = len(REGEX_NL.findall(self.json_str, re.DOTALL)) + 2
+
+    def clean_dirty_tags(self, flat_keys):
+        for el in deepcopy(self.dirty_tags):
+            if flat_keys == el[:len(flat_keys)]:
+                self.dirty_tags.discard(el)
 
 
 class MenuBar(ttk.Frame):
@@ -509,10 +504,6 @@ class KeyValueSection(ttk.Frame):
 
     def buffer_entry_value(self, event, flat_keys):
         # FIXME: get position of event inside canvas
-        #  print(event.widget.winfo_y())
-        #  print(self.frame.canvas.coords(entry))
-        #
-        #print("Flat keys insie buffer_entry_value: ", flat_keys)
 
         value = event.widget.get()
 
@@ -548,7 +539,6 @@ class KeyValueSection(ttk.Frame):
         self.parent.editor.update_tags(value, flat_keys)
 
 
-
 class Editor(ttk.Frame):
     def __init__(self, parent, data_object=None, *args, **kwargs):
         ttk.Frame.__init__(self, parent, *args, **kwargs)
@@ -571,22 +561,22 @@ class Editor(ttk.Frame):
         self.textfield.tag_config('match', foreground='red')
 
     def create_textfield(self):
-            self.scrollbar = ttk.Scrollbar(self)
-            self.scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
-            self.textfield = tk.Text(self, font=self.textfield_font,
-                    yscrollcommand=self.scrollbar.set,
-                    width=self.splashscreen_width)
-            # make textfield copy-pastable
-            self.textfield.bind("<1>", lambda event: self.textfield.focus_set())
-            self.textfield.pack(fill=tk.BOTH, expand=1)
-            self.scrollbar.config(command=self.textfield.yview)
+        self.scrollbar = ttk.Scrollbar(self)
+        self.scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
+        self.textfield = tk.Text(self, font=self.textfield_font,
+                yscrollcommand=self.scrollbar.set,
+                width=self.splashscreen_width)
+        # make textfield copy-pastable
+        self.textfield.bind("<1>", lambda event: self.textfield.focus_set())
+        self.textfield.pack(fill=tk.BOTH, expand=1)
+        self.scrollbar.config(command=self.textfield.yview)
 
-            self.splash_style = ttk.Style()
-            self.splash = ttk.Label(self.textfield, textvariable=self.startup_screen,
-                    style="SPLASH.TLabel")
-            self.splash_style.configure("SPLASH.TLabel", font=('Courier', 8, 'bold'),
-                    background="white", anchor=tk.CENTER, padding=50)
-            self.splash.pack()
+        self.splash_style = ttk.Style()
+        self.splash = ttk.Label(self.textfield, textvariable=self.startup_screen,
+                style="SPLASH.TLabel")
+        self.splash_style.configure("SPLASH.TLabel", font=('Courier', 8, 'bold'),
+                background="white", anchor=tk.CENTER, padding=50)
+        self.splash.pack()
 
     def vh_update(self, value, v_shift, h_shift=0):
         if h_shift != 0:
@@ -646,8 +636,6 @@ class CreateDialog(dialog_window.Dialog):
         self.tab_ids = ["Array", "Float", "Integer", "String"]
         self.checked = tk.IntVar()
         self.node_list, self.node_labels = self.parent.data_object.node_list()
-        #  self.resizable(width=False, height=False)
-        #  self..config(width=200)
         if not self.parent.data_object.name:
             self.parent.menubar.enable_menu_entries()
 
@@ -681,6 +669,7 @@ class CreateDialog(dialog_window.Dialog):
     def create_tabs(self, tab, value_type):
         # create elements
         nodes = ttk.Combobox(tab)
+        nodes.config(width=self._calc_cb_length())
         obj_key_entry = StringEntry(tab, state=tk.DISABLED)
         key_entry = StringEntry(tab)
 
@@ -768,11 +757,10 @@ class CreateDialog(dialog_window.Dialog):
             value = value.strip() # strip spaces from string, left and right
 
         if self.checked.get() == 1:
-            object_key = self.tab_widgets[active_tab][1].get().strip().replace(' ', '_').lower()
+            object_key = self.tab_widgets[active_tab][1].get().strip()#.replace(' ', '_').lower()
             node = node + (object_key,)
 
         flat_keys =  (node + (key,))
-        print("Flat keys: ", flat_keys)
 
         self.parent.data_object.dyn_dict_set(flat_keys, value)
 
@@ -801,13 +789,13 @@ class DeleteDialog(dialog_window.Dialog):
         self.frame = ttk.Frame(root)
         self.frame.pack()
         self.nodes = ttk.Combobox(self.frame, state='readonly')
+        self.nodes.config(width=self._calc_cb_length())
         self.key = ttk.Combobox(self.frame, state='readonly')
 
         # Nodes label
         ttk.Label(self.frame, style="id_label_style.TLabel", text="Node"
                  ).grid(row=0, column=0, sticky=tk.NW)
 
-        print("Self node list: ", self.node_list)
         self.nodes['values'] = (self.node_list)
         self.nodes.bind("<<ComboboxSelected>>", self._update_label_cb)
         self.nodes.bind("<FocusIn>", self._update_label_cb)
@@ -828,13 +816,7 @@ class DeleteDialog(dialog_window.Dialog):
             node = node + (key,)
 
         flat_keys =  node
-        print("node3 inside body delete: ", node)
-        print("key inside body delete: ", key)
         value = self.parent.data_object.dyn_dict_get(flat_keys)
-        print("Flat keys inside body delete: ", flat_keys)
-        print()
-        print("value inside delte: ", value)
-        print()
 
         self.parent.data_object.set_previous_textfield_length()
 
@@ -843,7 +825,12 @@ class DeleteDialog(dialog_window.Dialog):
         self.parent.data_object.gen_flat_key_dict()
 
         self.parent.key_value_section.create_entry_widgets()
-        self.parent.data_object.dirty_tags.discard(flat_keys)
+        print("Dirty tags before discard: \n", self.parent.data_object.dirty_tags)
+        #  self.parent.data_object.dirty_tags.discard(flat_keys)
+        self.parent.data_object.clean_dirty_tags(flat_keys)
+        print("Flat keys: \n", flat_keys)
+        #  print("Value: ", value)
+        print("Dirty tags: \n", self.parent.data_object.dirty_tags)
         self.parent.editor.refresh()
 
     def _update_label_cb(self, event=None):
@@ -890,6 +877,7 @@ class MainApplication(ttk.Frame):
         # bind delete object
         self.parent.bind('<Control-Shift-D>', self.menubar.delete_object)
         self.parent.bind('<Control-Shift-d>', self.menubar.delete_object)
+
     def init_data_object(self):
         self.data_object = DataObject()
 

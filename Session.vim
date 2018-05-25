@@ -1,6 +1,6 @@
 " /mnt/DATA/__programming/PROJECTS/config_tool/Session.vim:
 " Vim session script.
-" Created by session.vim 2.13.1 on 18 Mai 2018 at 23:26:09.
+" Created by session.vim 2.13.1 on 24 Mai 2018 at 23:02:52.
 " Open this file in Vim and run :source % to restore your session.
 
 set guioptions=aegimrLtT
@@ -31,6 +31,7 @@ let SuperTabLongestHighlight =  0
 let NERDTreeMapCloseDir = "x"
 let NERDTreeSortHiddenFirst = "1"
 let NERDTreeMarkBookmarks = "1"
+let NERDTreeMinimalUI = "0"
 let NERDUsePlaceHolders = "1"
 let NERDTreeShowLineNumbers = "0"
 let UltiSnipsExpandTrigger = "<tab>"
@@ -46,6 +47,7 @@ let EasyMotion_enter_jump_first =  0
 let EasyMotion_use_upper =  0 
 let EasyMotion_do_mapping =  1 
 let SuperTabCrMapping =  1 
+let NERDTreeStatusline = "%{exists('b:NERDTree')?b:NERDTree.root.path.str():''}"
 let SuperTabCompleteCase = "inherit"
 let SuperTabClosePreviewOnPopupClose =  0 
 let NERDTreeMapPreview = "go"
@@ -81,11 +83,11 @@ let EasyMotion_add_search_history =  1
 let NERDTreeChDirMode = "0"
 let EasyMotion_do_shade =  1 
 let NERDTreeCreatePrefix = "silent"
-let NERDTreeMinimalUI = "0"
 let EasyMotion_grouping =  1 
 let NERDTreeAutoCenterThreshold = "3"
 let NERDTreeShowFiles = "1"
 let NERDTreeMapOpenSplit = "i"
+let NERDTreeDirArrowCollapsible = "▾"
 let EasyMotion_skipfoldedline =  1 
 let NERDTreeCaseSensitiveSort = "0"
 let NERDTreeHijackNetrw = "1"
@@ -118,13 +120,13 @@ let EasyMotion_cursor_highlight =  1
 let NERDRemoveAltComs = "1"
 let NERDTreeCascadeOpenSingleChildDir = "1"
 let NERDTreeMapOpenVSplit = "s"
-let EasyMotion_startofline =  1 
 let NERDTreeMapJumpLastChild = "J"
 let SuperTabLongestEnhanced =  0 
 let NERDTrimTrailingWhitespace =  1 
 let NERDTreeMapDeleteBookmark = "D"
 let UltiSnipsListSnippets = "<c-tab>"
 let NERDBlockComIgnoreEmpty = "0"
+let EasyMotion_startofline =  1 
 let NERDTreeMapJumpNextSibling = "<C-j>"
 let EasyMotion_inc_highlight =  1 
 let UltiSnipsEditSplit = "normal"
@@ -141,27 +143,21 @@ let EasyMotion_force_csapprox =  0
 let EasyMotion_loaded =  1 
 let NERDTreeMapOpenExpl = "e"
 let NERDTreeMapJumpFirstChild = "K"
-let NERDTreeDirArrowCollapsible = "▾"
 let NERDTreeMapOpenRecursively = "O"
 let NERDTreeMapToggleBookmarks = "B"
 let SuperTabMappingBackward = "<s-tab>"
 let NERDTreeMapUpdirKeepOpen = "U"
 let EasyMotion_landing_highlight =  0 
 let NERDTreeQuitOnOpen = "0"
-let NERDTreeStatusline = "%{exists('b:NERDTree')?b:NERDTree.root.path.str():''}"
 silent only
 cd /mnt/DATA/__programming/PROJECTS/config_tool
 if expand('%') == '' && !&modified && line('$') <= 1 && getline(1) == ''
   let s:wipebuf = bufnr('%')
 endif
 set shortmess=aoO
-badd +246 tf_config.py
-badd +1 validating_entry.py
-badd +1 dialog_window.py
-badd +1 vertical_scroll_frame.py
+badd +1 tf_config.py
 argglobal
 silent! argdel *
-set stal=2
 edit tf_config.py
 set splitbelow splitright
 set nosplitbelow
@@ -178,182 +174,129 @@ setlocal fml=1
 setlocal fdn=20
 setlocal fen
 silent! normal! zE
+1,2fold
 4,25fold
 26,45fold
+48,49fold
 50,60fold
-62,71fold
-73,75fold
-76,79fold
-81,83fold
-85,87fold
-88,107fold
-108,138fold
-108,138fold
-139,171fold
-172,193fold
-194,208fold
-209,216fold
-217,237fold
-238,240fold
+62,70fold
+72,74fold
+76,78fold
+80,82fold
+84,86fold
+87,104fold
+105,134fold
+135,167fold
+168,188fold
+189,203fold
+204,209fold
+210,226fold
+227,229fold
+230,240fold
 241,251fold
-252,262fold
-263,287fold
-288,301fold
-302,304fold
-47,304fold
-307,345fold
-346,360fold
-361,365fold
-366,383fold
-384,402fold
-403,417fold
-418,426fold
-427,435fold
-306,435fold
-440,450fold
-451,458fold
-459,509fold
-510,550fold
-437,550fold
-553,572fold
-573,590fold
-591,600fold
-601,611fold
-612,631fold
-632,640fold
-552,640fold
-643,655fold
-656,680fold
-681,731fold
-732,746fold
-747,785fold
-786,792fold
-642,792fold
-795,799fold
-800,822fold
-823,848fold
-849,856fold
-794,856fold
-859,892fold
-893,895fold
-896,899fold
-900,902fold
-903,903fold
-903,906fold
-907,909fold
-858,910fold
-912,921fold
-4
-silent! normal! zo
+252,276fold
+277,290fold
+291,291fold
+291,293fold
+294,294fold
+294,298fold
+294,298fold
+47,298fold
+301,339fold
+340,354fold
+355,359fold
+360,377fold
+378,396fold
+397,411fold
+412,420fold
+421,429fold
+300,429fold
+432,433fold
+434,444fold
+445,452fold
+453,503fold
+504,539fold
+431,539fold
+541,541fold
+542,561fold
+562,579fold
+580,589fold
+590,600fold
+601,620fold
+621,629fold
+541,629fold
+632,642fold
+643,667fold
+668,719fold
+720,734fold
+735,772fold
+773,779fold
+631,779fold
+781,781fold
+782,786fold
+787,809fold
+810,834fold
+835,842fold
+781,842fold
+844,844fold
+845,879fold
+880,882fold
+883,886fold
+887,889fold
+890,893fold
+894,897fold
+844,897fold
+844,898fold
+899,908fold
 47
 silent! normal! zo
-108
+50
 silent! normal! zo
-263
+291
 silent! normal! zo
-306
-silent! normal! zo
-306
+291
 normal! zc
-437
+294
 silent! normal! zo
-552
+294
 silent! normal! zo
-642
+294
 silent! normal! zo
-794
+300
 silent! normal! zo
-823
+431
 silent! normal! zo
-849
+541
 silent! normal! zo
-858
+601
 silent! normal! zo
-859
+631
 silent! normal! zo
-903
+735
 silent! normal! zo
-let s:l = 275 - ((58 * winheight(0) + 30) / 60)
+631
+normal! zc
+781
+silent! normal! zo
+782
+silent! normal! zo
+810
+silent! normal! zo
+844
+silent! normal! zo
+844
+silent! normal! zo
+844
+normal! zc
+844
+normal! zc
+let s:l = 297 - ((20 * winheight(0) + 30) / 61)
 if s:l < 1 | let s:l = 1 | endif
 exe s:l
 normal! zt
-275
+297
 normal! 017|
-tabedit vertical_scroll_frame.py
-set splitbelow splitright
-set nosplitbelow
-set nosplitright
-wincmd t
-set winminheight=1 winheight=1 winminwidth=1 winwidth=1
-argglobal
-setlocal fdm=manual
-setlocal fde=0
-setlocal fmr={{{,}}}
-setlocal fdi=#
-setlocal fdl=0
-setlocal fml=1
-setlocal fdn=20
-setlocal fen
-silent! normal! zE
-let s:l = 11 - ((0 * winheight(0) + 30) / 60)
-if s:l < 1 | let s:l = 1 | endif
-exe s:l
-normal! zt
-11
-normal! 0
-tabedit validating_entry.py
-set splitbelow splitright
-set nosplitbelow
-set nosplitright
-wincmd t
-set winminheight=1 winheight=1 winminwidth=1 winwidth=1
-argglobal
-setlocal fdm=manual
-setlocal fde=0
-setlocal fmr={{{,}}}
-setlocal fdi=#
-setlocal fdl=0
-setlocal fml=1
-setlocal fdn=20
-setlocal fen
-silent! normal! zE
-let s:l = 65 - ((44 * winheight(0) + 30) / 60)
-if s:l < 1 | let s:l = 1 | endif
-exe s:l
-normal! zt
-65
-normal! 023|
-tabedit dialog_window.py
-set splitbelow splitright
-set nosplitbelow
-set nosplitright
-wincmd t
-set winminheight=1 winheight=1 winminwidth=1 winwidth=1
-argglobal
-setlocal fdm=expr
-setlocal fde=SimpylFold#FoldExpr(v:lnum)
-setlocal fmr={{{,}}}
-setlocal fdi=#
-setlocal fdl=0
-setlocal fml=1
-setlocal fdn=20
-setlocal fen
-1
-silent! normal! zo
-5
-silent! normal! zo
-7
-silent! normal! zo
-43
-silent! normal! zo
-let s:l = 43 - ((42 * winheight(0) + 30) / 60)
-if s:l < 1 | let s:l = 1 | endif
-exe s:l
-normal! zt
-43
-normal! 09|
 tabnext 1
-set stal=1
 if exists('s:wipebuf')
 "   silent exe 'bwipe ' . s:wipebuf
 endif
