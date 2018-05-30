@@ -43,7 +43,8 @@ class VerticalScrollFrame(ttk.Frame):
                                 background=self.canvas_bg)
 
         #  self.canvas.configure(height=screen_height - (screen_height * 0.3))
-        self.canvas.configure(height=self.canvas_height)
+        #  self.canvas.configure(height=self.canvas_height)
+        self.canvas.configure(height=630)
         self.canvas.pack(side=tk.LEFT, fill=tk.BOTH, expand=tk.TRUE)
         self.vscrollbar.config(command=self.canvas.yview)
 

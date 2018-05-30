@@ -180,7 +180,7 @@ class DataObject(object):
             count = 0
             for el in l:
                 count += 1
-                if el.endswith('],'):
+                if el.endswith('],') or el.endswith(']'):
                     return count
 
         def _findkey(l, t, lev=0, ind=0):
@@ -207,63 +207,20 @@ class DataObject(object):
         idx = start_row - 1
         start_col = l[idx].find(':') + 2
 
-
         if l[idx].endswith('['):
             end_row = _count_array_length(l[idx + 1:]) + start_row
             #end_col = l[end_row - 1].find('],') + 2
             end_col = start_col
         else:# l[idx].endswith('"'):
             end_row = start_row
-            end_col = len(l[idx]) - 1
+            end_col = len(l[idx])# - 1
         #  else:
         #      print("Something bad happend")
 
         start = Decimal(start_row) + Decimal('0.' + str(start_col))
         end  = Decimal(end_row) + Decimal('0.' + str(end_col))
-        #pu.db
 
         return start, end
-
-    #  def gen_value_coords(self, path):
-    #      """TODO: Docstring for function.
-    #
-    #      :arg1: TODO
-    #      :returns: TODO
-    #
-    #      """
-    #      match_all = '([^}]|[^}]{[^}]*})*[^{]*'
-    #      se = ''
-    #      for i in range(len(path) - 1):
-    #          se += '"' + path[i] + '"' + match_all
-    #
-    #      se += '"' + path[-1] + '"' + ':\s*(\[[^}]*?\]|".*?"|\d+\.*\d*)'
-    #      print(se)
-    #      print(self.json_str)
-    #
-    #      s = re.compile(se, re.DOTALL)
-    #      match = s.search(self.json_str)
-    #
-    #      start = self.calc_match_position(self.json_str, match.start(len(path)))
-    #      end = self.calc_match_position(self.json_str, match.end(len(path)))
-    #      return start, end
-    #
-    #  def calc_match_position(self, match_index):
-    #      """
-    #      Calculates the positions of the matched value in the editor window.
-    #
-    #      :match:   matched string
-    #      :returns: position in the form of line.column
-    #      """
-    #      #  line = 1
-    #      #  for ln in REGEX_NL.finditer(string, 0, match_index):
-    #      #      line += 1
-    #
-    #      s = re.compile(t[-1] + ': (\s*(\[[^}]*?\]|".*?"|\d+\.*\d*))', re.DOTALL)
-    #      match = s.search(l[line - 1])
-    #
-    #      column = match_index - ln.start() - 1
-    #
-    #      return Decimal(line) + Decimal('0.' + str(column))
 
     def dyn_dict_get(self, flat_keys):
         try:
@@ -316,6 +273,7 @@ class DataObject(object):
     def node_list(self):
         node_set = OrderedSet()
         node_key_dict = OrderedDict()
+        #pu.db
 
         def get_list(d, path_tuple=tuple()):
             if not isinstance(d, dict):
@@ -498,8 +456,7 @@ class KeyValueSection(ttk.Frame):
     def __init__(self, parent, *args, **kwargs):
         """TODO: to be defined1. """
         ttk.Frame.__init__(self, parent, *args, **kwargs)
-        #self.frame = VerticalScrollFrame(self, (screen_height - (screen_height * 0.3)))
-        self.frame = VerticalScrollFrame(self, 630)
+        self.frame = VerticalScrollFrame(self, (screen_height - (screen_height * 0.3)))
         self.parent = parent
         #  self.entry_list = []
 
@@ -884,6 +841,7 @@ class DeleteDialog(dialog_window.Dialog):
 
         self.parent.data_object.set_previous_textfield_length()
 
+        pu.db # debugger
         self.parent.data_object.dyn_dict_delete(node)
 
         self.parent.data_object.gen_flat_key_dict()
