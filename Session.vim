@@ -1,6 +1,6 @@
 " /mnt/DATA/__programming/PROJECTS/config_tool/Session.vim:
 " Vim session script.
-" Created by session.vim 2.13.1 on 24 Mai 2018 at 23:02:52.
+" Created by session.vim 2.13.1 on 30 Mai 2018 at 00:19:31.
 " Open this file in Vim and run :source % to restore your session.
 
 set guioptions=aegimrLtT
@@ -47,7 +47,7 @@ let EasyMotion_enter_jump_first =  0
 let EasyMotion_use_upper =  0 
 let EasyMotion_do_mapping =  1 
 let SuperTabCrMapping =  1 
-let NERDTreeStatusline = "%{exists('b:NERDTree')?b:NERDTree.root.path.str():''}"
+let NERDTreeStatusline = "%{matchstr(getline('.'), '\\s\\zs\\w\\(.*\\)')}"
 let SuperTabCompleteCase = "inherit"
 let SuperTabClosePreviewOnPopupClose =  0 
 let NERDTreeMapPreview = "go"
@@ -175,127 +175,151 @@ setlocal fdn=20
 setlocal fen
 silent! normal! zE
 1,2fold
-4,25fold
-26,45fold
-48,49fold
-50,60fold
-62,70fold
-72,74fold
-76,78fold
-80,82fold
-84,86fold
-87,104fold
-105,134fold
-135,167fold
-168,188fold
-189,203fold
-204,209fold
-210,226fold
-227,229fold
-230,240fold
-241,251fold
-252,276fold
-277,290fold
-291,291fold
+4,30fold
+31,50fold
+53,54fold
+55,65fold
+67,75fold
+77,79fold
+81,83fold
+85,87fold
+89,91fold
+92,109fold
+110,139fold
+140,226fold
+234,245fold
+227,249fold
+250,267fold
+227,267fold
+268,273fold
+274,290fold
 291,293fold
-294,294fold
-294,298fold
-294,298fold
-47,298fold
-301,339fold
-340,354fold
-355,359fold
-360,377fold
-378,396fold
-397,411fold
-412,420fold
-421,429fold
-300,429fold
-432,433fold
-434,444fold
-445,452fold
-453,503fold
-504,539fold
-431,539fold
-541,541fold
-542,561fold
-562,579fold
-580,589fold
-590,600fold
-601,620fold
-621,629fold
-541,629fold
-632,642fold
-643,667fold
-668,719fold
-720,734fold
-735,772fold
-773,779fold
-631,779fold
-781,781fold
-782,786fold
-787,809fold
-810,834fold
-835,842fold
-781,842fold
-844,844fold
-845,879fold
-880,882fold
-883,886fold
-887,889fold
-890,893fold
-894,897fold
-844,897fold
-844,898fold
-899,908fold
-47
+294,304fold
+305,315fold
+316,340fold
+341,354fold
+355,355fold
+355,357fold
+358,358fold
+358,362fold
+358,362fold
+52,362fold
+365,403fold
+404,418fold
+419,423fold
+424,441fold
+442,460fold
+461,475fold
+476,484fold
+485,493fold
+364,493fold
+496,497fold
+498,508fold
+509,516fold
+517,567fold
+568,603fold
+495,603fold
+605,605fold
+606,625fold
+626,643fold
+644,653fold
+654,664fold
+665,684fold
+685,693fold
+605,693fold
+696,706fold
+707,731fold
+732,783fold
+784,798fold
+799,836fold
+837,843fold
+695,843fold
+845,845fold
+846,850fold
+851,873fold
+874,898fold
+899,906fold
+845,906fold
+908,908fold
+909,943fold
+944,946fold
+947,950fold
+951,953fold
+954,957fold
+958,961fold
+908,961fold
+908,962fold
+963,972fold
+4
 silent! normal! zo
-50
+31
 silent! normal! zo
-291
+52
 silent! normal! zo
-291
+55
+silent! normal! zo
+85
+silent! normal! zo
+92
+silent! normal! zo
+110
+silent! normal! zo
+140
+silent! normal! zo
+227
+silent! normal! zo
+227
+silent! normal! zo
+234
+silent! normal! zo
+250
+silent! normal! zo
+227
 normal! zc
-294
+355
 silent! normal! zo
-294
-silent! normal! zo
-294
-silent! normal! zo
-300
-silent! normal! zo
-431
-silent! normal! zo
-541
-silent! normal! zo
-601
-silent! normal! zo
-631
-silent! normal! zo
-735
-silent! normal! zo
-631
+355
 normal! zc
-781
+358
 silent! normal! zo
-782
+358
 silent! normal! zo
-810
-silent! normal! zo
-844
-silent! normal! zo
-844
-silent! normal! zo
-844
+358
 normal! zc
-844
+364
+silent! normal! zo
+495
+silent! normal! zo
+568
+silent! normal! zo
+605
+silent! normal! zo
+665
+silent! normal! zo
+695
+silent! normal! zo
+799
+silent! normal! zo
+845
+silent! normal! zo
+846
+silent! normal! zo
+874
+silent! normal! zo
+908
+silent! normal! zo
+908
+silent! normal! zo
+908
 normal! zc
-let s:l = 297 - ((20 * winheight(0) + 30) / 61)
+908
+normal! zc
+let s:l = 223 - ((44 * winheight(0) + 25) / 50)
 if s:l < 1 | let s:l = 1 | endif
 exe s:l
 normal! zt
-297
-normal! 017|
+223
+normal! 09|
 tabnext 1
 if exists('s:wipebuf')
 "   silent exe 'bwipe ' . s:wipebuf

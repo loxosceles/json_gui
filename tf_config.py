@@ -2,6 +2,10 @@
 # -*- coding: utf-8 -*-
 
 ## imports
+
+# debugger
+import pudb
+
 import tkinter as tk
 from tkinter import ttk
 
@@ -157,7 +161,7 @@ class DataObject(object):
                 except KeyError as e:
                     self.json_dict_flat[path][label]['original_value'] = None
 
-                start, end = self.gen_value_coords(self.json_str, path_tuple)
+                start, end = self.gen_value_coords(path_tuple)
                 self.json_dict_flat[path][label]['coords'] = [start, end]
             else:
                 for key, value in d.items():
@@ -166,41 +170,100 @@ class DataObject(object):
         self.json_dict_flat.clear()
         gen_dict(self.json_dict)
 
-    def gen_value_coords(self, json_str, path):
-        """TODO: Docstring for function.
+    def gen_value_coords(self, path):
 
-        :arg1: TODO
-        :returns: TODO
+        def _create_dict(ds):
+            l = ds.split('\n')
+            return l, [x.lstrip() for x in l]
 
-        """
-        match_all = '([^}]|[^}]{[^}]*})*[^{]*'
-        se = ''
-        for i in range(len(path) - 1):
-            se += '"' + path[i] + '"' + match_all
+        def _count_array_length(l):
+            count = 0
+            for el in l:
+                count += 1
+                if el.endswith('],'):
+                    return count
 
-        se += '"' + path[-1] + '"' + ':\s*(\[[^}]*?\]|".*?"|\d+\.*\d*)'
+        def _findkey(l, t, lev=0, ind=0):
+            if ind == len(t):
+                return 1
+            else:
+                el = l[0]
+                try:
+                    if el.startswith('"' + t[ind]) and t.index(t[ind]) == lev:
+                        ind += 1
+                except IndexError as e:
+                    pass
 
-        s = re.compile(se, re.DOTALL)
-        match = s.search(self.json_str)
+                if "{" in el:
+                    lev += 1
+                if "}" in el:
+                    lev -= 1
+                return 1 + _findkey(l[1:], t, lev, ind)
 
-        start = self.calc_match_position(self.json_str, match.start(len(path)))
-        end = self.calc_match_position(self.json_str, match.end(len(path)))
+        l, ll = _create_dict(self.json_str) # l: list, ll: list (spaces stripped)
+
+        start_row  = _findkey(ll[1:], path)
+
+        idx = start_row - 1
+        start_col = l[idx].find(':') + 2
+
+
+        if l[idx].endswith('['):
+            end_row = _count_array_length(l[idx + 1:]) + start_row
+            #end_col = l[end_row - 1].find('],') + 2
+            end_col = start_col
+        else:# l[idx].endswith('"'):
+            end_row = start_row
+            end_col = len(l[idx]) - 1
+        #  else:
+        #      print("Something bad happend")
+
+        start = Decimal(start_row) + Decimal('0.' + str(start_col))
+        end  = Decimal(end_row) + Decimal('0.' + str(end_col))
+        #pu.db
+
         return start, end
 
-    def calc_match_position(self, string, match_index):
-        """
-        Calculates the positions of the matched value in the editor window.
-
-        :match:   matched string
-        :returns: position in the form of line.column
-        """
-        line = 1
-        for ln in REGEX_NL.finditer(string, 0, match_index):
-            line += 1
-
-        column = match_index - ln.start() - 1
-
-        return Decimal(line) + Decimal('0.' + str(column))
+    #  def gen_value_coords(self, path):
+    #      """TODO: Docstring for function.
+    #
+    #      :arg1: TODO
+    #      :returns: TODO
+    #
+    #      """
+    #      match_all = '([^}]|[^}]{[^}]*})*[^{]*'
+    #      se = ''
+    #      for i in range(len(path) - 1):
+    #          se += '"' + path[i] + '"' + match_all
+    #
+    #      se += '"' + path[-1] + '"' + ':\s*(\[[^}]*?\]|".*?"|\d+\.*\d*)'
+    #      print(se)
+    #      print(self.json_str)
+    #
+    #      s = re.compile(se, re.DOTALL)
+    #      match = s.search(self.json_str)
+    #
+    #      start = self.calc_match_position(self.json_str, match.start(len(path)))
+    #      end = self.calc_match_position(self.json_str, match.end(len(path)))
+    #      return start, end
+    #
+    #  def calc_match_position(self, match_index):
+    #      """
+    #      Calculates the positions of the matched value in the editor window.
+    #
+    #      :match:   matched string
+    #      :returns: position in the form of line.column
+    #      """
+    #      #  line = 1
+    #      #  for ln in REGEX_NL.finditer(string, 0, match_index):
+    #      #      line += 1
+    #
+    #      s = re.compile(t[-1] + ': (\s*(\[[^}]*?\]|".*?"|\d+\.*\d*))', re.DOTALL)
+    #      match = s.search(l[line - 1])
+    #
+    #      column = match_index - ln.start() - 1
+    #
+    #      return Decimal(line) + Decimal('0.' + str(column))
 
     def dyn_dict_get(self, flat_keys):
         try:
@@ -435,7 +498,8 @@ class KeyValueSection(ttk.Frame):
     def __init__(self, parent, *args, **kwargs):
         """TODO: to be defined1. """
         ttk.Frame.__init__(self, parent, *args, **kwargs)
-        self.frame = VerticalScrollFrame(self, (screen_height - (screen_height * 0.3)))
+        #self.frame = VerticalScrollFrame(self, (screen_height - (screen_height * 0.3)))
+        self.frame = VerticalScrollFrame(self, 630)
         self.parent = parent
         #  self.entry_list = []
 
