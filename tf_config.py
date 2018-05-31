@@ -209,13 +209,10 @@ class DataObject(object):
 
         if l[idx].endswith('['):
             end_row = _count_array_length(l[idx + 1:]) + start_row
-            #end_col = l[end_row - 1].find('],') + 2
             end_col = start_col
-        else:# l[idx].endswith('"'):
+        else:
             end_row = start_row
-            end_col = len(l[idx])# - 1
-        #  else:
-        #      print("Something bad happend")
+            end_col = len(l[idx])
 
         start = Decimal(start_row) + Decimal('0.' + str(start_col))
         end  = Decimal(end_row) + Decimal('0.' + str(end_col))
@@ -273,7 +270,6 @@ class DataObject(object):
     def node_list(self):
         node_set = OrderedSet()
         node_key_dict = OrderedDict()
-        #pu.db
 
         def get_list(d, path_tuple=tuple()):
             if not isinstance(d, dict):
@@ -294,6 +290,10 @@ class DataObject(object):
 
         get_list(self.json_dict)
         node_set.discard('')
+        #  print("Node set: ")
+        #  pprint.pprint(list(node_set))
+        #  print("Node key dict: ")
+        #  pprint.pprint(node_key_dict)
         return list(node_set), node_key_dict
 
     def is_field_dirty(self, flat_keys, value):
@@ -708,7 +708,8 @@ class CreateDialog(dialog_window.Dialog):
                  ).grid(row=0, column=0, sticky=tk.NW)
 
         # key list config and placement
-        nodes['values'] = (self.node_list)
+        list_items = [ ARROW_SYM.join(i) for i in self.node_list ]
+        nodes['values'] = list_items
         try:
             nodes.current(0)
         except tk.TclError as e:
@@ -817,7 +818,9 @@ class DeleteDialog(dialog_window.Dialog):
         ttk.Label(self.frame, style="id_label_style.TLabel", text="Node"
                  ).grid(row=0, column=0, sticky=tk.NW)
 
-        self.nodes['values'] = (self.node_list)
+        list_items = [ ARROW_SYM.join(i) for i in self.node_list ]
+        print(list_items)
+        self.nodes['values'] = list_items
         self.nodes.bind("<<ComboboxSelected>>", self._update_label_cb)
         self.nodes.bind("<FocusIn>", self._update_label_cb)
         self.nodes.focus_set()
@@ -830,7 +833,7 @@ class DeleteDialog(dialog_window.Dialog):
         self.key.grid(row=3, column=0, sticky=tk.NW)
 
     def apply(self):
-        node = tuple(self.nodes.get().strip().split(' '))
+        node = tuple(self.nodes.get().strip().split(ARROW_SYM))
         key = self.key.get().strip()
 
         if key:
@@ -841,7 +844,7 @@ class DeleteDialog(dialog_window.Dialog):
 
         self.parent.data_object.set_previous_textfield_length()
 
-        pu.db # debugger
+        #  pu.db # debugger
         self.parent.data_object.dyn_dict_delete(node)
 
         self.parent.data_object.gen_flat_key_dict()
@@ -857,8 +860,9 @@ class DeleteDialog(dialog_window.Dialog):
 
     def _update_label_cb(self, event=None):
         try:
-            self.key.config(values=self.node_labels[tuple(event.widget.get().split(' '))], state=tk.NORMAL)
+            self.key.config(values=self.node_labels[tuple(event.widget.get().split(ARROW_SYM))], state=tk.NORMAL)
             self.key.current(0)
+            self.key.config(state="readonly")
         except KeyError:
             self.key.set('')
             self.key.config(state=tk.DISABLED)

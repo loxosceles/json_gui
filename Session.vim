@@ -1,6 +1,6 @@
 " /mnt/DATA/__programming/PROJECTS/config_tool/Session.vim:
 " Vim session script.
-" Created by session.vim 2.13.1 on 30 Mai 2018 at 11:34:35.
+" Created by session.vim 2.13.1 on 30 Mai 2018 at 21:21:28.
 " Open this file in Vim and run :source % to restore your session.
 
 set guioptions=aegimrLtT
@@ -205,13 +205,13 @@ silent! normal! zE
 92,109fold
 110,139fold
 140,172fold
-173,224fold
-225,230fold
-231,247fold
-248,250fold
-251,261fold
-262,272fold
-273,298fold
+173,221fold
+222,227fold
+228,244fold
+245,247fold
+248,258fold
+259,269fold
+270,298fold
 299,312fold
 313,313fold
 313,315fold
@@ -244,30 +244,32 @@ silent! normal! zE
 563,651fold
 654,664fold
 665,689fold
-690,741fold
-742,756fold
-757,794fold
-795,801fold
-653,801fold
-803,803fold
-804,808fold
-809,831fold
-832,857fold
-858,865fold
-803,865fold
-867,867fold
-868,902fold
-903,905fold
-906,909fold
-910,912fold
-913,916fold
+690,742fold
+743,757fold
+758,795fold
+796,802fold
+653,802fold
+804,804fold
+805,809fold
+810,834fold
+835,860fold
+861,869fold
+804,869fold
+871,871fold
+872,906fold
+907,909fold
+910,913fold
+914,916fold
 917,920fold
-867,920fold
-867,921fold
-922,931fold
+921,924fold
+871,924fold
+871,925fold
+926,935fold
+31
+silent! normal! zo
 52
 silent! normal! zo
-173
+270
 silent! normal! zo
 313
 silent! normal! zo
@@ -293,26 +295,28 @@ silent! normal! zo
 normal! zc
 653
 silent! normal! zo
-757
+804
 silent! normal! zo
-803
+810
 silent! normal! zo
-832
+835
 silent! normal! zo
-867
+861
 silent! normal! zo
-867
+871
 silent! normal! zo
-867
+871
+silent! normal! zo
+871
 normal! zc
-867
+871
 normal! zc
-let s:l = 216 - ((36 * winheight(0) + 21) / 42)
+let s:l = 865 - ((33 * winheight(0) + 21) / 42)
 if s:l < 1 | let s:l = 1 | endif
 exe s:l
 normal! zt
-216
-normal! 034|
+865
+normal! 046|
 wincmd w
 2wincmd w
 exe 'vert 1resize ' . ((&columns * 25 + 53) / 107)
