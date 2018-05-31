@@ -45,7 +45,6 @@ SPLASHSCREEN_TEXT = \
         === Configuration Editor for Neuronal Networks ===
 """
 PROGRAM_NAME = 'Tensorflow Configuration Tool'
-REGEX_NL = re.compile('\n')
 ARROW_SYM = ' \u2799 '
 
 
@@ -78,12 +77,12 @@ class DataObject(object):
         return self._name
 
     @property
-    def previous_textfield_length(self):
+    def prev_tf_length(self):
         return self._textfield_length
 
     @property
-    def current_textfield_length(self):
-        return len(REGEX_NL.findall(self.json_str, re.DOTALL)) + 2
+    def curr_tf_length(self):
+        return len(self.json_str.split('\n'))
 
     @name.setter
     def name(self, name):
@@ -106,6 +105,41 @@ class DataObject(object):
         except ValueError as e:
             print("Decoding the JSON config file has failed. Please make sure the\
                     format is correct.")
+
+    def update_json_dict(self, value, flat_keys):
+
+        path = flat_keys[:-1]
+        label = flat_keys[-1]
+        fd_value = self.json_dict_flat[path][label]['buffered_value']
+
+        if isinstance(fd_value, int):
+            try:
+                value = int(value)
+            except ValueError:
+                value = ""
+        if isinstance(fd_value, float):
+            try:
+                value = float(value)
+            except ValueError:
+                value = ""
+        if isinstance(fd_value, list):
+            try:
+                value = [ int(x) for x in ' '.join(value.split()).split(' ') ]
+            except ValueError:
+                value = []
+
+        # set textfield field length before it changes (on save)
+        self.set_prev_tf_length()
+
+        # save previous value for column comparison
+        # FIXME: move this into flat_dict
+        self.previous_value = self.dyn_dict_get(flat_keys)
+
+        # save value to master dict
+        self.dyn_dict_set(value, flat_keys)
+
+        # call the update method of the editor
+        self.update_tags(value, flat_keys)
 
     def gen_file_dict(self):
         """ Parse json object recursivly and build a dictionary holding (flat)
@@ -227,22 +261,12 @@ class DataObject(object):
         except KeyError:
             pass
 
-    def dyn_dict_set(self, flat_keys, value):
+    def dyn_dict_set(self, value, flat_keys):
         dic = self.json_dict
 
         for key in flat_keys[:-1]:
             dic = dic.setdefault(key, {})
         dic[flat_keys[-1]] = value
-        #  try:
-        #      self.dyn_dict_get(flat_keys[:-1])[flat_keys[-1]] = value
-        #  except TypeError as e:
-        #      print(e)
-        #      reduce(operator.getitem, flat_keys[:-1], self.json_dict)
-        #  except KeyError:
-        #      print("Error")
-        #      self.dyn_dict_get(flat_keys[:-2])[flat_keys[-2]] = {}
-        #      self.dyn_dict_get(flat_keys[:-1])[flat_keys[-1]] = value
-        #  print(self.json_dict)
 
     def dyn_dict_delete(self, flat_keys):
         del self.dyn_dict_get(flat_keys[:-1])[flat_keys[-1]]
@@ -257,17 +281,6 @@ class DataObject(object):
         path = flat_keys[:-1]
         label = flat_keys[-1]
         return self.json_dict_flat[path][label]['coords'][position]
-
-    def get_value_dict_flat(self, flat_keys):
-        """TODO: Docstring for function.
-
-        :arg1: TODO
-        :returns: TODO
-
-        """
-        path = flat_keys[:-1]
-        label = flat_keys[-1]
-        return self.json_dict_flat[path][label]['buffered_value']
 
     def node_list(self):
         node_set = OrderedSet()
@@ -308,13 +321,45 @@ class DataObject(object):
         else:
             return False
 
-    def set_previous_textfield_length(self):
-        self._textfield_length = len(REGEX_NL.findall(self.json_str, re.DOTALL)) + 2
+    def set_prev_tf_length(self):
+        self._textfield_length = len(self.json_str.split('\n'))
 
     def clean_dirty_tags(self, flat_keys):
         for el in deepcopy(self.dirty_tags):
             if flat_keys == el[:len(flat_keys)]:
                 self.dirty_tags.discard(el)
+
+    def vh_update(self, value, v_shift, h_shift=0):
+        if h_shift != 0:
+            aux = list(map(lambda x: int(x), str(value).split('.')))
+            aux[0] = str(aux[0] + v_shift)
+            aux[1] = str(aux[1] + h_shift)
+            value = Decimal('.'.join(aux))
+        else:
+            value += v_shift
+        return value
+
+    def shift_positions(self, start_idx, v_shift, h_shift):
+        for obj in self.json_dict_flat.values():
+            for label in obj.values():
+                start_cds = label['coords'][0]
+                end_cds = label['coords'][1]
+                if end_cds == start_idx:
+                    label['coords'][1] = self.vh_update(end_cds, v_shift, h_shift)
+                elif start_cds > start_idx:
+                    label['coords'][0] = self.vh_update(start_cds, v_shift)
+                    label['coords'][1] = self.vh_update(end_cds, v_shift)
+
+    def update_tags(self, value, flat_keys):
+        line_diff = self.curr_tf_length - self.prev_tf_length
+        column_diff = len(str(value)) - len(str(self.previous_value))
+        end = self.get_coords(flat_keys, 1)
+
+        self.shift_positions(end, line_diff, column_diff)
+        self.dirty_tags.discard(flat_keys)
+
+        if self.is_field_dirty(flat_keys, value):
+            self.dirty_tags.add(flat_keys)
 
 
 class MenuBar(ttk.Frame):
@@ -361,6 +406,7 @@ class MenuBar(ttk.Frame):
         input_file_name = filedialog.askopenfilename(defaultextension=".json",
         filetypes=[("Configuration files", "*.json")])
         if input_file_name:
+            # FIXME: move to MainApplication
             self.parent.init_data_object()
             self.parent.data_object.name = input_file_name
             self.parent.set_title()
@@ -370,6 +416,7 @@ class MenuBar(ttk.Frame):
             self.parent.editor.textfield.insert(1.0, self.parent.data_object.json_str)
             self.parent.editor.textfield.configure(state=tk.DISABLED)
             self.parent.key_value_section.create_entry_widgets()
+        if self.parent.data_object.name:
             self.enable_menu_entries()
 
     def enable_menu_entries(self):
@@ -390,6 +437,7 @@ class MenuBar(ttk.Frame):
         if not self.parent.data_object.name:
             self.save_as()
         else:
+            # FIXME: move to data object
             self.write_to_file(self.parent.data_object.name)
             self.parent.data_object.dirty_tags.clear()
             self.parent.editor.refresh()
@@ -422,6 +470,7 @@ class MenuBar(ttk.Frame):
 
         """
 
+        # FIXME: move to data object
         try:
             content = self.parent.data_object.json_dict
             with open(file_name, 'w') as outfile:
@@ -517,52 +566,20 @@ class KeyValueSection(ttk.Frame):
 
                 entry.grid(row=k+1, column=j, sticky=tk.NW)
                 entry.bind("<FocusOut>", lambda event, flat_keys=(path + (key,)):
-                    self.buffer_entry_value(event, flat_keys))
+                    self.save_entry_value(event, flat_keys))
 
                 j, k = self._accomodate_rows(j, k)
 
-    def buffer_entry_value(self, event, flat_keys):
-        # FIXME: get position of event inside canvas
-
+    def save_entry_value(self, event, flat_keys):
         value = event.widget.get()
-
-        fd_value = self.parent.data_object.get_value_dict_flat(flat_keys)
-
-        if isinstance(fd_value, int):
-            try:
-                value = int(value)
-            except ValueError:
-                value = ""
-        if isinstance(fd_value, float):
-            try:
-                value = float(value)
-            except ValueError:
-                value = ""
-        if isinstance(fd_value, list):
-            try:
-                value = [ int(x) for x in ' '.join(value.split()).split(' ') ]
-            except ValueError:
-                value = []
-
-        # set textfield field length before it changes (on save)
-        self.parent.data_object.set_previous_textfield_length()
-
-        # save previous value for column comparison
-        # FIXME: Move this to data object
-        self.parent.data_object.previous_value = self.parent.data_object.dyn_dict_get(flat_keys)
-
-        # save value to master dict
-        self.parent.data_object.dyn_dict_set(flat_keys, value)
-
-        # call the update method of the editor
-        self.parent.editor.update_tags(value, flat_keys)
+        self.parent.data_object.update_json_dict(value, flat_keys)
+        self.parent.editor.refresh(flat_keys)
 
 
 class Editor(ttk.Frame):
-    def __init__(self, parent, data_object=None, *args, **kwargs):
+    def __init__(self, parent, *args, **kwargs):
         ttk.Frame.__init__(self, parent, *args, **kwargs)
         self.parent = parent
-        self.parent.data_object = parent.data_object
 
         # style variables
         self.splashscreen_width = 80
@@ -597,47 +614,7 @@ class Editor(ttk.Frame):
                 background="white", anchor=tk.CENTER, padding=50)
         self.splash.pack()
 
-    def vh_update(self, value, v_shift, h_shift=0):
-        if h_shift != 0:
-            aux = list(map(lambda x: int(x), str(value).split('.')))
-            aux[0] = str(aux[0] + v_shift)
-            aux[1] = str(aux[1] + h_shift)
-            value = Decimal('.'.join(aux))
-        else:
-            value += v_shift
-        return value
-
-    def shift_positions(self, d, start_idx, v_shift, h_shift):
-        for obj in d.values():
-            for label in obj.values():
-                start_cds = label['coords'][0]
-                end_cds = label['coords'][1]
-                if end_cds == start_idx:
-                    label['coords'][1] = self.vh_update(end_cds, v_shift, h_shift)
-                elif start_cds > start_idx:
-                    label['coords'][0] = self.vh_update(start_cds, v_shift)
-                    label['coords'][1] = self.vh_update(end_cds, v_shift)
-
-    def update_tags(self, value, flat_keys=None):
-        prev_tf_length = self.parent.data_object.previous_textfield_length
-        curr_tf_length = self.parent.data_object.current_textfield_length
-        line_diff = curr_tf_length - prev_tf_length
-        column_diff = len(str(value)) - len(str(self.parent.data_object.previous_value)) + 10
-
-
-        start = self.parent.data_object.get_coords(flat_keys, 0)
-        end = self.parent.data_object.get_coords(flat_keys, 1)
-
-        self.shift_positions(self.parent.data_object.json_dict_flat, end, line_diff, column_diff )
-        self.parent.data_object.dirty_tags.discard(flat_keys)
-
-        if self.parent.data_object.is_field_dirty(flat_keys, value):
-            self.parent.data_object.dirty_tags.add(flat_keys)
-
-        self.refresh()
-        self.textfield.see(end)
-
-    def refresh(self):
+    def refresh(self, flat_keys=None):
         self.textfield.configure(state=tk.NORMAL)
         self.textfield.delete(1.0, tk.END)
         self.textfield.insert(1.0, self.parent.data_object.json_str)
@@ -645,6 +622,10 @@ class Editor(ttk.Frame):
             self.textfield.tag_add('match', self.parent.data_object.get_coords(el, 0),
                                             self.parent.data_object.get_coords(el, 1))
         self.textfield.configure(state=tk.DISABLED)
+
+        if flat_keys:
+            end = self.parent.data_object.get_coords(flat_keys, 1)
+            self.parent.editor.textfield.see(end)
 
 
 class CreateDialog(dialog_window.Dialog):
@@ -760,7 +741,7 @@ class CreateDialog(dialog_window.Dialog):
         if not self.parent.data_object.dyn_dict_get(node):
             node = self.tab_widgets[active_tab][0].get().strip(),
 
-        key = self.tab_widgets[active_tab][2].get().strip()#.replace(' ', '_').lower()
+        key = self.tab_widgets[active_tab][2].get().strip()
         value = self.tab_widgets[active_tab][3].get()
 
         if active_tab == 0:
@@ -776,19 +757,20 @@ class CreateDialog(dialog_window.Dialog):
             value = value.strip() # strip spaces from string, left and right
 
         if self.checked.get() == 1:
-            object_key = self.tab_widgets[active_tab][1].get().strip()#.replace(' ', '_').lower()
+            object_key = self.tab_widgets[active_tab][1].get().strip()
             node = node + (object_key,)
 
         flat_keys =  (node + (key,))
 
-        self.parent.data_object.dyn_dict_set(flat_keys, value)
+        self.parent.data_object.dyn_dict_set(value, flat_keys)
 
         self.parent.data_object.gen_flat_key_dict()
 
         self.parent.key_value_section.create_entry_widgets()
 
-        self.parent.data_object.set_previous_textfield_length()
-        self.parent.editor.update_tags(value, flat_keys)
+        self.parent.data_object.set_prev_tf_length()
+        self.parent.data_object.update_tags(value, flat_keys)
+        self.parent.editor.refresh(flat_keys)
 
     def toggle_objectname_field(self, entry_widgets, checkbox):
         for ew in entry_widgets:
@@ -839,12 +821,9 @@ class DeleteDialog(dialog_window.Dialog):
         flat_keys =  node
         value = self.parent.data_object.dyn_dict_get(flat_keys)
 
-        self.parent.data_object.set_previous_textfield_length()
-
+        self.parent.data_object.set_prev_tf_length()
         self.parent.data_object.dyn_dict_delete(node)
-
         self.parent.data_object.gen_flat_key_dict()
-
         self.parent.key_value_section.create_entry_widgets()
         self.parent.data_object.clean_dirty_tags(flat_keys)
         self.parent.editor.refresh()

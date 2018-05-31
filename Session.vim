@@ -1,6 +1,6 @@
 " /mnt/DATA/__programming/PROJECTS/config_tool/Session.vim:
 " Vim session script.
-" Created by session.vim 2.13.1 on 30 Mai 2018 at 22:15:17.
+" Created by session.vim 2.13.1 on 31 Mai 2018 at 00:06:09.
 " Open this file in Vim and run :source % to restore your session.
 
 set guioptions=aegimrLtT
@@ -194,127 +194,121 @@ setlocal fen
 silent! normal! zE
 1,2fold
 4,30fold
-31,50fold
-53,54fold
-55,65fold
-67,75fold
-77,79fold
-81,83fold
-85,87fold
-89,91fold
-92,109fold
-110,139fold
-140,172fold
-173,223fold
-224,229fold
-230,246fold
-247,249fold
-250,260fold
-261,271fold
-272,296fold
-297,310fold
-311,311fold
-311,313fold
-314,314fold
-314,318fold
-314,318fold
-52,318fold
-321,359fold
-360,374fold
-375,379fold
-380,397fold
-398,416fold
-417,431fold
-432,440fold
-441,449fold
-320,449fold
-452,453fold
-454,464fold
-465,472fold
-473,523fold
-524,559fold
-451,559fold
-561,561fold
-562,581fold
-582,599fold
-600,609fold
-610,620fold
-621,639fold
-640,648fold
-561,648fold
-651,661fold
-662,686fold
-687,739fold
-740,754fold
-755,792fold
-793,799fold
-650,799fold
-801,801fold
-802,806fold
-807,831fold
-832,851fold
-852,860fold
-801,860fold
-862,862fold
-863,897fold
-898,900fold
-901,904fold
-905,907fold
-908,911fold
-912,915fold
-862,915fold
-862,916fold
-917,926fold
-52
+31,49fold
+52,53fold
+54,64fold
+66,74fold
+76,78fold
+80,82fold
+84,86fold
+88,90fold
+91,108fold
+109,143fold
+144,173fold
+174,206fold
+207,257fold
+258,263fold
+264,270fold
+271,273fold
+274,284fold
+285,309fold
+310,323fold
+324,324fold
+324,326fold
+327,327fold
+327,331fold
+327,331fold
+51,331fold
+332,341fold
+342,352fold
+353,363fold
+366,404fold
+405,421fold
+422,426fold
+427,445fold
+446,464fold
+465,480fold
+481,489fold
+490,498fold
+365,498fold
+501,502fold
+503,513fold
+514,521fold
+522,572fold
+573,577fold
+500,577fold
+579,579fold
+580,598fold
+600,600fold
+599,616fold
+617,629fold
+632,642fold
+643,667fold
+668,720fold
+721,735fold
+736,774fold
+775,781fold
+631,781fold
+783,783fold
+784,788fold
+789,813fold
+814,830fold
+831,839fold
+783,839fold
+841,841fold
+842,876fold
+877,879fold
+880,883fold
+884,886fold
+887,890fold
+891,894fold
+841,894fold
+841,894fold
+896,905fold
+51
 silent! normal! zo
-311
+324
 silent! normal! zo
-311
+324
 normal! zc
-314
+327
 silent! normal! zo
-314
+327
 silent! normal! zo
-314
+327
 normal! zc
-320
+365
 silent! normal! zo
-320
+405
+silent! normal! zo
+500
+silent! normal! zo
+503
+silent! normal! zo
+599
+silent! normal! zo
+599
 normal! zc
-451
+631
 silent! normal! zo
-524
+736
 silent! normal! zo
-561
+783
 silent! normal! zo
-582
-silent! normal! zo
-600
-silent! normal! zo
-610
-silent! normal! zo
-621
-silent! normal! zo
-650
-silent! normal! zo
-755
-silent! normal! zo
-801
-silent! normal! zo
-862
-silent! normal! zo
-862
-silent! normal! zo
-862
+783
 normal! zc
-862
+841
+silent! normal! zo
+841
+silent! normal! zo
+841
 normal! zc
-let s:l = 587 - ((34 * winheight(0) + 21) / 42)
+let s:l = 741 - ((238 * winheight(0) + 21) / 42)
 if s:l < 1 | let s:l = 1 | endif
 exe s:l
 normal! zt
-587
-normal! 09|
+741
+normal! 016|
 wincmd w
 2wincmd w
 exe 'vert 1resize ' . ((&columns * 25 + 53) / 107)
