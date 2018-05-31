@@ -201,6 +201,8 @@ class DataObject(object):
                 return 1 + _findkey(l[1:], t, lev, ind)
 
         l, ll = _create_dict(self.json_str) # l: list, ll: list (spaces stripped)
+        #  print("ll: ", ll)
+        #  print("json dict: ", self.json_dict)
 
         start_row  = _findkey(ll[1:], path)
 
@@ -290,10 +292,6 @@ class DataObject(object):
 
         get_list(self.json_dict)
         node_set.discard('')
-        #  print("Node set: ")
-        #  pprint.pprint(list(node_set))
-        #  print("Node key dict: ")
-        #  pprint.pprint(node_key_dict)
         return list(node_set), node_key_dict
 
     def is_field_dirty(self, flat_keys, value):
@@ -624,7 +622,6 @@ class Editor(ttk.Frame):
         prev_tf_length = self.parent.data_object.previous_textfield_length
         curr_tf_length = self.parent.data_object.current_textfield_length
         line_diff = curr_tf_length - prev_tf_length
-        #FIXME: + 10 should not be necessary (but without it some brackets aren't marked consistently in red)
         column_diff = len(str(value)) - len(str(self.parent.data_object.previous_value)) + 10
 
 
@@ -758,7 +755,7 @@ class CreateDialog(dialog_window.Dialog):
     def apply(self):
         active_tab = self.n.index(self.n.select())
 
-        node = tuple(self.tab_widgets[active_tab][0].get().strip().split(' '))
+        node = tuple(self.tab_widgets[active_tab][0].get().strip().split())
 
         if not self.parent.data_object.dyn_dict_get(node):
             node = self.tab_widgets[active_tab][0].get().strip(),
@@ -844,18 +841,12 @@ class DeleteDialog(dialog_window.Dialog):
 
         self.parent.data_object.set_previous_textfield_length()
 
-        #  pu.db # debugger
         self.parent.data_object.dyn_dict_delete(node)
 
         self.parent.data_object.gen_flat_key_dict()
 
         self.parent.key_value_section.create_entry_widgets()
-        print("Dirty tags before discard: \n", self.parent.data_object.dirty_tags)
-        #  self.parent.data_object.dirty_tags.discard(flat_keys)
         self.parent.data_object.clean_dirty_tags(flat_keys)
-        print("Flat keys: \n", flat_keys)
-        #  print("Value: ", value)
-        print("Dirty tags: \n", self.parent.data_object.dirty_tags)
         self.parent.editor.refresh()
 
     def _update_label_cb(self, event=None):
