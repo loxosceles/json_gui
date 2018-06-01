@@ -97,7 +97,9 @@ class Dialog(tk.Toplevel):
         pass # override
     def _calc_cb_length(self):
         upper = 40
-        lower = 10
-        return max(min(max([ len(''.join(x)) + 1
-            for x in self.node_list ]) - 6, upper), lower)
-
+        lower = 20
+        if self.node_list:
+            return max(min(max([ len(''.join(x)) + 1
+                for x in self.node_list ]), upper), lower)
+        else:
+            return lower

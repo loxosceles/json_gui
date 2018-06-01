@@ -1,0 +1,1 @@
+{"sample_obj": {"string": "some_strings", "nested_sample_obj": {"some_array": [77, 31, 233], "sind_e": {}}}, "train_input_fn": {"batch_size": 100, "num_epochs": "None", "shuffle": "True"}}

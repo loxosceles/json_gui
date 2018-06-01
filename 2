@@ -238,6 +238,8 @@ class DataObject(object):
                 return 1 + _findkey(l[1:], t, lev, ind)
 
         l, ll = _create_dict(self.json_str) # l: list, ll: list (spaces stripped)
+        #  print("ll: ", ll)
+        #  print("json dict: ", self.json_dict)
 
         start_row  = _findkey(ll[1:], path)
         idx = start_row - 1
@@ -512,7 +514,7 @@ class KeyValueSection(ttk.Frame):
             k +=2
             return 0, k
 
-    def create_entry_widgets(self, jdf_nodes):
+    def create_entry_widgets(self):
         """Update the key-value section with entry fields."""
 
         self.label_style = ttk.Style()
@@ -522,17 +524,18 @@ class KeyValueSection(ttk.Frame):
                           font=('Arial', 10, 'bold')
                           )
 
-        self.parent.destroy_splash()
+        self.parent.editor.splash.destroy()
+        self.parent.editor.textfield.configure(width=self.parent.editor.textfield_width)
 
         self.frame.destroy()
         self.frame = VerticalScrollFrame(self, (screen_height - (screen_height * 0.3)))
         self.frame.grid(row=0, column=0, sticky=tk.NSEW)
 
-        for i, (path, label) in enumerate(jdf_nodes, 1):
+        for i, (path, label) in enumerate(self.parent.data_object.json_dict_flat.items(), 1):
             frame = ttk.Frame(self.frame.interior)
             frame.grid(row=i, column=0, padx='20', sticky=tk.NSEW)
             ttk.Label(frame, style="label_style.TLabel",
-                      text=('\n' + ARROW_SYM + ' ').join(path)
+                      text=(' ' + ARROW_SYM + ' ').join(path)
                   ).grid(row=0, column=0, columnspan=2, sticky=tk.NW)
 
             j = 0
@@ -564,7 +567,7 @@ class KeyValueSection(ttk.Frame):
 
     def save_entry_value(self, event, flat_keys):
         value = event.widget.get()
-        self.parent.update_json_dict(value, flat_keys)
+        self.parent.data_object.update_json_dict(value, flat_keys)
         self.parent.refresh_editor(flat_keys)
 
 
@@ -586,7 +589,6 @@ class Editor(ttk.Frame):
 
         self.startup_screen.set(SPLASHSCREEN_TEXT)
         self.create_textfield()
-        self.create_splash()
         self.textfield.tag_config('match', foreground='red')
 
     def create_textfield(self):
@@ -600,7 +602,6 @@ class Editor(ttk.Frame):
         self.textfield.pack(fill=tk.BOTH, expand=1)
         self.scrollbar.config(command=self.textfield.yview)
 
-    def create_splash(self):
         self.splash_style = ttk.Style()
         self.splash = ttk.Label(self.textfield, textvariable=self.startup_screen,
                 style="SPLASH.TLabel")
@@ -608,16 +609,7 @@ class Editor(ttk.Frame):
                 background="white", anchor=tk.CENTER, padding=50)
         self.splash.pack()
 
-    def destroy_splash(self):
-        self.splash.destroy()
-
-    def insert(self, string):
-        self.textfield.configure(state=tk.NORMAL)
-        self.textfield.delete(1.0, tk.END)
-        self.textfield.insert(1.0, string)
-        self.textfield.configure(state=tk.DISABLED)
-
-    def refresh(self, string, dtags, end=None):
+    def refresh(self, string, dtags, flat_keys=None):
         self.textfield.configure(state=tk.NORMAL)
         self.textfield.delete(1.0, tk.END)
         self.textfield.insert(1.0, string)
@@ -627,11 +619,9 @@ class Editor(ttk.Frame):
 
         self.textfield.configure(state=tk.DISABLED)
 
-        if end:
+        if flat_keys:
+            end = self.parent.data_object.get_coords(flat_keys, 1)
             self.parent.editor.textfield.see(end)
-
-    def adjust_textfield(self):
-        self.textfield.configure(width=self.textfield_width)
 
 
 class CreateDialog(dialog_window.Dialog):
@@ -766,7 +756,7 @@ class CreateDialog(dialog_window.Dialog):
 
         self.parent.data_object.gen_flat_key_dict()
 
-        self.parent.create_entry_widgets()
+        self.parent.key_value_section.create_entry_widgets()
 
         self.parent.data_object.set_prev_tf_length()
         self.parent.data_object.update_tags(value, flat_keys)
@@ -819,10 +809,12 @@ class DeleteDialog(dialog_window.Dialog):
             node = node + (key,)
 
         flat_keys =  node
+        #  value = self.parent.data_object.dyn_dict_get(flat_keys)
+
         self.parent.data_object.set_prev_tf_length()
         self.parent.data_object.dyn_dict_delete(node)
         self.parent.data_object.gen_flat_key_dict()
-        self.parent.create_entry_widgets()
+        self.parent.key_value_section.create_entry_widgets()
         self.parent.data_object.clean_dirty_tags(flat_keys)
         self.parent.refresh_editor()
 
@@ -874,13 +866,15 @@ class MainApplication(ttk.Frame):
 
     def init_data_object(self, file_name=None):
         self.data_object = DataObject()
-
         if file_name:
             self.data_object.name = file_name
             self.set_title()
+            self.editor.textfield.configure(state=tk.NORMAL)
+            self.editor.textfield.delete(1.0, tk.END)
             self.data_object.import_file(file_name)
-            self.editor.insert(self.data_object.json_str)
-            self.create_entry_widgets()
+            self.editor.textfield.insert(1.0, self.data_object.json_str)
+            self.editor.textfield.configure(state=tk.DISABLED)
+            self.key_value_section.create_entry_widgets()
 
     def set_title(self):
         self.parent.title('{} - {}'.format(os.path.basename(
@@ -889,24 +883,16 @@ class MainApplication(ttk.Frame):
     def set_do_name(self, file_name):
         self.data_object.name = file_name
 
-    def update_json_dict(self, value, flat_keys):
-        self.data_object.update_json_dict(value, flat_keys)
-
     def clear_do_tags(self):
         self.data_object.dirty_tags.clear()
 
     def refresh_editor(self, flat_keys=None):
         dtags = []
-
         for fkey in self.data_object.dirty_tags:
             dtags.append([self.data_object.get_coords(fkey, 0),
                           self.data_object.get_coords(fkey, 1)])
 
-        try:
-            end = self.data_object.get_coords(flat_keys, 1)
-            self.editor.refresh(self.data_object.json_str, dtags, end)
-        except TypeError:
-            self.editor.refresh(self.data_object.json_str, dtags)
+        self.editor.refresh(self.data_object.json_str, dtags, flat_keys)
 
     def quit_editor(self, event=None):
         self.parent.destroy()
@@ -922,8 +908,10 @@ class MainApplication(ttk.Frame):
     def write_to_file(self):
         """Write current json_dict to file
 
+        :arg1: TODO
         :returns: None
         """
+
         try:
             content = self.data_object.json_dict
             file_name = self.data_object.name
@@ -932,14 +920,6 @@ class MainApplication(ttk.Frame):
                 json.dump(content, outfile)
         except IOError:
             pass
-
-    def create_entry_widgets(self):
-        jdf_nodes = self.data_object.json_dict_flat.items()
-        self.key_value_section.create_entry_widgets(jdf_nodes)
-
-    def destroy_splash(self):
-        self.editor.destroy_splash()
-        self.editor.adjust_textfield()
 
 
 if __name__ == "__main__":

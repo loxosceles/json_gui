@@ -1,6 +1,6 @@
 " /mnt/DATA/__programming/PROJECTS/config_tool/Session.vim:
 " Vim session script.
-" Created by session.vim 2.13.1 on 31 Mai 2018 at 00:06:09.
+" Created by session.vim 2.13.1 on 01 Juni 2018 at 00:54:07.
 " Open this file in Vim and run :source % to restore your session.
 
 set guioptions=aegimrLtT
@@ -155,7 +155,7 @@ if expand('%') == '' && !&modified && line('$') <= 1 && getline(1) == ''
   let s:wipebuf = bufnr('%')
 endif
 set shortmess=aoO
-badd +460 tf_config.py
+badd +797 tf_config.py
 argglobal
 silent! argdel *
 edit tf_config.py
@@ -168,8 +168,8 @@ set nosplitbelow
 set nosplitright
 wincmd t
 set winminheight=1 winheight=1 winminwidth=1 winwidth=1
-exe 'vert 1resize ' . ((&columns * 25 + 53) / 107)
-exe 'vert 2resize ' . ((&columns * 81 + 53) / 107)
+exe 'vert 1resize ' . ((&columns * 25 + 84) / 168)
+exe 'vert 2resize ' . ((&columns * 142 + 84) / 168)
 argglobal
 enew
 " file NERD_tree_1
@@ -202,11 +202,13 @@ silent! normal! zE
 80,82fold
 84,86fold
 88,90fold
-91,108fold
-109,143fold
-144,173fold
-174,206fold
-207,257fold
+91,93fold
+94,96fold
+97,112fold
+113,147fold
+148,177fold
+178,209fold
+210,257fold
 258,263fold
 264,270fold
 271,273fold
@@ -218,53 +220,69 @@ silent! normal! zE
 327,327fold
 327,331fold
 327,331fold
-51,331fold
 332,341fold
 342,352fold
 353,363fold
+51,363fold
 366,404fold
-405,421fold
-422,426fold
-427,445fold
-446,464fold
-465,480fold
-481,489fold
-490,498fold
-365,498fold
-501,502fold
-503,513fold
-514,521fold
-522,572fold
-573,577fold
-500,577fold
-579,579fold
-580,598fold
-600,600fold
-599,616fold
-617,629fold
-632,642fold
-643,667fold
-668,720fold
-721,735fold
-736,774fold
+405,415fold
+416,421fold
+423,427fold
+422,432fold
+434,438fold
+433,451fold
+453,457fold
+452,473fold
+474,482fold
+483,491fold
+365,491fold
+494,495fold
+496,506fold
+507,514fold
+515,564fold
+565,569fold
+493,569fold
+572,591fold
+593,593fold
+592,602fold
+603,610fold
+611,613fold
+614,619fold
+620,632fold
+633,635fold
+571,635fold
+571,635fold
+638,645fold
+646,670fold
+671,723fold
+724,738fold
+739,774fold
 775,781fold
-631,781fold
+637,781fold
 783,783fold
 784,788fold
 789,813fold
-814,830fold
-831,839fold
-783,839fold
-841,841fold
-842,876fold
-877,879fold
-880,883fold
-884,886fold
-887,890fold
-891,894fold
-841,894fold
-841,894fold
-896,905fold
+814,828fold
+829,837fold
+783,837fold
+839,839fold
+840,874fold
+875,884fold
+885,888fold
+889,891fold
+892,894fold
+895,897fold
+898,910fold
+898,910fold
+911,913fold
+914,917fold
+918,921fold
+839,921fold
+922,935fold
+936,939fold
+940,943fold
+839,943fold
+945,954fold
 51
 silent! normal! zo
 324
@@ -277,42 +295,58 @@ silent! normal! zo
 silent! normal! zo
 327
 normal! zc
+51
+normal! zc
 365
 silent! normal! zo
-405
+422
 silent! normal! zo
-500
-silent! normal! zo
-503
-silent! normal! zo
-599
-silent! normal! zo
-599
+422
 normal! zc
-631
+433
 silent! normal! zo
-736
+433
+normal! zc
+452
 silent! normal! zo
+452
+normal! zc
+493
+silent! normal! zo
+571
+silent! normal! zo
+571
+silent! normal! zo
+592
+silent! normal! zo
+592
+normal! zc
+571
+normal! zc
+637
+silent! normal! zo
+637
+normal! zc
 783
 silent! normal! zo
 783
 normal! zc
-841
+839
 silent! normal! zo
-841
+839
 silent! normal! zo
-841
-normal! zc
-let s:l = 741 - ((238 * winheight(0) + 21) / 42)
+898
+silent! normal! zo
+let s:l = 839 - ((838 * winheight(0) + 25) / 50)
 if s:l < 1 | let s:l = 1 | endif
 exe s:l
 normal! zt
-741
-normal! 016|
+839
+normal! 0
 wincmd w
 2wincmd w
-exe 'vert 1resize ' . ((&columns * 25 + 53) / 107)
-exe 'vert 2resize ' . ((&columns * 81 + 53) / 107)
+exe 'vert 1resize ' . ((&columns * 25 + 84) / 168)
+exe 'vert 2resize ' . ((&columns * 142 + 84) / 168)
 tabnext 1
 if exists('s:wipebuf')
 "   silent exe 'bwipe ' . s:wipebuf
@@ -342,7 +376,7 @@ if !getbufvar(s:bufnr_save, '&modified')
   endif
 endif
 execute "cd" fnameescape(s:cwd_save)
-1resize 42|vert 1resize 25|2resize 42|vert 2resize 81|
+1resize 50|vert 1resize 25|2resize 50|vert 2resize 142|
 2wincmd w
 tabnext 1
 if exists('s:wipebuf')
