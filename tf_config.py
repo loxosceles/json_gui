@@ -363,6 +363,20 @@ class DataObject(object):
 
 
 class MenuBar(ttk.Frame):
+
+    """
+    Define namespace, styling and method calls of the menubar.
+
+    The menubar hosts the usual file, edit, about, and other menus with their
+    corresponding sub-menus. All sub-menu entries trigger callbacks which can bundle
+    information and call a method of the main applications (if necessary).
+    Methods inside the menubar are not designed to execute much of the application
+    logic, but rather passing events and received user interaction down to the main
+    application. The main application takes care of recollecting information from
+    other GUI elements and/or the data object.
+
+    """
+
     def __init__(self, parent, *args, **kwargs):
         ttk.Frame.__init__(self, parent, *args, **kwargs)
         self.parent = parent

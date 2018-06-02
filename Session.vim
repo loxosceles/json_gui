@@ -1,6 +1,6 @@
 " /mnt/DATA/__programming/PROJECTS/config_tool/Session.vim:
 " Vim session script.
-" Created by session.vim 2.13.1 on 01 Juni 2018 at 00:54:07.
+" Created by session.vim 2.13.1 on 02 Juni 2018 at 00:23:04.
 " Open this file in Vim and run :source % to restore your session.
 
 set guioptions=aegimrLtT
@@ -160,28 +160,10 @@ argglobal
 silent! argdel *
 edit tf_config.py
 set splitbelow splitright
-wincmd _ | wincmd |
-vsplit
-1wincmd h
-wincmd w
 set nosplitbelow
 set nosplitright
 wincmd t
 set winminheight=1 winheight=1 winminwidth=1 winwidth=1
-exe 'vert 1resize ' . ((&columns * 25 + 84) / 168)
-exe 'vert 2resize ' . ((&columns * 142 + 84) / 168)
-argglobal
-enew
-" file NERD_tree_1
-setlocal fdm=manual
-setlocal fde=0
-setlocal fmr={{{,}}}
-setlocal fdi=#
-setlocal fdl=0
-setlocal fml=1
-setlocal fdn=20
-setlocal nofen
-wincmd w
 argglobal
 setlocal fdm=manual
 setlocal fde=0
@@ -224,65 +206,67 @@ silent! normal! zE
 342,352fold
 353,363fold
 51,363fold
-366,404fold
-405,415fold
-416,421fold
-423,427fold
-422,432fold
-434,438fold
-433,451fold
-453,457fold
-452,473fold
-474,482fold
-483,491fold
-365,491fold
-494,495fold
-496,506fold
-507,514fold
-515,564fold
-565,569fold
-493,569fold
-572,591fold
-593,593fold
-592,602fold
-603,610fold
-611,613fold
-614,619fold
-620,632fold
-633,635fold
-571,635fold
-571,635fold
-638,645fold
-646,670fold
-671,723fold
-724,738fold
-739,774fold
-775,781fold
-637,781fold
-783,783fold
-784,788fold
-789,813fold
-814,828fold
-829,837fold
-783,837fold
-839,839fold
-840,874fold
-875,884fold
-885,888fold
-889,891fold
-892,894fold
-895,897fold
-898,910fold
-898,910fold
-911,913fold
-914,917fold
-918,921fold
-839,921fold
-922,935fold
-936,939fold
-940,943fold
-839,943fold
-945,954fold
+380,418fold
+419,429fold
+430,435fold
+437,441fold
+436,446fold
+448,452fold
+447,465fold
+467,471fold
+466,487fold
+488,496fold
+497,505fold
+368,505fold
+366,505fold
+365,505fold
+508,509fold
+510,520fold
+521,528fold
+529,578fold
+579,583fold
+507,583fold
+586,605fold
+607,607fold
+606,616fold
+617,624fold
+625,627fold
+628,633fold
+634,646fold
+647,649fold
+585,649fold
+585,649fold
+652,659fold
+660,684fold
+685,737fold
+738,752fold
+753,788fold
+789,795fold
+651,795fold
+797,797fold
+798,802fold
+803,827fold
+828,842fold
+843,851fold
+797,851fold
+853,853fold
+854,888fold
+889,898fold
+899,902fold
+903,905fold
+906,908fold
+909,911fold
+912,924fold
+912,924fold
+925,927fold
+928,931fold
+932,935fold
+853,935fold
+936,949fold
+950,953fold
+954,957fold
+853,957fold
+959,968fold
 51
 silent! normal! zo
 324
@@ -299,54 +283,56 @@ normal! zc
 normal! zc
 365
 silent! normal! zo
-422
+366
 silent! normal! zo
-422
+368
+silent! normal! zo
+436
+silent! normal! zo
+436
 normal! zc
-433
+447
 silent! normal! zo
-433
+447
 normal! zc
-452
+466
 silent! normal! zo
-452
+466
 normal! zc
-493
+507
 silent! normal! zo
-571
+585
 silent! normal! zo
-571
+585
 silent! normal! zo
-592
+606
 silent! normal! zo
-592
+606
 normal! zc
-571
+585
 normal! zc
-637
+651
 silent! normal! zo
-637
+651
 normal! zc
-783
+797
 silent! normal! zo
-783
+797
 normal! zc
-839
+853
 silent! normal! zo
-839
+853
 silent! normal! zo
-898
+853
 silent! normal! zo
-let s:l = 839 - ((838 * winheight(0) + 25) / 50)
+912
+silent! normal! zo
+let s:l = 366 - ((365 * winheight(0) + 21) / 42)
 if s:l < 1 | let s:l = 1 | endif
 exe s:l
 normal! zt
-839
+366
 normal! 0
-wincmd w
-2wincmd w
-exe 'vert 1resize ' . ((&columns * 25 + 84) / 168)
-exe 'vert 2resize ' . ((&columns * 142 + 84) / 168)
 tabnext 1
 if exists('s:wipebuf')
 "   silent exe 'bwipe ' . s:wipebuf
@@ -365,19 +351,6 @@ let &so = s:so_save | let &siso = s:siso_save
 " by :mksession out of the box).
 
 1wincmd w
-tabnext 1
-let s:bufnr_save = bufnr("%")
-let s:cwd_save = getcwd()
-NERDTree /mnt/DATA/__programming/PROJECTS/config_tool
-if !getbufvar(s:bufnr_save, '&modified')
-  let s:wipebuflines = getbufline(s:bufnr_save, 1, '$')
-  if len(s:wipebuflines) <= 1 && empty(get(s:wipebuflines, 0, ''))
-    silent execute 'bwipeout' s:bufnr_save
-  endif
-endif
-execute "cd" fnameescape(s:cwd_save)
-1resize 50|vert 1resize 25|2resize 50|vert 2resize 142|
-2wincmd w
 tabnext 1
 if exists('s:wipebuf')
   if empty(bufname(s:wipebuf))
