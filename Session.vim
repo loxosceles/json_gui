@@ -1,6 +1,6 @@
 " /mnt/DATA/__programming/PROJECTS/config_tool/Session.vim:
 " Vim session script.
-" Created by session.vim 2.13.1 on 02 Juni 2018 at 00:23:04.
+" Created by session.vim 2.13.1 on 03 Juni 2018 at 17:24:14.
 " Open this file in Vim and run :source % to restore your session.
 
 set guioptions=aegimrLtT
@@ -207,66 +207,68 @@ silent! normal! zE
 353,363fold
 51,363fold
 380,418fold
-419,429fold
-430,435fold
-437,441fold
-436,446fold
-448,452fold
-447,465fold
-467,471fold
-466,487fold
-488,496fold
-497,505fold
-368,505fold
-366,505fold
-365,505fold
-508,509fold
-510,520fold
-521,528fold
-529,578fold
-579,583fold
-507,583fold
-586,605fold
-607,607fold
-606,616fold
-617,624fold
-625,627fold
-628,633fold
-634,646fold
-647,649fold
-585,649fold
-585,649fold
-652,659fold
-660,684fold
-685,737fold
-738,752fold
-753,788fold
-789,795fold
-651,795fold
-797,797fold
-798,802fold
-803,827fold
-828,842fold
-843,851fold
-797,851fold
-853,853fold
-854,888fold
-889,898fold
-899,902fold
-903,905fold
-906,908fold
-909,911fold
-912,924fold
-912,924fold
-925,927fold
-928,931fold
-932,935fold
-853,935fold
-936,949fold
-950,953fold
-954,957fold
-853,957fold
-959,968fold
+419,430fold
+431,437fold
+439,443fold
+438,448fold
+450,454fold
+449,467fold
+469,473fold
+468,489fold
+490,493fold
+494,497fold
+368,497fold
+366,497fold
+365,497fold
+500,501fold
+502,512fold
+513,520fold
+521,570fold
+571,575fold
+499,575fold
+578,597fold
+599,599fold
+598,608fold
+609,616fold
+617,619fold
+620,625fold
+626,638fold
+639,641fold
+577,641fold
+577,641fold
+644,651fold
+652,676fold
+677,729fold
+730,744fold
+745,780fold
+781,787fold
+643,787fold
+789,789fold
+790,794fold
+795,819fold
+820,834fold
+835,843fold
+789,843fold
+845,845fold
+846,880fold
+881,890fold
+891,894fold
+895,897fold
+898,900fold
+901,903fold
+904,916fold
+904,916fold
+917,919fold
+920,923fold
+924,927fold
+845,927fold
+928,941fold
+942,945fold
+946,949fold
+845,949fold
+951,960fold
+31
+silent! normal! zo
 51
 silent! normal! zo
 324
@@ -287,51 +289,63 @@ silent! normal! zo
 silent! normal! zo
 368
 silent! normal! zo
-436
+438
 silent! normal! zo
-436
+438
 normal! zc
-447
+449
 silent! normal! zo
-447
+449
 normal! zc
-466
+468
 silent! normal! zo
-466
+468
 normal! zc
-507
+494
 silent! normal! zo
-585
+499
 silent! normal! zo
-585
+500
 silent! normal! zo
-606
+502
 silent! normal! zo
-606
+577
+silent! normal! zo
+577
+silent! normal! zo
+598
+silent! normal! zo
+598
 normal! zc
-585
+639
+silent! normal! zo
+643
+silent! normal! zo
+643
 normal! zc
-651
+789
 silent! normal! zo
-651
+789
 normal! zc
-797
+845
 silent! normal! zo
-797
-normal! zc
-853
+845
 silent! normal! zo
-853
+845
 silent! normal! zo
-853
+846
 silent! normal! zo
-912
+904
 silent! normal! zo
-let s:l = 366 - ((365 * winheight(0) + 21) / 42)
+942
+silent! normal! zo
+946
+silent! normal! zo
+let s:l = 854 - ((65 * winheight(0) + 25) / 51)
 if s:l < 1 | let s:l = 1 | endif
 exe s:l
 normal! zt
-366
+854
 normal! 0
 tabnext 1
 if exists('s:wipebuf')

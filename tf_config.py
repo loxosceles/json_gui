@@ -142,7 +142,7 @@ class DataObject(object):
         # save value to master dict
         self.dyn_dict_set(value, flat_keys)
 
-        # call the update method of the editor
+        # call the update method of the monitor
         self.update_tags(value, flat_keys)
 
     def gen_file_dict(self):
@@ -417,6 +417,7 @@ class MenuBar(ttk.Frame):
         self.menubar.add_cascade(label='About', menu=self.about_menu)
 
     def set_file_submenus(self):
+        """Enable/disable file menu entries depending on data object state."""
         if self.parent.data_object.is_live() and not self.parent.data_object.is_empty():
             self.file_menu.entryconfig('Save', state=tk.NORMAL)
             self.file_menu.entryconfig('Save as..', state=tk.NORMAL)
@@ -428,6 +429,7 @@ class MenuBar(ttk.Frame):
             self.file_menu.entryconfig('Save as..', state=tk.DISABLED)
 
     def set_edit_submenus(self, event=None):
+        """Enable/disable edit menu entries depending on data object state."""
         if not self.parent.data_object.is_empty():
             self.edit_menu.entryconfig('Delete Object', state=tk.NORMAL)
         else:
@@ -460,7 +462,7 @@ class MenuBar(ttk.Frame):
         else:
             self.parent.write_to_file()
             self.parent.clear_do_tags()
-            self.parent.refresh_editor()
+            self.parent.refresh_monitor()
         return "break"
 
     def save_as(self, event=None):
@@ -482,29 +484,19 @@ class MenuBar(ttk.Frame):
             self.parent.write_to_file()
             self.parent.set_title()
             self.parent.clear_do_tags()
-            self.parent.refresh_editor()
+            self.parent.refresh_monitor()
             return "break"
 
     def add_object(self, event=None):
-        """TODO: Docstring for .
-
-        :arg1: TODO
-        :returns: TODO
-
-        """
+        """Trigger action in MainApplication on selection "add object."""
         self.parent.create_dialog()
 
     def delete_object(self, event=None):
-        """TODO: Docstring for delete_object
-
-        :arg1: TODO
-        :returns: TODO
-
-        """
+        """Trigger action in MainApplication on selection "delete object."""
         self.parent.delete_dialog()
 
 
-class KeyValueSection(ttk.Frame):
+class Editor(ttk.Frame):
     """ Section where configurations can be edited."""
 
     def __init__(self, parent, *args, **kwargs):
@@ -579,10 +571,10 @@ class KeyValueSection(ttk.Frame):
     def save_entry_value(self, event, flat_keys):
         value = event.widget.get()
         self.parent.update_json_dict(value, flat_keys)
-        self.parent.refresh_editor(flat_keys)
+        self.parent.refresh_monitor(flat_keys)
 
 
-class Editor(ttk.Frame):
+class Monitor(ttk.Frame):
     def __init__(self, parent, *args, **kwargs):
         ttk.Frame.__init__(self, parent, *args, **kwargs)
         self.parent = parent
@@ -642,7 +634,7 @@ class Editor(ttk.Frame):
         self.textfield.configure(state=tk.DISABLED)
 
         if end:
-            self.parent.editor.textfield.see(end)
+            self.parent.monitor.textfield.see(end)
 
     def adjust_textfield(self):
         self.textfield.configure(width=self.textfield_width)
@@ -784,7 +776,7 @@ class CreateDialog(dialog_window.Dialog):
 
         self.parent.data_object.set_prev_tf_length()
         self.parent.data_object.update_tags(value, flat_keys)
-        self.parent.refresh_editor(flat_keys)
+        self.parent.refresh_monitor(flat_keys)
 
     def toggle_objectname_field(self, entry_widgets, checkbox):
         for ew in entry_widgets:
@@ -838,7 +830,7 @@ class DeleteDialog(dialog_window.Dialog):
         self.parent.data_object.gen_flat_key_dict()
         self.parent.create_entry_widgets()
         self.parent.data_object.clean_dirty_tags(flat_keys)
-        self.parent.refresh_editor()
+        self.parent.refresh_monitor()
 
     def _update_label_cb(self, event=None):
         try:
@@ -857,12 +849,12 @@ class MainApplication(ttk.Frame):
         self.init_data_object()
 
         # Create GUI elements
+        self.monitor = Monitor(self)
         self.editor = Editor(self)
-        self.key_value_section = KeyValueSection(self)
 
         # Place GUI elements
-        self.key_value_section.grid(row = 0, column = 1)
-        self.editor.grid(row=0, column=0, sticky=tk.NS)
+        self.editor.grid(row = 0, column = 1)
+        self.monitor.grid(row=0, column=0, sticky=tk.NS)
 
         # Add menu bar
         self.menubar = MenuBar(self)
@@ -877,8 +869,8 @@ class MainApplication(ttk.Frame):
         self.parent.bind('<Control-Shift-s>', self.menubar.save_as)
         self.parent.bind('<Control-Shift-S>', self.menubar.save_as)
         # bind quit shortcut
-        self.parent.bind('<Control-Q>', self.quit_editor)
-        self.parent.bind('<Control-q>', self.quit_editor)
+        self.parent.bind('<Control-Q>', self.quit_monitor)
+        self.parent.bind('<Control-q>', self.quit_monitor)
         # bind add object
         self.parent.bind('<Control-Shift-O>', self.menubar.add_object)
         self.parent.bind('<Control-Shift-o>', self.menubar.add_object)
@@ -893,7 +885,7 @@ class MainApplication(ttk.Frame):
             self.data_object.name = file_name
             self.set_title()
             self.data_object.import_file(file_name)
-            self.editor.insert(self.data_object.json_str)
+            self.monitor.insert(self.data_object.json_str)
             self.create_entry_widgets()
 
     def set_title(self):
@@ -909,7 +901,7 @@ class MainApplication(ttk.Frame):
     def clear_do_tags(self):
         self.data_object.dirty_tags.clear()
 
-    def refresh_editor(self, flat_keys=None):
+    def refresh_monitor(self, flat_keys=None):
         dtags = []
 
         for fkey in self.data_object.dirty_tags:
@@ -918,11 +910,11 @@ class MainApplication(ttk.Frame):
 
         try:
             end = self.data_object.get_coords(flat_keys, 1)
-            self.editor.refresh(self.data_object.json_str, dtags, end)
+            self.monitor.refresh(self.data_object.json_str, dtags, end)
         except TypeError:
-            self.editor.refresh(self.data_object.json_str, dtags)
+            self.monitor.refresh(self.data_object.json_str, dtags)
 
-    def quit_editor(self, event=None):
+    def quit_monitor(self, event=None):
         self.parent.destroy()
 
     def create_dialog(self):
@@ -949,11 +941,11 @@ class MainApplication(ttk.Frame):
 
     def create_entry_widgets(self):
         jdf_nodes = self.data_object.json_dict_flat.items()
-        self.key_value_section.create_entry_widgets(jdf_nodes)
+        self.editor.create_entry_widgets(jdf_nodes)
 
     def destroy_splash(self):
-        self.editor.destroy_splash()
-        self.editor.adjust_textfield()
+        self.monitor.destroy_splash()
+        self.monitor.adjust_textfield()
 
 
 if __name__ == "__main__":
